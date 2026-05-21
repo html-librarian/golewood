@@ -10,6 +10,8 @@ export default {
   unitsLoadingOffers: 'Updating prices…',
   unitsForNights: 'for {n} nights',
   unitsPickDates: 'Select dates and guests',
+  propertyCapacityMeta: 'Up to {guests} guests · {units} units',
+  propertyCapacityGuestsOnly: 'Up to {guests} guests',
   propertyBookingHint: 'Pick a unit — each has its own price, photos, and rules.',
   guests: 'guests',
   guestsCapacityExtended: 'Up to {max} guests ({included} included)',

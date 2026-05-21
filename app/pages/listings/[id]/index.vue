@@ -208,8 +208,6 @@ const isTeamListing = computed(() => Boolean(listing.value?.managedByTeam))
 const isPropertyComplex = computed(() => listing.value?.kind === 'property')
 const propertyUnits = computed(() => listing.value?.units ?? [])
 
-const propertyGuests = ref('2')
-
 const propertyUnitsLabels = computed(() => ({
   title: t('unitsTitle'),
   empty: t('unitsEmpty'),
@@ -247,6 +245,14 @@ const claimLabels = computed(() => ({
 const capacityLabel = computed(() => {
   if (!listing.value) {
     return ''
+  }
+
+  if (listing.value.kind === 'property') {
+    const unitsCount = propertyUnits.value.length
+
+    return unitsCount > 0
+      ? t('propertyCapacityMeta', { guests: listing.value.maxGuests, units: unitsCount })
+      : t('propertyCapacityGuestsOnly', { guests: listing.value.maxGuests })
   }
 
   if (listing.value.extraGuestsOffered && listing.value.maxGuestsWithExtra) {
@@ -751,36 +757,20 @@ const listingMapLabel = computed(() => {
         />
 
         <template v-if="isPropertyComplex">
-          <section class="scroll-mt-32 space-y-4 rounded-xl border border-stone-200 bg-stone-50 p-4 dark:border-stone-700 dark:bg-stone-900/50">
-            <p class="text-sm font-medium text-stone-900 dark:text-stone-100">
-              {{ t('unitsPickDates') }}
-            </p>
-            <div class="grid gap-3 sm:grid-cols-3">
-              <FormInput
-                v-model="checkIn"
-                type="date"
-                :label="$t('search.checkIn')"
-              />
-              <FormInput
-                v-model="checkOut"
-                type="date"
-                :label="$t('search.checkOut')"
-              />
-              <FormInput
-                v-model="propertyGuests"
-                type="number"
-                min="1"
-                :label="$t('search.guests')"
-              />
-            </div>
-          </section>
+          <ListingPropertyBookingFields
+            v-model:check-in="checkIn"
+            v-model:check-out="checkOut"
+            v-model:guests="guests"
+            class="scroll-mt-32"
+            :title="t('unitsPickDates')"
+          />
 
           <ListingPropertyUnits
             :property-id="listing.id"
             :units="propertyUnits"
             :check-in="checkIn"
             :check-out="checkOut"
-            :guests="Number(propertyGuests) || 2"
+            :guests="guests"
             :labels="propertyUnitsLabels"
           />
         </template>

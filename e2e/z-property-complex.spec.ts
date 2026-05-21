@@ -21,12 +21,13 @@ test.describe('property complex', () => {
     expect(property).toBeTruthy()
 
     await loginWithOtp(page)
-    await gotoReady(page, `/listings/${property!.id}`)
+    await gotoReady(
+      page,
+      `/listings/${property!.id}?checkIn=${CHECK_IN}&checkOut=${CHECK_OUT}&guests=2`,
+    )
 
+    await expect(page.getByTestId('listing-property-booking-fields')).toBeVisible()
     await expect(page.getByTestId('listing-property-units')).toBeVisible()
-
-    await page.getByLabel(/заезд|check-in/i).fill(CHECK_IN)
-    await page.getByLabel(/выезд|check-out/i).fill(CHECK_OUT)
 
     const bookLink = page.locator('a').filter({
       has: page.getByRole('button', { name: /забронировать|book/i }),

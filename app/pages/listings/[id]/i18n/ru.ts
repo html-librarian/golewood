@@ -10,6 +10,8 @@ export default {
   unitsLoadingOffers: 'Обновляем цены…',
   unitsForNights: 'за {n} ночей',
   unitsPickDates: 'Выберите даты и гостей',
+  propertyCapacityMeta: 'До {guests} гостей · {units} домиков',
+  propertyCapacityGuestsOnly: 'До {guests} гостей',
   propertyBookingHint: 'Выберите домик — у каждого своя цена, фото и условия.',
   guests: 'гостей',
   guestsCapacityExtended: 'До {max} гостей ({included} в цене)',
