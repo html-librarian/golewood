@@ -6,7 +6,6 @@ export interface SearchFiltersProps {
   amenities: Amenity[]
   accommodationTypes: string[]
   teamBadgeSlugs: string[]
-  teamCatalog: boolean
 }
 
 export interface SearchFiltersEmits {
@@ -15,5 +14,4 @@ export interface SearchFiltersEmits {
   'update:amenities': [value: Amenity[]]
   'update:accommodationTypes': [value: string[]]
   'update:teamBadgeSlugs': [value: string[]]
-  'update:teamCatalog': [value: boolean]
 }

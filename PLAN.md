@@ -940,3 +940,19 @@ app/pages/search/
 - [x] Reindex-подсказка в `DEPLOY.md` после миграций каталога
 
 **Настройка prod:** после `db:migrate` — **Reindex** (§6 `DEPLOY.md`). MAX — см. фазы 11–12 (только env + business.max.ru).
+
+---
+
+## Запуск в production (ops) — [LAUNCH.md](LAUNCH.md)
+
+**Код:** ✅ `npm run verify:all` (57 E2E). **Осталось на стороне инфраструктуры:**
+
+- [ ] `git push` → зелёный CI
+- [ ] VPS: DNS, `.env`, `check:prod`, `docker compose -f docker-compose.prod.yml up -d --build`
+- [ ] `db:migrate` + reindex Meilisearch
+- [ ] Caddy/TLS, YooKassa webhook, S3, SMTP
+- [ ] `SITE_URL=… npm run smoke:prod`
+- [ ] Host payouts (YooKassa split)
+- [ ] MAX (опционально) — пункты фаз 11–12 ниже
+
+**UI (v68):** фильтр «Только каталог Golewood» убран из поиска; метки Golewood выше типа жилья; пустое состояние поиска (`SearchEmptyState`).

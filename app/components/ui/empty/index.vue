@@ -8,13 +8,13 @@ withDefaults(defineProps<UiEmptyProps>(), {
 
 <template>
   <div class="surface-card mx-auto max-w-md p-10 text-center">
-    <div class="mx-auto flex size-16 items-center justify-center rounded-2xl bg-brand-50 dark:bg-brand-950/60">
+    <div class="mx-auto flex size-16 items-center justify-center rounded-2xl bg-brand-50 ring-1 ring-brand-100/80 dark:bg-brand-950/60 dark:ring-brand-900/50">
       <Icon
         :name="icon"
         class="size-8 text-brand-600 dark:text-brand-400"
       />
     </div>
-    <h2 class="mt-5 font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
+    <h2 class="mt-5 text-lg font-semibold tracking-tight text-stone-900 dark:text-stone-50">
       {{ title }}
     </h2>
     <p

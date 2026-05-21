@@ -175,7 +175,7 @@ git push -u origin main
 
 On push/PR to `main`, GitHub Actions runs `npm run verify`, E2E (`SEED_E2E=1`), and a **Docker build** of the production image. Requires Postgres, Redis and Meilisearch service containers (see `.github/workflows/ci.yml`).
 
-**Production:** checklist and env vars — [`DEPLOY.md`](DEPLOY.md). After deploy: `SITE_URL=https://golewood.ru npm run smoke:prod`.
+**Production:** quick checklist — [`LAUNCH.md`](LAUNCH.md), full guide — [`DEPLOY.md`](DEPLOY.md). After deploy: `SITE_URL=https://golewood.ru npm run smoke:prod`.
 
 ## Architecture
 

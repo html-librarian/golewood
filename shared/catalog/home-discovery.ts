@@ -6,7 +6,7 @@ export type HomeDiscoveryFilter = {
   labelEn: string
   icon: string
   tone: string
-  params: Pick<SearchParams, 'city' | 'amenities' | 'teamCatalog'>
+  params: Pick<SearchParams, 'city' | 'amenities' | 'teamBadgeSlugs' | 'accommodationTypes'>
 }
 
 export type HomeDiscoveryGroup = {

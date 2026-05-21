@@ -103,41 +103,6 @@ const toggleTeamBadge = (slug: string) => {
     />
 
     <div
-      v-if="accommodationTypeCatalog?.length"
-      class="space-y-2 border-t border-stone-200 pt-4 dark:border-stone-800"
-    >
-      <p class="text-sm font-semibold text-stone-900 dark:text-stone-100">
-        {{ $t('search.accommodationTypes') }}
-      </p>
-      <ul class="space-y-2">
-        <li
-          v-for="item in accommodationTypeCatalog"
-          :key="item.slug"
-        >
-          <FormCheckbox
-            :model-value="accommodationTypes.includes(item.slug)"
-            @update:model-value="toggleAccommodationType(item.slug)"
-          >
-            <span class="inline-flex min-w-0 items-center gap-1.5">
-              <Icon
-                :name="item.icon"
-                class="size-4 shrink-0 text-brand-700 dark:text-brand-400"
-              />
-              <span>{{ accommodationLabel(item) }}</span>
-            </span>
-          </FormCheckbox>
-        </li>
-      </ul>
-    </div>
-
-    <FormCheckbox
-      class="border-t border-stone-200 pt-4 dark:border-stone-800"
-      :model-value="teamCatalog"
-      :label="$t('search.teamCatalogOnly')"
-      @update:model-value="emit('update:teamCatalog', $event)"
-    />
-
-    <div
       v-if="teamBadges?.length"
       class="space-y-2 border-t border-stone-200 pt-4 dark:border-stone-800"
     >
@@ -159,6 +124,34 @@ const toggleTeamBadge = (slug: string) => {
                 class="size-4 shrink-0 text-brand-700 dark:text-brand-400"
               />
               <span>{{ badgeLabel(badge.slug, badge.titleRu, badge.titleEn) }}</span>
+            </span>
+          </FormCheckbox>
+        </li>
+      </ul>
+    </div>
+
+    <div
+      v-if="accommodationTypeCatalog?.length"
+      class="space-y-2 border-t border-stone-200 pt-4 dark:border-stone-800"
+    >
+      <p class="text-sm font-semibold text-stone-900 dark:text-stone-100">
+        {{ $t('search.accommodationTypes') }}
+      </p>
+      <ul class="space-y-2">
+        <li
+          v-for="item in accommodationTypeCatalog"
+          :key="item.slug"
+        >
+          <FormCheckbox
+            :model-value="accommodationTypes.includes(item.slug)"
+            @update:model-value="toggleAccommodationType(item.slug)"
+          >
+            <span class="inline-flex min-w-0 items-center gap-1.5">
+              <Icon
+                :name="item.icon"
+                class="size-4 shrink-0 text-brand-700 dark:text-brand-400"
+              />
+              <span>{{ accommodationLabel(item) }}</span>
             </span>
           </FormCheckbox>
         </li>

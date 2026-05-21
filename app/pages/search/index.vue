@@ -39,7 +39,6 @@ const applyRouteToForm = (params: SearchParams) => {
   form.amenities = (params.amenities ?? []) as Amenity[]
   form.accommodationTypes = [...(params.accommodationTypes ?? [])]
   form.teamBadgeSlugs = [...(params.teamBadgeSlugs ?? [])]
-  form.teamCatalog = Boolean(params.teamCatalog)
 }
 
 const routeSearchParams = computed(() =>
@@ -59,7 +58,6 @@ const form = reactive({
   amenities: [] as Amenity[],
   accommodationTypes: [] as string[],
   teamBadgeSlugs: [] as string[],
-  teamCatalog: false,
 })
 
 applyRouteToForm(routeSearchParams.value)
@@ -124,7 +122,6 @@ const formToSearchParams = (page = 1): SearchParams => ({
   amenities: form.amenities.length ? form.amenities : undefined,
   accommodationTypes: form.accommodationTypes.length ? form.accommodationTypes : undefined,
   teamBadgeSlugs: form.teamBadgeSlugs.length ? form.teamBadgeSlugs : undefined,
-  teamCatalog: form.teamCatalog || undefined,
   page: normalizeSearchPage(page),
   pageSize: routeSearchParams.value.pageSize,
 })
@@ -201,7 +198,6 @@ watch(
     [...form.amenities].sort().join(','),
     [...form.accommodationTypes].sort().join(','),
     [...form.teamBadgeSlugs].sort().join(','),
-    form.teamCatalog ? '1' : '',
   ],
   () => {
     clearTimeout(filterApplyTimer)
@@ -303,13 +299,32 @@ const activeFiltersCount = computed(() => {
 
   count += form.amenities.length
   count += form.teamBadgeSlugs.length
-
-  if (form.teamCatalog) {
-    count += 1
-  }
+  count += form.accommodationTypes.length
 
   return count
 })
+
+const hasActiveFilters = computed(() => activeFiltersCount.value > 0)
+
+const resultsSummary = computed(() => {
+  if (showSkeleton.value) {
+    return `${t('results')}…`
+  }
+
+  const total = results.value?.total ?? 0
+
+  return total === 0 ? t('resultsNone') : `${t('results')}: ${total}`
+})
+
+const clearSearchFilters = async () => {
+  form.minPrice = ''
+  form.maxPrice = ''
+  form.amenities = []
+  form.accommodationTypes = []
+  form.teamBadgeSlugs = []
+  form.sort = ''
+  await runSearch(1)
+}
 
 const showListPanel = computed(() => isLgUp.value || mobileView.value === 'list')
 const showMapPanel = computed(() => isLgUp.value || mobileView.value === 'map')
@@ -410,13 +425,12 @@ watch(mobileView, (view) => {
         v-model:amenities="form.amenities"
         v-model:accommodation-types="form.accommodationTypes"
         v-model:team-badge-slugs="form.teamBadgeSlugs"
-        v-model:team-catalog="form.teamCatalog"
         class="hidden lg:sticky lg:top-32 lg:block lg:self-start"
       />
 
       <div class="flex flex-col gap-3 lg:hidden">
         <p class="text-sm font-medium text-stone-600 dark:text-stone-400">
-          {{ t('results') }}: {{ showSkeleton ? '…' : (results?.total ?? 0) }}
+          {{ resultsSummary }}
         </p>
 
         <div class="flex flex-wrap items-center gap-2">
@@ -487,7 +501,6 @@ watch(mobileView, (view) => {
             v-model:amenities="form.amenities"
             v-model:accommodation-types="form.accommodationTypes"
             v-model:team-badge-slugs="form.teamBadgeSlugs"
-            v-model:team-catalog="form.teamCatalog"
           />
         </div>
       </div>
@@ -496,11 +509,19 @@ watch(mobileView, (view) => {
         class="flex min-w-0 flex-col"
         :class="{ 'max-lg:hidden': !showListPanel }"
       >
-        <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <p class="text-sm font-medium text-stone-600 dark:text-stone-400">
-            {{ t('results') }}: {{ showSkeleton ? '…' : (results?.total ?? 0) }}
+        <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p
+            class="text-sm font-medium"
+            :class="(results?.total ?? 0) === 0 && !showSkeleton
+              ? 'text-stone-500 dark:text-stone-500'
+              : 'text-stone-700 dark:text-stone-300'"
+          >
+            {{ resultsSummary }}
           </p>
-          <SearchSort v-model="form.sort" />
+          <SearchSort
+            v-if="(results?.total ?? 0) > 0 || showSkeleton"
+            v-model="form.sort"
+          />
         </div>
 
         <div
@@ -531,16 +552,17 @@ watch(mobileView, (view) => {
           </div>
         </div>
 
-        <UiEmpty
+        <SearchEmptyState
           v-else-if="!results?.items.length"
-          icon="ph:magnifying-glass-duotone"
+          :has-active-filters="hasActiveFilters"
           :title="t('empty')"
           :description="t('emptyDescription')"
-        >
-          <NuxtLink :to="localePath('/search')">
-            <UiButton variant="outline">{{ t('resetSearch') }}</UiButton>
-          </NuxtLink>
-        </UiEmpty>
+          :clear-filters-label="t('clearFilters')"
+          :reset-search-label="t('resetSearch')"
+          :tip-dates="t('emptyTipDates')"
+          :tip-city="t('emptyTipCity')"
+          @clear-filters="clearSearchFilters"
+        />
 
         <div
           v-else
