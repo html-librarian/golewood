@@ -37,9 +37,15 @@ else
   warn 'docker not running (needed for prod:up)'
 fi
 
+if [[ -d .output/server ]]; then
+  ok 'production build (.output) present'
+else
+  warn 'no .output — run npm run verify or npm run build'
+fi
+
 echo ""
-echo "Code quality (run manually if unsure):"
-echo "  npm run verify:all"
+echo "Code quality:"
+echo "  npm run launch:verify   # verify + 57 E2E (~3 min)"
 echo ""
 echo "Production env:"
 if [[ -f .env ]]; then
