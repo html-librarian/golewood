@@ -1,0 +1,15 @@
+export default {
+  title: 'Новый комплекс',
+  subtitle: 'Глэмпинг, база отдыха или несколько домиков на одной территории. У каждого домика будут своя цена, фото и условия.',
+  nameLabel: 'Название комплекса',
+  cityLabel: 'Город',
+  addressLabel: 'Адрес',
+  descriptionLabel: 'О комплексе',
+  checkInOutTitle: 'Заезд и выезд',
+  checkInOutHint: 'Общее время для комплекса — гости увидят на странице глэмпинга.',
+  checkInTimeLabel: 'Заезд',
+  checkOutTimeLabel: 'Выезд',
+  submit: 'Создать комплекс',
+  cancel: 'К списку объявлений',
+  error: 'Не удалось создать комплекс',
+} as const

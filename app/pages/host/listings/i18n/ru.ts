@@ -1,0 +1,22 @@
+export default {
+  title: 'Мои объявления',
+  create: 'Создать объявление',
+  createProperty: 'Создать комплекс',
+  propertyBadge: 'Комплекс',
+  unitsBadge: '{count} домиков',
+  empty: 'У вас пока нет объявлений',
+  emptyFiltered: 'Нет объявлений в этой категории',
+  edit: 'Редактировать',
+  calendar: 'Календарь',
+  stories: 'Сторис',
+  news: 'Новости',
+  promote: 'Продвижение',
+  giftCertificates: 'Сертификаты',
+  archive: 'В архив',
+  restore: 'Восстановить',
+  filters: {
+    all: 'Все',
+    active: 'Активные',
+    archived: 'В архиве',
+  },
+} as const

@@ -1,0 +1,23 @@
+export default {
+  title: 'My bookings',
+  myStoriesLink: 'My stories',
+  myStoriesHint: 'Stories from your trips (24h)',
+  empty: 'You have no bookings yet',
+  emptyFiltered: 'No bookings in this category',
+  emptyDescription: 'Find a place and book your first trip',
+  explore: 'Browse listings',
+  cancel: 'Cancel',
+  pay: 'Pay',
+  leaveReview: 'Leave a review',
+  report: 'Report',
+  reported: 'Report submitted',
+  filters: {
+    all: 'All',
+    upcoming: 'Upcoming',
+    past: 'Past',
+  },
+  refundFull: 'Cancellation refund: {amount}',
+  refundPartial: 'Cancellation refund: {amount} ({percent}%)',
+  refundNone: 'No refund per cancellation policy',
+  giftCertificateApplied: 'Certificate −{amount}',
+} as const

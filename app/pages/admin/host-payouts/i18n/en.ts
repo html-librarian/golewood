@@ -1,0 +1,16 @@
+export default {
+  title: 'Host payouts',
+  subtitle: 'After YooKassa onboarding, paste the recipient account_id and activate the profile.',
+  empty: 'No pending applications',
+  phone: 'Phone',
+  userId: 'User ID',
+  inn: 'Tax ID (INN)',
+  bik: 'BIK',
+  bankAccount: 'Bank account',
+  recipientId: 'YooKassa account_id (split recipient)',
+  activate: 'Enable payouts',
+  reject: 'Reject',
+  recipientRequired: 'Enter account_id from the YooKassa dashboard',
+  actionFailed: 'Could not save',
+  defaultRejectReason: 'Please check your details and submit again',
+} as const

@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  NUXT_DATABASE_URL: postgresql://golewood:golewood@localhost:5432/golewood
+  NUXT_REDIS_URL: redis://localhost:6379
+  NUXT_MEILI_HOST: http://localhost:7700
+  NUXT_JWT_SECRET: ci-jwt-secret-not-for-production
+  NUXT_AUTH_DEV_CODE: '0000'
+  NUXT_PUBLIC_SITE_URL: http://localhost:3000
+  NUXT_RATE_LIMIT_MAX: '0'
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: golewood
+          POSTGRES_PASSWORD: golewood
+          POSTGRES_DB: golewood
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U golewood -d golewood"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      meilisearch:
+        image: getmeili/meilisearch:v1.11
+        env:
+          MEILI_ENV: development
+          MEILI_NO_ANALYTICS: 'true'
+        ports:
+          - 7700:7700
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run db:migrate
+      - run: npm run verify
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: lint-test-build
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: golewood
+          POSTGRES_PASSWORD: golewood
+          POSTGRES_DB: golewood
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U golewood -d golewood"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      meilisearch:
+        image: getmeili/meilisearch:v1.11
+        env:
+          MEILI_ENV: development
+          MEILI_NO_ANALYTICS: 'true'
+        ports:
+          - 7700:7700
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run db:migrate
+      - run: npx playwright install chromium --with-deps
+      - run: npm run test:e2e
+        env:
+          CI: true
+          SEED_E2E: '1'

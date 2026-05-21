@@ -1,0 +1,413 @@
+{
+  "seo": {
+    "defaultTitle": "Golewood — short-term rentals",
+    "defaultDescription": "Short-term apartment and home rentals. Search, book and pay online.",
+    "homeTitle": "Short-term rentals",
+    "searchTitle": "Search listings"
+  },
+  "common": {
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "home": "Home",
+    "search": "Search",
+    "bookings": "Bookings",
+    "favorites": "Favorites",
+    "messages": "Messages",
+    "host": "Host",
+    "rentOut": "List your place",
+    "hostCabinet": "Host dashboard",
+    "admin": "Admin",
+    "login": "Login",
+    "account": "Account",
+    "logout": "Log out",
+    "emDash": "—",
+    "loading": "Loading…",
+    "menu": "Menu",
+    "closeMenu": "Close menu"
+  },
+  "story": {
+    "anonymous": "Guest",
+    "guestOnlyPage": "Stories are for guest accounts only.",
+    "myStories": "My stories"
+  },
+  "spotlight": {
+    "yourVote": "Your vote",
+    "vote": "Vote",
+    "voted": "Voted",
+    "anonymous": "Guest",
+    "heroCredit": "Photo of the month · {listing}",
+    "link": "Photo of the month"
+  },
+  "blog": {
+    "link": "Blog",
+    "readMore": "Read review",
+    "back": "Back to blog",
+    "relatedListing": "Listing",
+    "viewListing": "View on Golewood",
+    "teamReview": "Team review"
+  },
+  "listing": {
+    "noPhoto": "No photo",
+    "noPhotos": "No photos",
+    "perNight": "/ night",
+    "priceFrom": "from",
+    "propertyComplex": "Property complex",
+    "unitsCount": "{count} units",
+    "guests": "guests",
+    "bedrooms": "bedrooms",
+    "reviews": "reviews",
+    "openListing": "Open listing",
+    "teamReviewTitle": "Team review",
+    "teamReviewReadFull": "Read full review",
+    "hostNewsTitle": "News from the host",
+    "hostNewsPreview": "Host update",
+    "teamCatalog": "Golewood catalog"
+  },
+  "listingSectionNav": {
+    "ariaLabel": "Listing sections"
+  },
+  "listingNews": {
+    "title": "News from the host",
+    "scrollPrev": "Previous",
+    "scrollNext": "Next",
+    "like": "Like",
+    "dislike": "Dislike"
+  },
+  "form": {
+    "selectPlaceholder": "Select…",
+    "datesPlaceholder": "Check-in — check-out",
+    "pickDates": "Select stay dates",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "decrease": "Decrease",
+    "increase": "Increase",
+    "citySearch": "Search city…",
+    "cityEmpty": "No cities found",
+    "cityClear": "Clear city",
+    "cityOpen": "Open city list",
+    "cityClose": "Close city list",
+    "cityDefaultHint": "“{city}” was filled in automatically from your location",
+    "filePickerPick": "Attach files",
+    "filePickerRemove": "Remove file",
+    "localeTabs": {
+      "aria": "Content language",
+      "ru": "Russian",
+      "en": "English"
+    },
+    "richText": {
+      "toolbar": "Text formatting",
+      "bold": "Bold",
+      "italic": "Italic",
+      "heading": "Heading",
+      "bulletList": "Bullet list",
+      "orderedList": "Numbered list",
+      "quote": "Quote"
+    }
+  },
+  "listingMedia": {
+    "photosTitle": "Photos",
+    "photosHint": "Up to {maxMb} MB per file, compressed on the server",
+    "uploadPhotos": "Upload photos",
+    "cover": "Cover",
+    "videosTitle": "Videos",
+    "videosHint": "Optional. Paste a public link from Rutube, VK Video, or YouTube.",
+    "videoLabel": "Video link",
+    "videoPlaceholder": "https://youtube.com/watch?v=…",
+    "addVideo": "Add to listing",
+    "documentsTitle": "Documents for guests",
+    "documentsHint": "Optional. PDF or image: house rules, check-in guide, etc.",
+    "documentTitleLabel": "Document name",
+    "documentTitlePlaceholder": "e.g. House rules",
+    "pickDocument": "Choose file on your device",
+    "pickDocumentHint": "PDF, Word, or image",
+    "uploadDocument": "Upload document",
+    "changeDocument": "Choose another file",
+    "noDocumentSelected": "No file selected",
+    "photoTooLarge": "File is too large",
+    "uploadError": "Upload failed",
+    "videoError": "Unsupported video URL",
+    "documentError": "Document upload failed"
+  },
+  "search": {
+    "city": "Where",
+    "cityPlaceholder": "Moscow",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "dates": "Dates",
+    "guests": "Guests",
+    "submit": "Search",
+    "filters": "Filters",
+    "minPrice": "Min price",
+    "maxPrice": "Max price",
+    "sortLabel": "Sort by",
+    "amenities": "Amenities",
+    "accommodationTypes": "Property type",
+    "teamBadges": "Golewood badges",
+    "teamCatalogOnly": "Golewood catalog only",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "mapExpand": "Full screen",
+    "mapClose": "Exit full screen",
+    "sort": {
+      "default": "Default",
+      "price_asc": "Price: low to high",
+      "price_desc": "Price: high to low",
+      "distance": "Distance"
+    },
+    "mapFallback": "Fallback map (primary tiles unavailable)"
+  },
+  "booking": {
+    "guests": "Guests",
+    "calendarUnavailableHint": "Crossed-out dates are taken (bookings via the site or host blocks) and cannot be selected.",
+    "hostCalendarHint": "Click two dates to block a range. Click a grey manual block again to remove it. Red = Golewood bookings, amber = iCal import.",
+    "book": "Book now",
+    "selectDates": "Select dates",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "total": "Total",
+    "myBookings": "My bookings",
+    "hostBookings": "Listing bookings",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "empty": "No bookings yet",
+    "booked": "Booking created",
+    "pay": "Pay",
+    "paymentStatus": "Payment",
+    "nights": "nights",
+    "cleaningFee": "Cleaning fee",
+    "serviceFee": "Golewood service fee",
+    "serviceFeePercent": "Platform service fee is {percent}% on top of the host stay price.",
+    "transfer": "Transfer",
+    "transferOnRequestHint": "Price agreed with the host after booking",
+    "transferOnRequestNote": "Transfer: price agreed with the host",
+    "extraGuests": "Extra guests ({count})",
+    "extraGuestsHint": "{included} guests included in the rate. Each extra guest — {price} per night.",
+    "priceIncludesNote": "Total due: stay, extra guests, transfer, and platform service fee",
+    "bonusBalance": "Bonuses: {amount}",
+    "bonusApply": "Pay with bonuses",
+    "bonusApplied": "Bonuses",
+    "cashDue": "Due by card",
+    "bonusMaxHint": "Up to {amount} ({percent}% of total)",
+    "bonusLoginHint": "Sign in to use bonuses",
+    "giftCertificateCode": "Gift certificate code",
+    "giftCertificateApply": "Apply",
+    "giftCertificateClear": "Remove",
+    "giftCertificateApplied": "Gift certificate",
+    "giftCertificateInvalid": "Invalid, expired, or already used code",
+    "giftCertificateHint": "Nominal is deducted from the booking total at checkout"
+  },
+  "error": {
+    "notFound": "Page not found",
+    "default": "Something went wrong",
+    "home": "Back to home"
+  },
+  "payment": {
+    "title": "Booking payment",
+    "payNow": "Proceed to payment",
+    "processing": "Processing payment…",
+    "success": "Payment successful",
+    "returnHint": "You will return here after payment",
+    "backToBookings": "Back to my bookings",
+    "bonusApplied": "Bonuses applied",
+    "cashDue": "Due by card",
+    "paidWithBonuses": "Fully paid with bonuses"
+  },
+  "promotion": {
+    "recommended": "Recommended",
+    "cityPinBadge": "Top in city",
+    "cityPinHeroLabel": "Pinned in your city",
+    "points": "points",
+    "activeUntil": "until {date}",
+    "purchase": "Activate",
+    "purchased": "Promotion activated",
+    "insufficientBalance": "Insufficient promo balance"
+  },
+  "hostVerification": {
+    "verifiedShort": "Verified",
+    "providerInfo": "Provider information",
+    "close": "Close",
+    "modalTitle": "Provider information",
+    "modalSubtitle": "Reference details",
+    "hostSection": "Accommodation provided by",
+    "platformSection": "Platform (aggregator)",
+    "inn": "Tax ID (INN)",
+    "ogrn": "OGRN",
+    "address": "Address",
+    "workingHours": "Working hours",
+    "workingHoursDefault": "according to the property check-in and check-out times"
+  },
+  "share": {
+    "title": "Share",
+    "copyLink": "Copy link",
+    "copied": "Link copied",
+    "vk": "VK",
+    "ok": "Odnoklassniki",
+    "pinterest": "Pinterest",
+    "telegram": "Telegram"
+  },
+  "review": {
+    "title": "Reviews",
+    "empty": "No reviews yet",
+    "average": "Average rating",
+    "rating": "Rating",
+    "ratingsTitle": "Rate your stay",
+    "ratingsHint": "Score each category from 1 to 10",
+    "text": "Your review",
+    "submit": "Submit review",
+    "submitted": "Review submitted for moderation",
+    "leaveReview": "Leave a review",
+    "selectRating": "Select a rating",
+    "selectAllRatings": "Rate all categories",
+    "minLength": "Review must be at least 10 characters",
+    "anonymousGuest": "Guest",
+    "ratingAriaLabel": "{dimension}: {value} out of 10",
+    "photos": "Trip photos",
+    "photosHint": "Up to 8 photos, 8 MB each",
+    "addPhotos": "Add photos",
+    "totalCount": "{count} reviews | {count} review | {count} reviews | {count} reviews",
+    "postedToday": "today",
+    "postedDaysAgo": "{count} days ago | {count} day ago | {count} days ago | {count} days ago",
+    "postedWeeksAgo": "{count} weeks ago | {count} week ago | {count} weeks ago | {count} weeks ago",
+    "stayPeriod": "{period}, {nights} {nightsLabel}",
+    "nights": "nights | night | nights | nights",
+    "stayGuests": "{count} adults | {count} adult | {count} adults | {count} adults",
+    "overallScore": "Overall score {score}",
+    "dimensions": {
+      "cleanliness": "Cleanliness",
+      "checkIn": "Check-in timeliness",
+      "location": "Location",
+      "photoMatch": "Matches photos",
+      "value": "Value for money",
+      "service": "Service quality"
+    },
+    "replyHost": "Host",
+    "replyGuest": "Guest",
+    "replyAction": "Reply",
+    "replyPlaceholder": "Your reply…",
+    "replySubmit": "Post reply",
+    "replySubmitError": "Could not post reply",
+    "pendingModeration": "Pending moderation",
+    "pendingReviewsTitle": "Reviews awaiting moderation",
+    "pendingReviewsHint": "After an admin approves the review, guests will see it and you can reply."
+  },
+  "admin": {
+    "hostVerification": {
+      "verificationTitle": "Host verification",
+      "loading": "Loading…",
+      "verified": "Verified host (show badge)",
+      "legalType": "Provider type",
+      "legalTypes": {
+        "company": "Legal entity",
+        "individual": "Individual entrepreneur"
+      },
+      "legalName": "Legal name",
+      "inn": "Tax ID (INN)",
+      "ogrn": "OGRN / OGRNIP",
+      "legalAddress": "Legal address",
+      "workingHoursNote": "Working hours (optional)",
+      "saveVerification": "Save verification",
+      "showForm": "Verification & legal details"
+    },
+    "nav": {
+      "sectionOverview": "Overview",
+      "sectionSupport": "Support",
+      "sectionOperations": "Operations",
+      "sectionCatalog": "Content",
+      "dashboard": "Dashboard",
+      "listings": "Listings",
+      "users": "Users",
+      "hostPayouts": "Host payouts",
+      "reports": "Reports",
+      "supportRequests": "Inbox",
+      "cities": "Cities",
+      "news": "Listing news",
+      "amenities": "Amenities",
+      "teamBadges": "Team badges",
+      "spotlight": "Photo of the month",
+      "blog": "Blog"
+    }
+  },
+  "hostListingActions": {
+    "calendar": "Calendar",
+    "stories": "Stories",
+    "news": "News",
+    "promote": "Promotion",
+    "edit": "Edit",
+    "archive": "Archive",
+    "restore": "Restore"
+  },
+  "host": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "listings": "Listings",
+      "bookings": "Bookings",
+      "giftCertificates": "Gift certs",
+      "promo": "Promotion",
+      "payout": "Payouts",
+      "guide": "Guide"
+    },
+    "guide": {
+      "navAria": "Host help sections",
+      "nav": {
+        "overview": "Overview",
+        "listings": "Listings",
+        "bookings": "Bookings",
+        "calendar": "Calendar",
+        "messages": "Messages",
+        "promo": "Promotion"
+      }
+    }
+  },
+  "report": {
+    "reason": "Describe the issue",
+    "submit": "Submit report",
+    "submitted": "Report submitted",
+    "reportListing": "Report this listing",
+    "reportBooking": "Report"
+  },
+  "footer": {
+    "tagline": "Comfortable stays for your trips — book directly with trusted hosts.",
+    "help": "Help",
+    "legal": "Legal",
+    "service": "Service"
+  },
+  "cookieConsent": {
+    "message": "We use cookies and similar technologies for sign-in, language, theme, and site security. Learn more in our ",
+    "privacyLink": "Privacy policy",
+    "accept": "Accept"
+  },
+  "legalConsent": {
+    "prefix": "By registering or continuing to use the site you accept the ",
+    "and": " and ",
+    "suffix": "."
+  },
+  "legal": {
+    "nav": {
+      "overview": "Legal information",
+      "requisites": "Company details",
+      "offer": "Public offer",
+      "privacy": "Privacy policy",
+      "terms": "Terms of use"
+    }
+  },
+  "chart": {
+    "totalPeriod": "Last {days} days",
+    "perDay": "Daily average",
+    "peak": "Peak",
+    "emptyHint": "When there is activity in this period, you will see a daily trend here.",
+    "emptyHintRevenue": "Daily revenue will appear here: booking commission, points, and gift certificates.",
+    "noValuesInPeriod": "No payments in the last 30 days yet — the axis is ready; bars will appear after the first transactions."
+  },
+  "help": {
+    "nav": {
+      "overview": "Overview",
+      "faq": "Q&A",
+      "becomeHost": "How to host",
+      "createListing": "Publish a listing",
+      "support": "Support"
+    }
+  }
+}

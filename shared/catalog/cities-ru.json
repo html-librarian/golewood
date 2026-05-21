@@ -1,0 +1,1622 @@
+[
+  {
+    "name": "Москва",
+    "nameEn": "Moscow",
+    "sortOrder": 1
+  },
+  {
+    "name": "Санкт-Петербург",
+    "nameEn": "Saint Petersburg",
+    "sortOrder": 2
+  },
+  {
+    "name": "Новосибирск",
+    "nameEn": "Novosibirsk",
+    "sortOrder": 3
+  },
+  {
+    "name": "Екатеринбург",
+    "nameEn": "Yekaterinburg",
+    "sortOrder": 4
+  },
+  {
+    "name": "Казань",
+    "nameEn": "Kazan",
+    "sortOrder": 5
+  },
+  {
+    "name": "Нижний Новгород",
+    "nameEn": "Nizhny Novgorod",
+    "sortOrder": 6
+  },
+  {
+    "name": "Челябинск",
+    "nameEn": "Chelyabinsk",
+    "sortOrder": 7
+  },
+  {
+    "name": "Красноярск",
+    "nameEn": "Krasnoyarsk",
+    "sortOrder": 8
+  },
+  {
+    "name": "Самара",
+    "nameEn": "Samara",
+    "sortOrder": 9
+  },
+  {
+    "name": "Уфа",
+    "nameEn": "Ufa",
+    "sortOrder": 10
+  },
+  {
+    "name": "Ростов-на-Дону",
+    "nameEn": "Rostov-on-Don",
+    "sortOrder": 11
+  },
+  {
+    "name": "Омск",
+    "nameEn": "Omsk",
+    "sortOrder": 12
+  },
+  {
+    "name": "Краснодар",
+    "nameEn": "Krasnodar",
+    "sortOrder": 13
+  },
+  {
+    "name": "Воронеж",
+    "nameEn": "Voronezh",
+    "sortOrder": 14
+  },
+  {
+    "name": "Пермь",
+    "nameEn": "Perm",
+    "sortOrder": 15
+  },
+  {
+    "name": "Волгоград",
+    "nameEn": "Volgograd",
+    "sortOrder": 16
+  },
+  {
+    "name": "Саратов",
+    "nameEn": "Saratov",
+    "sortOrder": 17
+  },
+  {
+    "name": "Тюмень",
+    "nameEn": "Tyumen",
+    "sortOrder": 18
+  },
+  {
+    "name": "Тольятти",
+    "nameEn": "Tolyatti",
+    "sortOrder": 19
+  },
+  {
+    "name": "Барнаул",
+    "nameEn": "Barnaul",
+    "sortOrder": 20
+  },
+  {
+    "name": "Ижевск",
+    "nameEn": "Izhevsk",
+    "sortOrder": 21
+  },
+  {
+    "name": "Махачкала",
+    "nameEn": "Makhachkala",
+    "sortOrder": 22
+  },
+  {
+    "name": "Хабаровск",
+    "nameEn": "Khabarovsk",
+    "sortOrder": 23
+  },
+  {
+    "name": "Ульяновск",
+    "nameEn": "Ulyanovsk",
+    "sortOrder": 24
+  },
+  {
+    "name": "Иркутск",
+    "nameEn": "Irkutsk",
+    "sortOrder": 25
+  },
+  {
+    "name": "Владивосток",
+    "nameEn": "Vladivostok",
+    "sortOrder": 26
+  },
+  {
+    "name": "Ярославль",
+    "nameEn": "Yaroslavl",
+    "sortOrder": 27
+  },
+  {
+    "name": "Кемерово",
+    "nameEn": "Kemerovo",
+    "sortOrder": 28
+  },
+  {
+    "name": "Томск",
+    "nameEn": "Tomsk",
+    "sortOrder": 29
+  },
+  {
+    "name": "Набережные Челны",
+    "nameEn": "Naberezhnye Chelny",
+    "sortOrder": 30
+  },
+  {
+    "name": "Севастополь",
+    "nameEn": "Sevastopol",
+    "sortOrder": 31
+  },
+  {
+    "name": "Ставрополь",
+    "nameEn": "Stavropol",
+    "sortOrder": 32
+  },
+  {
+    "name": "Оренбург",
+    "nameEn": "Orenburg",
+    "sortOrder": 33
+  },
+  {
+    "name": "Новокузнецк",
+    "nameEn": "Novokuznetsk",
+    "sortOrder": 34
+  },
+  {
+    "name": "Рязань",
+    "nameEn": "Ryazan",
+    "sortOrder": 35
+  },
+  {
+    "name": "Балашиха",
+    "nameEn": "Balashikha",
+    "sortOrder": 36
+  },
+  {
+    "name": "Пенза",
+    "nameEn": "Penza",
+    "sortOrder": 37
+  },
+  {
+    "name": "Чебоксары",
+    "nameEn": "Cheboksary",
+    "sortOrder": 38
+  },
+  {
+    "name": "Липецк",
+    "nameEn": "Lipetsk",
+    "sortOrder": 39
+  },
+  {
+    "name": "Калининград",
+    "nameEn": "Kaliningrad",
+    "sortOrder": 40
+  },
+  {
+    "name": "Астрахань",
+    "nameEn": "Astrakhan",
+    "sortOrder": 41
+  },
+  {
+    "name": "Тула",
+    "nameEn": "Tula",
+    "sortOrder": 42
+  },
+  {
+    "name": "Киров",
+    "nameEn": "Kirov",
+    "sortOrder": 43
+  },
+  {
+    "name": "Сочи",
+    "nameEn": "Sochi",
+    "sortOrder": 44
+  },
+  {
+    "name": "Курск",
+    "nameEn": "Kursk",
+    "sortOrder": 45
+  },
+  {
+    "name": "Улан-Удэ",
+    "nameEn": "Ulan-Ude",
+    "sortOrder": 46
+  },
+  {
+    "name": "Тверь",
+    "nameEn": "Tver",
+    "sortOrder": 47
+  },
+  {
+    "name": "Магнитогорск",
+    "nameEn": "Magnitogorsk",
+    "sortOrder": 48
+  },
+  {
+    "name": "Сургут",
+    "nameEn": "Surgut",
+    "sortOrder": 49
+  },
+  {
+    "name": "Брянск",
+    "nameEn": "Bryansk",
+    "sortOrder": 50
+  },
+  {
+    "name": "Иваново",
+    "nameEn": "Ivanovo",
+    "sortOrder": 51
+  },
+  {
+    "name": "Якутск",
+    "nameEn": "Yakutsk",
+    "sortOrder": 52
+  },
+  {
+    "name": "Владимир",
+    "nameEn": "Vladimir",
+    "sortOrder": 53
+  },
+  {
+    "name": "Белгород",
+    "nameEn": "Belgorod",
+    "sortOrder": 54
+  },
+  {
+    "name": "Нижний Тагил",
+    "nameEn": "Nizhny Tagil",
+    "sortOrder": 55
+  },
+  {
+    "name": "Калуга",
+    "nameEn": "Kaluga",
+    "sortOrder": 56
+  },
+  {
+    "name": "Чита",
+    "nameEn": "Chita",
+    "sortOrder": 57
+  },
+  {
+    "name": "Грозный",
+    "nameEn": "Grozny",
+    "sortOrder": 58
+  },
+  {
+    "name": "Волжский",
+    "nameEn": "Volzhsky",
+    "sortOrder": 59
+  },
+  {
+    "name": "Смоленск",
+    "nameEn": "Smolensk",
+    "sortOrder": 60
+  },
+  {
+    "name": "Подольск",
+    "nameEn": "Podolsk",
+    "sortOrder": 61
+  },
+  {
+    "name": "Саранск",
+    "nameEn": "Saransk",
+    "sortOrder": 62
+  },
+  {
+    "name": "Вологда",
+    "nameEn": "Vologda",
+    "sortOrder": 63
+  },
+  {
+    "name": "Курган",
+    "nameEn": "Kurgan",
+    "sortOrder": 64
+  },
+  {
+    "name": "Череповец",
+    "nameEn": "Cherepovets",
+    "sortOrder": 65
+  },
+  {
+    "name": "Орёл",
+    "nameEn": "Oryol",
+    "sortOrder": 66
+  },
+  {
+    "name": "Архангельск",
+    "nameEn": "Arkhangelsk",
+    "sortOrder": 67
+  },
+  {
+    "name": "Владикавказ",
+    "nameEn": "Vladikavkaz",
+    "sortOrder": 68
+  },
+  {
+    "name": "Нижневартовск",
+    "nameEn": "Nizhnevartovsk",
+    "sortOrder": 69
+  },
+  {
+    "name": "Йошкар-Ола",
+    "nameEn": "Yoshkar-Ola",
+    "sortOrder": 70
+  },
+  {
+    "name": "Стерлитамак",
+    "nameEn": "Sterlitamak",
+    "sortOrder": 71
+  },
+  {
+    "name": "Мурманск",
+    "nameEn": "Murmansk",
+    "sortOrder": 72
+  },
+  {
+    "name": "Кострома",
+    "nameEn": "Kostroma",
+    "sortOrder": 73
+  },
+  {
+    "name": "Новороссийск",
+    "nameEn": "Novorossiysk",
+    "sortOrder": 74
+  },
+  {
+    "name": "Тамбов",
+    "nameEn": "Tambov",
+    "sortOrder": 75
+  },
+  {
+    "name": "Химки",
+    "nameEn": "Khimki",
+    "sortOrder": 76
+  },
+  {
+    "name": "Мытищи",
+    "nameEn": "Mytishchi",
+    "sortOrder": 77
+  },
+  {
+    "name": "Нальчик",
+    "nameEn": "Nalchik",
+    "sortOrder": 78
+  },
+  {
+    "name": "Таганрог",
+    "nameEn": "Taganrog",
+    "sortOrder": 79
+  },
+  {
+    "name": "Нижнекамск",
+    "nameEn": "Nizhnekamsk",
+    "sortOrder": 80
+  },
+  {
+    "name": "Благовещенск",
+    "nameEn": "Blagoveshchensk",
+    "sortOrder": 81
+  },
+  {
+    "name": "Комсомольск-на-Амуре",
+    "nameEn": "Komsomolsk-on-Amur",
+    "sortOrder": 82
+  },
+  {
+    "name": "Петрозаводск",
+    "nameEn": "Petrozavodsk",
+    "sortOrder": 83
+  },
+  {
+    "name": "Королёв",
+    "nameEn": "Korolyov",
+    "sortOrder": 84
+  },
+  {
+    "name": "Шахты",
+    "nameEn": "Shakhty",
+    "sortOrder": 85
+  },
+  {
+    "name": "Энгельс",
+    "nameEn": "Engels",
+    "sortOrder": 86
+  },
+  {
+    "name": "Великий Новгород",
+    "nameEn": "Veliky Novgorod",
+    "sortOrder": 87
+  },
+  {
+    "name": "Люберцы",
+    "nameEn": "Lyubertsy",
+    "sortOrder": 88
+  },
+  {
+    "name": "Братск",
+    "nameEn": "Bratsk",
+    "sortOrder": 89
+  },
+  {
+    "name": "Старый Оскол",
+    "nameEn": "Stary Oskol",
+    "sortOrder": 90
+  },
+  {
+    "name": "Ангарск",
+    "nameEn": "Angarsk",
+    "sortOrder": 91
+  },
+  {
+    "name": "Сыктывкар",
+    "nameEn": "Syktyvkar",
+    "sortOrder": 92
+  },
+  {
+    "name": "Дзержинск",
+    "nameEn": "Dzerzhinsk",
+    "sortOrder": 93
+  },
+  {
+    "name": "Псков",
+    "nameEn": "Pskov",
+    "sortOrder": 94
+  },
+  {
+    "name": "Орск",
+    "nameEn": "Orsk",
+    "sortOrder": 95
+  },
+  {
+    "name": "Красногорск",
+    "nameEn": "Krasnogorsk",
+    "sortOrder": 96
+  },
+  {
+    "name": "Армавир",
+    "nameEn": "Armavir",
+    "sortOrder": 97
+  },
+  {
+    "name": "Абакан",
+    "nameEn": "Abakan",
+    "sortOrder": 98
+  },
+  {
+    "name": "Балаково",
+    "nameEn": "Balakovo",
+    "sortOrder": 99
+  },
+  {
+    "name": "Бийск",
+    "nameEn": "Biysk",
+    "sortOrder": 100
+  },
+  {
+    "name": "Южно-Сахалинск",
+    "nameEn": "Yuzhno-Sakhalinsk",
+    "sortOrder": 101
+  },
+  {
+    "name": "Одинцово",
+    "nameEn": "Odintsovo",
+    "sortOrder": 102
+  },
+  {
+    "name": "Уссурийск",
+    "nameEn": "Ussuriysk",
+    "sortOrder": 103
+  },
+  {
+    "name": "Прокопьевск",
+    "nameEn": "Prokopyevsk",
+    "sortOrder": 104
+  },
+  {
+    "name": "Рыбинск",
+    "nameEn": "Rybinsk",
+    "sortOrder": 105
+  },
+  {
+    "name": "Норильск",
+    "nameEn": "Norilsk",
+    "sortOrder": 106
+  },
+  {
+    "name": "Волгодонск",
+    "nameEn": "Volgodonsk",
+    "sortOrder": 107
+  },
+  {
+    "name": "Сызрань",
+    "nameEn": "Syzran",
+    "sortOrder": 108
+  },
+  {
+    "name": "Петропавловск-Камчатский",
+    "nameEn": "Petropavlovsk-Kamchatsky",
+    "sortOrder": 109
+  },
+  {
+    "name": "Каменск-Уральский",
+    "nameEn": "Kamensk-Uralsky",
+    "sortOrder": 110
+  },
+  {
+    "name": "Новочеркасск",
+    "nameEn": "Novocherkassk",
+    "sortOrder": 111
+  },
+  {
+    "name": "Альметьевск",
+    "nameEn": "Almetyevsk",
+    "sortOrder": 112
+  },
+  {
+    "name": "Златоуст",
+    "nameEn": "Zlatoust",
+    "sortOrder": 113
+  },
+  {
+    "name": "Северодвинск",
+    "nameEn": "Severodvinsk",
+    "sortOrder": 114
+  },
+  {
+    "name": "Хасавюрт",
+    "nameEn": "Khasavyurt",
+    "sortOrder": 115
+  },
+  {
+    "name": "Керчь",
+    "nameEn": "Kerch",
+    "sortOrder": 116
+  },
+  {
+    "name": "Домодедово",
+    "nameEn": "Domodedovo",
+    "sortOrder": 117
+  },
+  {
+    "name": "Мелитополь",
+    "nameEn": "Melitopol",
+    "sortOrder": 118
+  },
+  {
+    "name": "Салават",
+    "nameEn": "Salavat",
+    "sortOrder": 119
+  },
+  {
+    "name": "Миасс",
+    "nameEn": "Miass",
+    "sortOrder": 120
+  },
+  {
+    "name": "Копейск",
+    "nameEn": "Kopeysk",
+    "sortOrder": 121
+  },
+  {
+    "name": "Пятигорск",
+    "nameEn": "Pyatigorsk",
+    "sortOrder": 122
+  },
+  {
+    "name": "Электросталь",
+    "nameEn": "Elektrostal",
+    "sortOrder": 123
+  },
+  {
+    "name": "Майкоп",
+    "nameEn": "Maykop",
+    "sortOrder": 124
+  },
+  {
+    "name": "Находка",
+    "nameEn": "Nakhodka",
+    "sortOrder": 125
+  },
+  {
+    "name": "Березники",
+    "nameEn": "Berezniki",
+    "sortOrder": 126
+  },
+  {
+    "name": "Коломна",
+    "nameEn": "Kolomna",
+    "sortOrder": 127
+  },
+  {
+    "name": "Щёлково",
+    "nameEn": "Shchyolkovo",
+    "sortOrder": 128
+  },
+  {
+    "name": "Серпухов",
+    "nameEn": "Serpukhov",
+    "sortOrder": 129
+  },
+  {
+    "name": "Ковров",
+    "nameEn": "Kovrov",
+    "sortOrder": 130
+  },
+  {
+    "name": "Нефтекамск",
+    "nameEn": "Neftekamsk",
+    "sortOrder": 131
+  },
+  {
+    "name": "Кисловодск",
+    "nameEn": "Kislovodsk",
+    "sortOrder": 132
+  },
+  {
+    "name": "Батайск",
+    "nameEn": "Bataysk",
+    "sortOrder": 133
+  },
+  {
+    "name": "Рубцовск",
+    "nameEn": "Rubtsovsk",
+    "sortOrder": 134
+  },
+  {
+    "name": "Обнинск",
+    "nameEn": "Obninsk",
+    "sortOrder": 135
+  },
+  {
+    "name": "Кызыл",
+    "nameEn": "Kyzyl",
+    "sortOrder": 136
+  },
+  {
+    "name": "Дербент",
+    "nameEn": "Derbent",
+    "sortOrder": 137
+  },
+  {
+    "name": "Нефтеюганск",
+    "nameEn": "Nefteyugansk",
+    "sortOrder": 138
+  },
+  {
+    "name": "Назрань",
+    "nameEn": "Nazran",
+    "sortOrder": 139
+  },
+  {
+    "name": "Каспийск",
+    "nameEn": "Kaspiysk",
+    "sortOrder": 140
+  },
+  {
+    "name": "Долгопрудный",
+    "nameEn": "Dolgoprudny",
+    "sortOrder": 141
+  },
+  {
+    "name": "Новочебоксарск",
+    "nameEn": "Novocheboksarsk",
+    "sortOrder": 142
+  },
+  {
+    "name": "Новомосковск",
+    "nameEn": "Novomoskovsk",
+    "sortOrder": 143
+  },
+  {
+    "name": "Ессентуки",
+    "nameEn": "Yessentuki",
+    "sortOrder": 144
+  },
+  {
+    "name": "Невинномысск",
+    "nameEn": "Nevinnomyssk",
+    "sortOrder": 145
+  },
+  {
+    "name": "Октябрьский",
+    "nameEn": "Oktyabrsky",
+    "sortOrder": 146
+  },
+  {
+    "name": "Раменское",
+    "nameEn": "Ramenskoye",
+    "sortOrder": 147
+  },
+  {
+    "name": "Первоуральск",
+    "nameEn": "Pervouralsk",
+    "sortOrder": 148
+  },
+  {
+    "name": "Михайловск",
+    "nameEn": "Mikhaylovsk",
+    "sortOrder": 149
+  },
+  {
+    "name": "Реутов",
+    "nameEn": "Reutov",
+    "sortOrder": 150
+  },
+  {
+    "name": "Черкесск",
+    "nameEn": "Cherkessk",
+    "sortOrder": 151
+  },
+  {
+    "name": "Жуковский",
+    "nameEn": "Zhukovsky",
+    "sortOrder": 152
+  },
+  {
+    "name": "Димитровград",
+    "nameEn": "Dimitrovgrad",
+    "sortOrder": 153
+  },
+  {
+    "name": "Пушкино",
+    "nameEn": "Pushkino",
+    "sortOrder": 154
+  },
+  {
+    "name": "Артём",
+    "nameEn": "Artyom",
+    "sortOrder": 155
+  },
+  {
+    "name": "Камышин",
+    "nameEn": "Kamyshin",
+    "sortOrder": 156
+  },
+  {
+    "name": "Евпатория",
+    "nameEn": "Yevpatoriya",
+    "sortOrder": 157
+  },
+  {
+    "name": "Муром",
+    "nameEn": "Murom",
+    "sortOrder": 158
+  },
+  {
+    "name": "Ханты-Мансийск",
+    "nameEn": "Khanty-Mansiysk",
+    "sortOrder": 159
+  },
+  {
+    "name": "Новый Уренгой",
+    "nameEn": "Novy Urengoy",
+    "sortOrder": 160
+  },
+  {
+    "name": "Северск",
+    "nameEn": "Seversk",
+    "sortOrder": 161
+  },
+  {
+    "name": "Бердянск",
+    "nameEn": "Berdyansk",
+    "sortOrder": 162
+  },
+  {
+    "name": "Алчевск",
+    "nameEn": "Alchevsk",
+    "sortOrder": 163
+  },
+  {
+    "name": "Орехово-Зуево",
+    "nameEn": "Orekhovo-Zuyevo",
+    "sortOrder": 164
+  },
+  {
+    "name": "Арзамас",
+    "nameEn": "Arzamas",
+    "sortOrder": 165
+  },
+  {
+    "name": "Ногинск",
+    "nameEn": "Noginsk",
+    "sortOrder": 166
+  },
+  {
+    "name": "Новошахтинск",
+    "nameEn": "Novoshakhtinsk",
+    "sortOrder": 167
+  },
+  {
+    "name": "Бердск",
+    "nameEn": "Berdsk",
+    "sortOrder": 168
+  },
+  {
+    "name": "Элиста",
+    "nameEn": "Elista",
+    "sortOrder": 169
+  },
+  {
+    "name": "Сергиев Посад",
+    "nameEn": "Sergiyev Posad",
+    "sortOrder": 170
+  },
+  {
+    "name": "Видное",
+    "nameEn": "Vidnoye",
+    "sortOrder": 171
+  },
+  {
+    "name": "Ачинск",
+    "nameEn": "Achinsk",
+    "sortOrder": 172
+  },
+  {
+    "name": "Тобольск",
+    "nameEn": "Tobolsk",
+    "sortOrder": 173
+  },
+  {
+    "name": "Ноябрьск",
+    "nameEn": "Noyabrsk",
+    "sortOrder": 174
+  },
+  {
+    "name": "Елец",
+    "nameEn": "Yelets",
+    "sortOrder": 175
+  },
+  {
+    "name": "Зеленодольск",
+    "nameEn": "Zelenodolsk",
+    "sortOrder": 176
+  },
+  {
+    "name": "Северодонецк",
+    "nameEn": "Severodonetsk",
+    "sortOrder": 177
+  },
+  {
+    "name": "Новокуйбышевск",
+    "nameEn": "Novokuybyshevsk",
+    "sortOrder": 178
+  },
+  {
+    "name": "Воткинск",
+    "nameEn": "Votkinsk",
+    "sortOrder": 179
+  },
+  {
+    "name": "Железногорск",
+    "nameEn": "Zheleznogorsk",
+    "sortOrder": 180
+  },
+  {
+    "name": "Междуреченск",
+    "nameEn": "Mezhdurechensk",
+    "sortOrder": 181
+  },
+  {
+    "name": "Воскресенск",
+    "nameEn": "Voskresensk",
+    "sortOrder": 182
+  },
+  {
+    "name": "Гатчина",
+    "nameEn": "Gatchina",
+    "sortOrder": 183
+  },
+  {
+    "name": "Серов",
+    "nameEn": "Serov",
+    "sortOrder": 184
+  },
+  {
+    "name": "Саров",
+    "nameEn": "Sarov",
+    "sortOrder": 185
+  },
+  {
+    "name": "Лисичанск",
+    "nameEn": "Lisichansk",
+    "sortOrder": 186
+  },
+  {
+    "name": "Ленинск-Кузнецкий",
+    "nameEn": "Leninsk-Kuznetsky",
+    "sortOrder": 187
+  },
+  {
+    "name": "Сарапул",
+    "nameEn": "Sarapul",
+    "sortOrder": 188
+  },
+  {
+    "name": "Магадан",
+    "nameEn": "Magadan",
+    "sortOrder": 189
+  },
+  {
+    "name": "Мичуринск",
+    "nameEn": "Michurinsk",
+    "sortOrder": 190
+  },
+  {
+    "name": "Соликамск",
+    "nameEn": "Solikamsk",
+    "sortOrder": 191
+  },
+  {
+    "name": "Мурино",
+    "nameEn": "Murino",
+    "sortOrder": 192
+  },
+  {
+    "name": "Чехов",
+    "nameEn": "Chekhov",
+    "sortOrder": 193
+  },
+  {
+    "name": "Клин",
+    "nameEn": "Klin",
+    "sortOrder": 194
+  },
+  {
+    "name": "Бузулук",
+    "nameEn": "Buzuluk",
+    "sortOrder": 195
+  },
+  {
+    "name": "Глазов",
+    "nameEn": "Glazov",
+    "sortOrder": 196
+  },
+  {
+    "name": "Канск",
+    "nameEn": "Kansk",
+    "sortOrder": 197
+  },
+  {
+    "name": "Великие Луки",
+    "nameEn": "Velikiye Luki",
+    "sortOrder": 198
+  },
+  {
+    "name": "Каменск-Шахтинский",
+    "nameEn": "Kamensk-Shakhtinsky",
+    "sortOrder": 199
+  },
+  {
+    "name": "Губкин",
+    "nameEn": "Gubkin",
+    "sortOrder": 200
+  },
+  {
+    "name": "Киселёвск",
+    "nameEn": "Kiselyovsk",
+    "sortOrder": 201
+  },
+  {
+    "name": "Ейск",
+    "nameEn": "Yeysk",
+    "sortOrder": 202
+  },
+  {
+    "name": "Ивантеевка",
+    "nameEn": "Ivanteyevka",
+    "sortOrder": 203
+  },
+  {
+    "name": "Лобня",
+    "nameEn": "Lobnya",
+    "sortOrder": 204
+  },
+  {
+    "name": "Азов",
+    "nameEn": "Azov",
+    "sortOrder": 205
+  },
+  {
+    "name": "Анапа",
+    "nameEn": "Anapa",
+    "sortOrder": 206
+  },
+  {
+    "name": "Бугульма",
+    "nameEn": "Bugulma",
+    "sortOrder": 207
+  },
+  {
+    "name": "Геленджик",
+    "nameEn": "Gelendzhik",
+    "sortOrder": 208
+  },
+  {
+    "name": "Ухта",
+    "nameEn": "Ukhta",
+    "sortOrder": 209
+  },
+  {
+    "name": "Юрга",
+    "nameEn": "Yurga",
+    "sortOrder": 210
+  },
+  {
+    "name": "Усть-Илимск",
+    "nameEn": "Ust-Ilimsk",
+    "sortOrder": 211
+  },
+  {
+    "name": "Красный Луч",
+    "nameEn": "Krasny Luch",
+    "sortOrder": 212
+  },
+  {
+    "name": "Всеволожск",
+    "nameEn": "Vsevolozhsk",
+    "sortOrder": 213
+  },
+  {
+    "name": "Новоуральск",
+    "nameEn": "Novouralsk",
+    "sortOrder": 214
+  },
+  {
+    "name": "Кузнецк",
+    "nameEn": "Kuznetsk",
+    "sortOrder": 215
+  },
+  {
+    "name": "Бор",
+    "nameEn": "Bor",
+    "sortOrder": 216
+  },
+  {
+    "name": "Кинешма",
+    "nameEn": "Kineshma",
+    "sortOrder": 217
+  },
+  {
+    "name": "Озёрск",
+    "nameEn": "Ozyorsk",
+    "sortOrder": 218
+  },
+  {
+    "name": "Енакиево",
+    "nameEn": "Yenakiyevo",
+    "sortOrder": 219
+  },
+  {
+    "name": "Новотроицк",
+    "nameEn": "Novotroitsk",
+    "sortOrder": 220
+  },
+  {
+    "name": "Кропоткин",
+    "nameEn": "Kropotkin",
+    "sortOrder": 221
+  },
+  {
+    "name": "Чайковский",
+    "nameEn": "Chaykovsky",
+    "sortOrder": 222
+  },
+  {
+    "name": "Черногорск",
+    "nameEn": "Chernogorsk",
+    "sortOrder": 223
+  },
+  {
+    "name": "Усолье-Сибирское",
+    "nameEn": "Usolye-Sibirskoye",
+    "sortOrder": 224
+  },
+  {
+    "name": "Ялта",
+    "nameEn": "Yalta",
+    "sortOrder": 225
+  },
+  {
+    "name": "Дубна",
+    "nameEn": "Dubna",
+    "sortOrder": 226
+  },
+  {
+    "name": "Балашов",
+    "nameEn": "Balashov",
+    "sortOrder": 227
+  },
+  {
+    "name": "Елабуга",
+    "nameEn": "Yelabuga",
+    "sortOrder": 228
+  },
+  {
+    "name": "Стаханов",
+    "nameEn": "Stakhanov",
+    "sortOrder": 229
+  },
+  {
+    "name": "Новоалтайск",
+    "nameEn": "Novoaltaysk",
+    "sortOrder": 230
+  },
+  {
+    "name": "Выборг",
+    "nameEn": "Vyborg",
+    "sortOrder": 231
+  },
+  {
+    "name": "Егорьевск",
+    "nameEn": "Yegoryevsk",
+    "sortOrder": 232
+  },
+  {
+    "name": "Верхняя Пышма",
+    "nameEn": "Verkhnyaya Pyshma",
+    "sortOrder": 233
+  },
+  {
+    "name": "Наро-Фоминск",
+    "nameEn": "Naro-Fominsk",
+    "sortOrder": 234
+  },
+  {
+    "name": "Бахмут",
+    "nameEn": "Bakhmut",
+    "sortOrder": 235
+  },
+  {
+    "name": "Минеральные Воды",
+    "nameEn": "Mineralnye Vody",
+    "sortOrder": 236
+  },
+  {
+    "name": "Троицк",
+    "nameEn": "Troitsk",
+    "sortOrder": 237
+  },
+  {
+    "name": "Чапаевск",
+    "nameEn": "Chapayevsk",
+    "sortOrder": 238
+  },
+  {
+    "name": "Минусинск",
+    "nameEn": "Minusinsk",
+    "sortOrder": 239
+  },
+  {
+    "name": "Биробиджан",
+    "nameEn": "Birobidzhan",
+    "sortOrder": 240
+  },
+  {
+    "name": "Шадринск",
+    "nameEn": "Shadrinsk",
+    "sortOrder": 241
+  },
+  {
+    "name": "Белово",
+    "nameEn": "Belovo",
+    "sortOrder": 242
+  },
+  {
+    "name": "Туймазы",
+    "nameEn": "Tuymazy",
+    "sortOrder": 243
+  },
+  {
+    "name": "Сертолово",
+    "nameEn": "Sertolovo",
+    "sortOrder": 244
+  },
+  {
+    "name": "Буйнакск",
+    "nameEn": "Buynaksk",
+    "sortOrder": 245
+  },
+  {
+    "name": "Ишим",
+    "nameEn": "Ishim",
+    "sortOrder": 246
+  },
+  {
+    "name": "Кирово-Чепецк",
+    "nameEn": "Kirovo-Chepetsk",
+    "sortOrder": 247
+  },
+  {
+    "name": "Анжеро-Судженск",
+    "nameEn": "Anzhero-Sudzhensk",
+    "sortOrder": 248
+  },
+  {
+    "name": "Феодосия",
+    "nameEn": "Feodosiya",
+    "sortOrder": 249
+  },
+  {
+    "name": "Дмитров",
+    "nameEn": "Dmitrov",
+    "sortOrder": 250
+  },
+  {
+    "name": "Сосновый Бор",
+    "nameEn": "Sosnovy Bor",
+    "sortOrder": 251
+  },
+  {
+    "name": "Горно-Алтайск",
+    "nameEn": "Gorno-Altaysk",
+    "sortOrder": 252
+  },
+  {
+    "name": "Лыткарино",
+    "nameEn": "Lytkarino",
+    "sortOrder": 253
+  },
+  {
+    "name": "Павловский Посад",
+    "nameEn": "Pavlovsky Posad",
+    "sortOrder": 254
+  },
+  {
+    "name": "Белорецк",
+    "nameEn": "Beloretsk",
+    "sortOrder": 255
+  },
+  {
+    "name": "Ступино",
+    "nameEn": "Stupino",
+    "sortOrder": 256
+  },
+  {
+    "name": "Гудермес",
+    "nameEn": "Gudermes",
+    "sortOrder": 257
+  },
+  {
+    "name": "Ишимбай",
+    "nameEn": "Ishimbay",
+    "sortOrder": 258
+  },
+  {
+    "name": "Донской",
+    "nameEn": "Donskoy",
+    "sortOrder": 259
+  },
+  {
+    "name": "Котельники",
+    "nameEn": "Kotelniki",
+    "sortOrder": 260
+  },
+  {
+    "name": "Кстово",
+    "nameEn": "Kstovo",
+    "sortOrder": 261
+  },
+  {
+    "name": "Урус-Мартан",
+    "nameEn": "Urus-Martan",
+    "sortOrder": 262
+  },
+  {
+    "name": "Георгиевск",
+    "nameEn": "Georgiyevsk",
+    "sortOrder": 263
+  },
+  {
+    "name": "Клинцы",
+    "nameEn": "Klintsy",
+    "sortOrder": 264
+  },
+  {
+    "name": "Нягань",
+    "nameEn": "Nyagan",
+    "sortOrder": 265
+  },
+  {
+    "name": "Славянск-на-Кубани",
+    "nameEn": "Slavyansk-na-Kubani",
+    "sortOrder": 266
+  },
+  {
+    "name": "Кунгур",
+    "nameEn": "Kungur",
+    "sortOrder": 267
+  },
+  {
+    "name": "Сунжа",
+    "nameEn": "Sunzha",
+    "sortOrder": 268
+  },
+  {
+    "name": "Туапсе",
+    "nameEn": "Tuapse",
+    "sortOrder": 269
+  },
+  {
+    "name": "Когалым",
+    "nameEn": "Kogalym",
+    "sortOrder": 270
+  },
+  {
+    "name": "Белогорск",
+    "nameEn": "Belogorsk",
+    "sortOrder": 271
+  },
+  {
+    "name": "Лениногорск",
+    "nameEn": "Leninogorsk",
+    "sortOrder": 272
+  },
+  {
+    "name": "Россошь",
+    "nameEn": "Rossosh",
+    "sortOrder": 273
+  },
+  {
+    "name": "Алексин",
+    "nameEn": "Aleksin",
+    "sortOrder": 274
+  },
+  {
+    "name": "Борисоглебск",
+    "nameEn": "Borisoglebsk",
+    "sortOrder": 275
+  },
+  {
+    "name": "Фрязино",
+    "nameEn": "Fryazino",
+    "sortOrder": 276
+  },
+  {
+    "name": "Гуково",
+    "nameEn": "Gukovo",
+    "sortOrder": 277
+  },
+  {
+    "name": "Ревда",
+    "nameEn": "Revda",
+    "sortOrder": 278
+  },
+  {
+    "name": "Прохладный",
+    "nameEn": "Prokhladny",
+    "sortOrder": 279
+  },
+  {
+    "name": "Берёзовский",
+    "nameEn": "Beryozovsky",
+    "sortOrder": 280
+  },
+  {
+    "name": "Белебей",
+    "nameEn": "Belebey",
+    "sortOrder": 281
+  },
+  {
+    "name": "Чистополь",
+    "nameEn": "Chistopol",
+    "sortOrder": 282
+  },
+  {
+    "name": "Заречный",
+    "nameEn": "Zarechny",
+    "sortOrder": 283
+  },
+  {
+    "name": "Будённовск",
+    "nameEn": "Budyonnovsk",
+    "sortOrder": 284
+  },
+  {
+    "name": "Кумертау",
+    "nameEn": "Kumertau",
+    "sortOrder": 285
+  },
+  {
+    "name": "Сальск",
+    "nameEn": "Salsk",
+    "sortOrder": 286
+  },
+  {
+    "name": "Дзержинский",
+    "nameEn": "Dzerzhinsky",
+    "sortOrder": 287
+  },
+  {
+    "name": "Лабинск",
+    "nameEn": "Labinsk",
+    "sortOrder": 288
+  },
+  {
+    "name": "Асбест",
+    "nameEn": "Asbest",
+    "sortOrder": 289
+  },
+  {
+    "name": "Искитим",
+    "nameEn": "Iskitim",
+    "sortOrder": 290
+  },
+  {
+    "name": "Павлово",
+    "nameEn": "Pavlovo",
+    "sortOrder": 291
+  },
+  {
+    "name": "Александров",
+    "nameEn": "Alexandrov",
+    "sortOrder": 292
+  },
+  {
+    "name": "Воркута",
+    "nameEn": "Vorkuta",
+    "sortOrder": 293
+  },
+  {
+    "name": "Сибай",
+    "nameEn": "Sibay",
+    "sortOrder": 294
+  },
+  {
+    "name": "Мелеуз",
+    "nameEn": "Meleuz",
+    "sortOrder": 295
+  },
+  {
+    "name": "Котлас",
+    "nameEn": "Kotlas",
+    "sortOrder": 296
+  },
+  {
+    "name": "Михайловка",
+    "nameEn": "Mikhaylovka",
+    "sortOrder": 297
+  },
+  {
+    "name": "Избербаш",
+    "nameEn": "Izberbash",
+    "sortOrder": 298
+  },
+  {
+    "name": "Краснотурьинск",
+    "nameEn": "Krasnoturyinsk",
+    "sortOrder": 299
+  },
+  {
+    "name": "Белореченск",
+    "nameEn": "Belorechensk",
+    "sortOrder": 300
+  },
+  {
+    "name": "Ржев",
+    "nameEn": "Rzhev",
+    "sortOrder": 301
+  },
+  {
+    "name": "Лесосибирск",
+    "nameEn": "Lesosibirsk",
+    "sortOrder": 302
+  },
+  {
+    "name": "Тихорецк",
+    "nameEn": "Tikhoretsk",
+    "sortOrder": 303
+  },
+  {
+    "name": "Тихвин",
+    "nameEn": "Tikhvin",
+    "sortOrder": 304
+  },
+  {
+    "name": "Рубежное",
+    "nameEn": "Rubezhnoye",
+    "sortOrder": 305
+  },
+  {
+    "name": "Шуя",
+    "nameEn": "Shuya",
+    "sortOrder": 306
+  },
+  {
+    "name": "Полевской",
+    "nameEn": "Polevskoy",
+    "sortOrder": 307
+  },
+  {
+    "name": "Щёкино",
+    "nameEn": "Shchyokino",
+    "sortOrder": 308
+  },
+  {
+    "name": "Шали",
+    "nameEn": "Shali",
+    "sortOrder": 309
+  },
+  {
+    "name": "Вольск",
+    "nameEn": "Volsk",
+    "sortOrder": 310
+  },
+  {
+    "name": "Крымск",
+    "nameEn": "Krymsk",
+    "sortOrder": 311
+  },
+  {
+    "name": "Зеленогорск",
+    "nameEn": "Zelenogorsk",
+    "sortOrder": 312
+  },
+  {
+    "name": "Лиски",
+    "nameEn": "Liski",
+    "sortOrder": 313
+  },
+  {
+    "name": "Лысьва",
+    "nameEn": "Lysva",
+    "sortOrder": 314
+  },
+  {
+    "name": "Нерюнгри",
+    "nameEn": "Neryungri",
+    "sortOrder": 315
+  },
+  {
+    "name": "Волжск",
+    "nameEn": "Volzhsk",
+    "sortOrder": 316
+  },
+  {
+    "name": "Энергодар",
+    "nameEn": "Energodar",
+    "sortOrder": 317
+  },
+  {
+    "name": "Вязьма",
+    "nameEn": "Vyazma",
+    "sortOrder": 318
+  },
+  {
+    "name": "Тимашёвск",
+    "nameEn": "Timashyovsk",
+    "sortOrder": 319
+  },
+  {
+    "name": "Гусь-Хрустальный",
+    "nameEn": "Gus-Khrustalny",
+    "sortOrder": 320
+  },
+  {
+    "name": "Краснокаменск",
+    "nameEn": "Krasnokamensk",
+    "sortOrder": 321
+  },
+  {
+    "name": "Кириши",
+    "nameEn": "Kirishi",
+    "sortOrder": 322
+  },
+  {
+    "name": "Снежинск",
+    "nameEn": "Snezhinsk",
+    "sortOrder": 323
+  },
+  {
+    "name": "Жигулёвск",
+    "nameEn": "Zhigulyovsk",
+    "sortOrder": 324
+  }
+]

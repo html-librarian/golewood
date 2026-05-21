@@ -1,0 +1,16 @@
+export default {
+  title: 'Выплаты хозяевам',
+  subtitle: 'После онбординга в кабинете ЮKassa вставьте account_id получателя и активируйте профиль.',
+  empty: 'Нет заявок на проверке',
+  phone: 'Телефон',
+  userId: 'ID пользователя',
+  inn: 'ИНН',
+  bik: 'БИК',
+  bankAccount: 'Расчётный счёт',
+  recipientId: 'ЮKassa account_id (получатель сплита)',
+  activate: 'Подключить выплаты',
+  reject: 'Отклонить',
+  recipientRequired: 'Укажите account_id из кабинета ЮKassa',
+  actionFailed: 'Не удалось сохранить',
+  defaultRejectReason: 'Проверьте реквизиты и отправьте заявку снова',
+} as const

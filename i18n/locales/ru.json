@@ -1,0 +1,413 @@
+{
+  "seo": {
+    "defaultTitle": "Golewood — аренда жилья",
+    "defaultDescription": "Краткосрочная аренда квартир и домов. Поиск, бронирование и оплата онлайн.",
+    "homeTitle": "Аренда жилья на короткий срок",
+    "searchTitle": "Поиск жилья"
+  },
+  "common": {
+    "language": "Язык",
+    "theme": "Тема",
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "system": "Системная",
+    "home": "Главная",
+    "search": "Поиск",
+    "bookings": "Бронирования",
+    "favorites": "Избранное",
+    "messages": "Сообщения",
+    "host": "Хост",
+    "rentOut": "Сдать жильё",
+    "hostCabinet": "Кабинет хоста",
+    "admin": "Админ",
+    "login": "Вход",
+    "account": "Личный кабинет",
+    "logout": "Выйти",
+    "emDash": "—",
+    "loading": "Загрузка…",
+    "menu": "Меню",
+    "closeMenu": "Закрыть меню"
+  },
+  "story": {
+    "anonymous": "Гость",
+    "guestOnlyPage": "Сторис доступны только гостям. Раздел «Мои сторис» — для аккаунтов с ролью guest.",
+    "myStories": "Мои сторис"
+  },
+  "spotlight": {
+    "yourVote": "Ваш голос",
+    "vote": "Голосовать",
+    "voted": "Голос учтён",
+    "anonymous": "Гость",
+    "heroCredit": "Фото месяца · {listing}",
+    "link": "Фото месяца"
+  },
+  "blog": {
+    "link": "Блог",
+    "readMore": "Читать обзор",
+    "back": "К блогу",
+    "relatedListing": "Объявление",
+    "viewListing": "Смотреть на Golewood",
+    "teamReview": "Обзор команды"
+  },
+  "listing": {
+    "noPhoto": "Нет фото",
+    "noPhotos": "Нет фото",
+    "perNight": "/ ночь",
+    "priceFrom": "от",
+    "propertyComplex": "Комплекс",
+    "unitsCount": "{count} домиков",
+    "guests": "гостей",
+    "bedrooms": "спален",
+    "reviews": "отзывов",
+    "openListing": "Открыть объявление",
+    "teamReviewTitle": "Обзор команды",
+    "teamReviewReadFull": "Читать полный обзор",
+    "hostNewsTitle": "Новости от хоста",
+    "hostNewsPreview": "Новость хоста",
+    "teamCatalog": "Каталог Golewood"
+  },
+  "listingSectionNav": {
+    "ariaLabel": "Разделы объявления"
+  },
+  "listingNews": {
+    "title": "Новости от хоста",
+    "scrollPrev": "Предыдущие",
+    "scrollNext": "Следующие",
+    "like": "Нравится",
+    "dislike": "Не нравится"
+  },
+  "form": {
+    "selectPlaceholder": "Выберите…",
+    "datesPlaceholder": "Заезд — выезд",
+    "pickDates": "Выберите даты проживания",
+    "prevMonth": "Предыдущий месяц",
+    "nextMonth": "Следующий месяц",
+    "decrease": "Уменьшить",
+    "increase": "Увеличить",
+    "citySearch": "Поиск города…",
+    "cityEmpty": "Город не найден",
+    "cityClear": "Сбросить город",
+    "cityOpen": "Открыть список городов",
+    "cityClose": "Закрыть список городов",
+    "cityDefaultHint": "«{city}» подставлен автоматически по вашему местоположению",
+    "filePickerPick": "Прикрепить файлы",
+    "filePickerRemove": "Удалить файл",
+    "localeTabs": {
+      "aria": "Язык контента",
+      "ru": "Русский",
+      "en": "English"
+    },
+    "richText": {
+      "toolbar": "Форматирование текста",
+      "bold": "Жирный",
+      "italic": "Курсив",
+      "heading": "Заголовок",
+      "bulletList": "Список",
+      "orderedList": "Нумерация",
+      "quote": "Цитата"
+    }
+  },
+  "listingMedia": {
+    "photosTitle": "Фотографии",
+    "photosHint": "До {maxMb} МБ на файл, сжатие на сервере",
+    "uploadPhotos": "Загрузить фото",
+    "cover": "Обложка",
+    "videosTitle": "Видео",
+    "videosHint": "Необязательно. Вставьте публичную ссылку — Rutube, VK Video или YouTube.",
+    "videoLabel": "Ссылка на видео",
+    "videoPlaceholder": "https://rutube.ru/video/…",
+    "addVideo": "Добавить в объявление",
+    "documentsTitle": "Документы для гостей",
+    "documentsHint": "Необязательно. PDF или изображение: правила проживания, инструкция по заселению и т.п.",
+    "documentTitleLabel": "Как назвать документ",
+    "documentTitlePlaceholder": "Например: Правила проживания",
+    "pickDocument": "Выбрать файл на компьютере",
+    "pickDocumentHint": "PDF, Word или изображение",
+    "uploadDocument": "Загрузить документ",
+    "changeDocument": "Выбрать другой файл",
+    "noDocumentSelected": "Файл не выбран",
+    "photoTooLarge": "Файл слишком большой",
+    "uploadError": "Не удалось загрузить",
+    "videoError": "Неподдерживаемая ссылка на видео",
+    "documentError": "Не удалось загрузить документ"
+  },
+  "search": {
+    "city": "Куда",
+    "cityPlaceholder": "Москва",
+    "checkIn": "Заезд",
+    "checkOut": "Выезд",
+    "dates": "Даты",
+    "guests": "Гости",
+    "submit": "Найти",
+    "filters": "Фильтры",
+    "minPrice": "Цена от",
+    "maxPrice": "Цена до",
+    "sortLabel": "Сортировка",
+    "amenities": "Удобства",
+    "accommodationTypes": "Тип жилья",
+    "teamBadges": "Метки Golewood",
+    "teamCatalogOnly": "Только каталог Golewood",
+    "showMore": "Показать ещё",
+    "showLess": "Свернуть",
+    "mapExpand": "На весь экран",
+    "mapClose": "Свернуть карту",
+    "sort": {
+      "default": "По умолчанию",
+      "price_asc": "Сначала дешевле",
+      "price_desc": "Сначала дороже",
+      "distance": "По расстоянию"
+    },
+    "mapFallback": "Резервная карта (основные тайлы недоступны)"
+  },
+  "booking": {
+    "guests": "Гости",
+    "calendarUnavailableHint": "Зачёркнутые даты заняты (бронь через сервис или блокировка хозяином) и недоступны для выбора.",
+    "hostCalendarHint": "Кликните две даты, чтобы заблокировать период. Повторный клик по серой дате снимает ручную блокировку. Красные — брони Golewood, жёлтые — импорт iCal.",
+    "book": "Забронировать",
+    "selectDates": "Выбрать даты",
+    "checkIn": "Заезд",
+    "checkOut": "Выезд",
+    "total": "Итого",
+    "myBookings": "Мои бронирования",
+    "hostBookings": "Бронирования объектов",
+    "confirm": "Подтвердить",
+    "cancel": "Отменить",
+    "empty": "Бронирований пока нет",
+    "booked": "Бронирование создано",
+    "pay": "Оплатить",
+    "paymentStatus": "Оплата",
+    "nights": "ночей",
+    "cleaningFee": "Уборка",
+    "serviceFee": "Сервисный сбор Golewood",
+    "serviceFeePercent": "Сервисный сбор платформы — {percent}% от суммы проживания (сверх цены хозяина).",
+    "transfer": "Трансфер",
+    "transferOnRequestHint": "Цена согласуется с хозяином после бронирования",
+    "transferOnRequestNote": "Трансфер: цена согласуется с хозяином",
+    "extraGuests": "Доп. гости ({count})",
+    "extraGuestsHint": "В цену входят {included} гостей. Каждый дополнительный — {price} за ночь.",
+    "priceIncludesNote": "Итого к оплате: проживание, доп. гости, трансфер и сервисный сбор платформы",
+    "bonusBalance": "Бонусы: {amount}",
+    "bonusApply": "Списать бонусы",
+    "bonusApplied": "Бонусы",
+    "cashDue": "К оплате картой",
+    "bonusMaxHint": "До {amount} ({percent}% от суммы)",
+    "bonusLoginHint": "Войдите, чтобы тратить бонусы",
+    "giftCertificateCode": "Код подарочного сертификата",
+    "giftCertificateApply": "Применить",
+    "giftCertificateClear": "Убрать",
+    "giftCertificateApplied": "Сертификат",
+    "giftCertificateInvalid": "Неверный, просроченный или уже использованный код",
+    "giftCertificateHint": "Номинал спишется с суммы брони при оплате"
+  },
+  "error": {
+    "notFound": "Страница не найдена",
+    "default": "Что-то пошло не так",
+    "home": "На главную"
+  },
+  "payment": {
+    "title": "Оплата бронирования",
+    "payNow": "Перейти к оплате",
+    "processing": "Обработка платежа…",
+    "success": "Оплата прошла успешно",
+    "returnHint": "После оплаты вы вернётесь на эту страницу",
+    "backToBookings": "К моим бронированиям",
+    "bonusApplied": "Списано бонусов",
+    "cashDue": "К оплате картой",
+    "paidWithBonuses": "Бронь полностью оплачена бонусами"
+  },
+  "promotion": {
+    "recommended": "Рекомендуем",
+    "cityPinBadge": "В топе города",
+    "cityPinHeroLabel": "Закреплено в городе",
+    "points": "баллов",
+    "activeUntil": "до {date}",
+    "purchase": "Подключить",
+    "purchased": "Продвижение активировано",
+    "insufficientBalance": "Недостаточно баллов на балансе"
+  },
+  "hostVerification": {
+    "verifiedShort": "Проверен",
+    "providerInfo": "Сведения об исполнителе",
+    "close": "Закрыть",
+    "modalTitle": "Сведения об исполнителях",
+    "modalSubtitle": "Справочная информация",
+    "hostSection": "Проживание предоставляет",
+    "platformSection": "Агрегатор",
+    "inn": "ИНН",
+    "ogrn": "ОГРН",
+    "address": "Адрес",
+    "workingHours": "Режим работы",
+    "workingHoursDefault": "в соответствии с временем заезда и выезда объекта"
+  },
+  "share": {
+    "title": "Поделиться",
+    "copyLink": "Копировать ссылку",
+    "copied": "Ссылка скопирована",
+    "vk": "ВКонтакте",
+    "ok": "Одноклассники",
+    "pinterest": "Pinterest",
+    "telegram": "Telegram"
+  },
+  "review": {
+    "title": "Отзывы",
+    "empty": "Отзывов пока нет",
+    "average": "Средняя оценка",
+    "rating": "Оценка",
+    "ratingsTitle": "Оцените поездку",
+    "ratingsHint": "Оценка по каждому параметру от 1 до 10",
+    "text": "Ваш отзыв",
+    "submit": "Отправить отзыв",
+    "submitted": "Отзыв отправлен на модерацию",
+    "leaveReview": "Оставить отзыв",
+    "selectRating": "Выберите оценку",
+    "selectAllRatings": "Оцените все параметры",
+    "minLength": "Отзыв должен быть не короче 10 символов",
+    "anonymousGuest": "Гость",
+    "ratingAriaLabel": "{dimension}: {value} из 10",
+    "photos": "Фото с поездки",
+    "photosHint": "До 8 фото, до 8 МБ каждое",
+    "addPhotos": "Добавить фото",
+    "totalCount": "{count} отзывов | {count} отзыв | {count} отзыва | {count} отзыва",
+    "postedToday": "сегодня",
+    "postedDaysAgo": "{count} дн. назад | {count} день назад | {count} дня назад | {count} дня назад",
+    "postedWeeksAgo": "{count} нед. назад | {count} неделю назад | {count} недели назад | {count} недели назад",
+    "stayPeriod": "{period}, {nights} {nightsLabel}",
+    "nights": "суток | сутки | суток | суток",
+    "stayGuests": "{count} взрослых | {count} взрослый | {count} взрослых | {count} взрослых",
+    "overallScore": "Общая оценка {score}",
+    "dimensions": {
+      "cleanliness": "Чистота",
+      "checkIn": "Своевременность заселения",
+      "location": "Расположение",
+      "photoMatch": "Соответствие фото",
+      "value": "Цена — качество",
+      "service": "Качество обслуживания"
+    },
+    "replyHost": "Хозяин",
+    "replyGuest": "Гость",
+    "replyAction": "Ответить",
+    "replyPlaceholder": "Ваш ответ…",
+    "replySubmit": "Отправить ответ",
+    "replySubmitError": "Не удалось отправить ответ",
+    "pendingModeration": "На модерации",
+    "pendingReviewsTitle": "Отзывы на модерации",
+    "pendingReviewsHint": "После одобления администратором гости увидят отзыв, а вы сможете ответить."
+  },
+  "admin": {
+    "hostVerification": {
+      "verificationTitle": "Проверка хоста",
+      "loading": "Загрузка…",
+      "verified": "Проверенный хост (показывать бейдж)",
+      "legalType": "Тип исполнителя",
+      "legalTypes": {
+        "company": "Юридическое лицо",
+        "individual": "ИП / самозанятый"
+      },
+      "legalName": "Наименование",
+      "inn": "ИНН",
+      "ogrn": "ОГРН / ОГРНИП",
+      "legalAddress": "Юридический адрес",
+      "workingHoursNote": "Режим работы (необязательно)",
+      "saveVerification": "Сохранить проверку",
+      "showForm": "Проверка и юр. данные"
+    },
+    "nav": {
+      "sectionOverview": "Обзор",
+      "sectionSupport": "Поддержка",
+      "sectionOperations": "Операции",
+      "sectionCatalog": "Контент",
+      "dashboard": "Дашборд",
+      "listings": "Объявления",
+      "users": "Пользователи",
+      "hostPayouts": "Выплаты хозяев",
+      "reports": "Жалобы",
+      "supportRequests": "Обращения",
+      "cities": "Города",
+      "news": "Новости объектов",
+      "amenities": "Удобства",
+      "teamBadges": "Метки команды",
+      "spotlight": "Фото месяца",
+      "blog": "Блог"
+    }
+  },
+  "hostListingActions": {
+    "calendar": "Календарь",
+    "stories": "Сторис",
+    "news": "Новости",
+    "promote": "Продвижение",
+    "edit": "Редактировать",
+    "archive": "В архив",
+    "restore": "Восстановить"
+  },
+  "host": {
+    "nav": {
+      "dashboard": "Обзор",
+      "listings": "Объявления",
+      "bookings": "Бронирования",
+      "giftCertificates": "Сертификаты",
+      "promo": "Продвижение",
+      "payout": "Выплаты",
+      "guide": "Обучение"
+    },
+    "guide": {
+      "navAria": "Разделы справки для хозяев",
+      "nav": {
+        "overview": "Обзор",
+        "listings": "Объявления",
+        "bookings": "Бронирования",
+        "calendar": "Календарь",
+        "messages": "Сообщения",
+        "promo": "Продвижение"
+      }
+    }
+  },
+  "report": {
+    "reason": "Опишите проблему",
+    "submit": "Отправить жалобу",
+    "submitted": "Жалоба отправлена",
+    "reportListing": "Пожаловаться на объявление",
+    "reportBooking": "Пожаловаться"
+  },
+  "footer": {
+    "tagline": "Уютное жильё для путешествий — бронируйте напрямую у проверенных хозяев.",
+    "help": "Помощь",
+    "legal": "Документы",
+    "service": "Сервис"
+  },
+  "cookieConsent": {
+    "message": "Мы используем файлы cookie и аналогичные технологии для входа, языка, темы оформления и безопасности сайта. Подробнее — в ",
+    "privacyLink": "Политике конфиденциальности",
+    "accept": "Принять"
+  },
+  "legalConsent": {
+    "prefix": "Регистрируясь или продолжая пользоваться сайтом, вы принимаете ",
+    "and": " и ",
+    "suffix": "."
+  },
+  "legal": {
+    "nav": {
+      "overview": "Правовая информация",
+      "requisites": "Реквизиты",
+      "offer": "Договор оферты",
+      "privacy": "Политика конфиденциальности",
+      "terms": "Пользовательское соглашение"
+    }
+  },
+  "chart": {
+    "totalPeriod": "За {days} дн.",
+    "perDay": "В среднем / день",
+    "peak": "Максимум",
+    "emptyHint": "Когда появятся данные за период, график покажет динамику по дням.",
+    "emptyHintRevenue": "Здесь будет выручка по дням: комиссия с броней, баллы и сертификаты.",
+    "noValuesInPeriod": "За 30 дней пока нет оплат — шкала готова, столбцы появятся после первых транзакций."
+  },
+  "help": {
+    "nav": {
+      "overview": "Обзор",
+      "faq": "Вопросы и ответы",
+      "becomeHost": "Как сдать жильё",
+      "createListing": "Разместить объявление",
+      "support": "Поддержка"
+    }
+  }
+}

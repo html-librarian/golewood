@@ -1,0 +1,23 @@
+export default {
+  title: 'Мои бронирования',
+  myStoriesLink: 'Мои сторис',
+  myStoriesHint: 'Сторис с ваших поездок (24 ч)',
+  empty: 'У вас пока нет бронирований',
+  emptyFiltered: 'Нет бронирований в этой категории',
+  emptyDescription: 'Найдите жильё и забронируйте первую поездку',
+  explore: 'Искать жильё',
+  cancel: 'Отменить',
+  pay: 'Оплатить',
+  leaveReview: 'Оставить отзыв',
+  report: 'Пожаловаться',
+  reported: 'Жалоба отправлена',
+  filters: {
+    all: 'Все',
+    upcoming: 'Предстоящие',
+    past: 'Прошедшие',
+  },
+  refundFull: 'При отмене вернётся {amount}',
+  refundPartial: 'При отмене вернётся {amount} ({percent}%)',
+  refundNone: 'По политике отмены возврат не предусмотрен',
+  giftCertificateApplied: 'Сертификат −{amount}',
+} as const

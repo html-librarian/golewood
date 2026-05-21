@@ -1,0 +1,15 @@
+export default {
+  title: 'New property complex',
+  subtitle: 'A glamping site or several cabins at one location. Each unit gets its own price, photos, and rules.',
+  nameLabel: 'Complex name',
+  cityLabel: 'City',
+  addressLabel: 'Address',
+  descriptionLabel: 'About the property',
+  checkInOutTitle: 'Check-in and check-out',
+  checkInOutHint: 'Default times for the complex — shown on the public property page.',
+  checkInTimeLabel: 'Check-in',
+  checkOutTimeLabel: 'Check-out',
+  submit: 'Create complex',
+  cancel: 'Back to listings',
+  error: 'Failed to create property',
+} as const

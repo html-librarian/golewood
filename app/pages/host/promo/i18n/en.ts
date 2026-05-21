@@ -1,0 +1,17 @@
+export default {
+  title: 'Promotion balance',
+  subtitle: 'Points pay for listing promotion in search. Earn from bookings or buy a package.',
+  balanceLabel: 'Available points',
+  howToGetTitle: 'How to earn points',
+  howToGetBody: 'After a booking completes you get 1% of the total (up to 300 points per booking). Need more? Buy a package below.',
+  buyTitle: 'Buy points',
+  buySubtitle: 'Card payment via YooKassa. Points are credited right after payment.',
+  buyPackage: 'Buy for {price}',
+  buying: 'Redirecting to payment…',
+  buyFailed: 'Could not start payment. Try again later.',
+  productsTitle: 'Promotion plans',
+  transactionsTitle: 'Transaction history',
+  emptyTransactions: 'No transactions yet',
+  promoteListing: 'Promote a listing',
+  backToHost: 'Host dashboard',
+} as const

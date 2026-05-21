@@ -1,0 +1,22 @@
+export default {
+  title: 'My listings',
+  create: 'Create listing',
+  createProperty: 'Create complex',
+  propertyBadge: 'Complex',
+  unitsBadge: '{count} units',
+  empty: 'You have no listings yet',
+  emptyFiltered: 'No listings in this category',
+  edit: 'Edit',
+  calendar: 'Calendar',
+  stories: 'Stories',
+  news: 'News',
+  promote: 'Promote',
+  giftCertificates: 'Gift certs',
+  archive: 'Archive',
+  restore: 'Restore',
+  filters: {
+    all: 'All',
+    active: 'Active',
+    archived: 'Archived',
+  },
+} as const

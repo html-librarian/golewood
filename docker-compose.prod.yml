@@ -1,0 +1,72 @@
+# Production stack for a single VPS. App listens on 127.0.0.1:3000 — put Caddy/nginx in front.
+# Copy deploy/.env.production.example → .env and set secrets before first start.
+
+services:
+  app:
+    build: .
+    ports:
+      - '127.0.0.1:3000:3000'
+    env_file:
+      - .env
+    environment:
+      NUXT_HOST: 0.0.0.0
+      NUXT_PORT: 3000
+      NUXT_DATABASE_URL: postgresql://${POSTGRES_USER:-golewood}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-golewood}
+      NUXT_REDIS_URL: redis://redis:6379
+      NUXT_MEILI_HOST: http://meilisearch:7700
+      RUN_DB_MIGRATE_ON_START: ${RUN_DB_MIGRATE_ON_START:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-golewood}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-golewood}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-golewood} -d ${POSTGRES_DB:-golewood}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    environment:
+      MEILI_ENV: production
+      MEILI_NO_ANALYTICS: 'true'
+      MEILI_MASTER_KEY: ${NUXT_MEILI_API_KEY:?Set NUXT_MEILI_API_KEY in .env}
+    volumes:
+      - meilisearch_data:/meili_data
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--spider', 'http://localhost:7700/health']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  meilisearch_data:

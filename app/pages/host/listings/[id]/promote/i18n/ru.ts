@@ -1,0 +1,15 @@
+export default {
+  title: 'Продвижение объявления',
+  subtitle: 'Поднимите объявление в поиске или выделите карточку размером и цветом.',
+  balance: 'Баланс: {balance} баллов',
+  activeTitle: 'Активные продвижения',
+  emptyActive: 'Нет активных продвижений',
+  catalogTitle: 'Подключить',
+  purchase: 'Подключить за {price} баллов',
+  purchasing: 'Подключение…',
+  purchased: 'Продвижение активировано',
+  alreadyActive: 'Уже активно',
+  backToListings: 'К объявлениям',
+  publishedOnly: 'Продвижение доступно только для опубликованных объявлений.',
+  buyPoints: 'Купить баллы',
+} as const

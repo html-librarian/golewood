@@ -1,0 +1,15 @@
+export default {
+  title: 'Promote listing',
+  subtitle: 'Boost search placement or highlight the listing card.',
+  balance: 'Balance: {balance} points',
+  activeTitle: 'Active promotions',
+  emptyActive: 'No active promotions',
+  catalogTitle: 'Activate',
+  purchase: 'Activate for {price} points',
+  purchasing: 'Activating…',
+  purchased: 'Promotion activated',
+  alreadyActive: 'Already active',
+  backToListings: 'Back to listings',
+  publishedOnly: 'Promotion is only available for published listings.',
+  buyPoints: 'Buy points',
+} as const

@@ -1,0 +1,23 @@
+# Install Caddy on the VPS, then:
+#   sudo cp deploy/Caddyfile.example /etc/caddy/Caddyfile
+#   sudo systemctl reload caddy
+#
+# Replace golewood.ru with your domain. App must listen on 127.0.0.1:3000 (docker-compose.prod.yml).
+
+golewood.ru, www.golewood.ru {
+	encode gzip zstd
+
+	@api path /api/*
+	handle @api {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	@sitemap path /sitemap.xml /robots.txt
+	handle @sitemap {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:3000
+	}
+}

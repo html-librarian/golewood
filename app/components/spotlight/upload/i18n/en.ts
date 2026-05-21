@@ -1,0 +1,17 @@
+export default {
+  uploadTitle: 'Add a photo',
+  uploadHint: 'Choose a place from your bookings. After moderation the photo appears in the gallery and can be voted on.',
+  loginHint: 'Sign in to upload — photos are only accepted for listings from your bookings.',
+  listing: 'Place',
+  listingPlaceholder: 'Choose from your bookings',
+  noBookings: 'No bookings yet — you can only add photos for listings you have booked.',
+  findListing: 'Find a place',
+  caption: 'Caption (optional)',
+  photo: 'Photo',
+  consent: 'I allow publication on the homepage and in the Photo of the Month gallery',
+  submit: 'Submit for moderation',
+  loginToUpload: 'Sign in to upload',
+  uploadSuccess: 'Photo submitted for moderation',
+  uploadError: 'Provide listing, photo, and publication consent',
+  uploadFailed: 'Could not upload photo',
+} as const
