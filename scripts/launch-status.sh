@@ -15,7 +15,7 @@ echo ""
 if git remote get-url origin &>/dev/null; then
   ok "git remote: $(git remote get-url origin)"
 else
-  miss 'git remote (run scripts/git-push-main.sh)'
+  miss 'git remote (./scripts/github-setup.sh or git-push-main.sh)'
 fi
 
 commits="$(git rev-list --count HEAD 2>/dev/null || echo 0)"

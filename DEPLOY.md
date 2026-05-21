@@ -24,15 +24,15 @@ Run `NODE_ENV=production npm run check:prod` before deploy.
 
 1. [ ] DNS A/AAAA → server IP (`golewood.ru`, `www`)
 2. [ ] Copy `deploy/.env.production.example` → `.env`, fill all `CHANGE_ME_*` values
-3. [ ] `NODE_ENV=production npm run check:prod` — no errors
-4. [ ] `npm run prod:up` (build, start, migrate — see `scripts/prod-up.sh`)
-6. [ ] Caddy (or nginx) → `127.0.0.1:3000`, TLS certificate
-7. [ ] YooKassa webhook: `https://<domain>/api/payments/yookassa/webhook`
-8. [ ] S3 for listing photos (`NUXT_S3_*`)
-9. [ ] SMTP for email OTP / notifications (`NUXT_SMTP_URL`)
-10. [ ] Admin: login → `/admin/listings` → **Reindex** search (or `POST /api/admin/search/reindex`)
-11. [ ] `SITE_URL=https://<domain> ./scripts/post-deploy-smoke.sh` (health, home, search page, sitemap, sample `/api/search`)
-12. [ ] Optional: MAX bot + webhook (§ MAX below — code ready, business.max.ru only)
+3. [ ] `npm run preflight:prod` — no errors
+4. [ ] `npm run prod:up` (build, start, migrate)
+5. [ ] Caddy (or nginx) → `127.0.0.1:3000`, TLS certificate
+6. [ ] YooKassa webhook: `https://<domain>/api/payments/yookassa/webhook`
+7. [ ] S3 for listing photos (`NUXT_S3_*`)
+8. [ ] SMTP for email OTP / notifications (`NUXT_SMTP_URL`)
+9. [ ] Admin: login → `/admin/listings` → **Reindex** search
+10. [ ] `SITE_URL=https://<domain> npm run smoke:prod`
+11. [ ] Optional: MAX bot + webhook (§ MAX below — business.max.ru)
 
 ## Prerequisites
 

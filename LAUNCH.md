@@ -6,7 +6,8 @@
 
 ```bash
 # 0. Репозиторий на GitHub (если ещё не создан)
-GIT_REMOTE=git@github.com:<org>/golewood.ru.git ./scripts/git-push-main.sh
+./scripts/github-setup.sh <org>/golewood.ru   # нужен: brew install gh && gh auth login
+# или: GIT_REMOTE=git@github.com:<org>/golewood.ru.git ./scripts/git-push-main.sh
 
 cp deploy/.env.production.example .env
 # отредактировать .env — затем проверка подхватит файл автоматически:
