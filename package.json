@@ -2,6 +2,10 @@
   "name": "golewood-ru",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": ">=22",
+    "npm": ">=11"
+  },
   "imports": {
     "#shared/*": "./shared/*"
   },

@@ -4,6 +4,8 @@ Marketplace for short-term rental housing (Sutochno.ru analog).
 
 **Stack:** Nuxt 4 · Nitro · PostgreSQL + PostGIS · Redis · Meilisearch · Drizzle · Tailwind 4
 
+**Requirements:** Node **22+**, npm **11+** (see `.nvmrc` and `package.json` `engines`). Production image installs npm 11 before `npm ci` — do not reuse `node_modules` from a Docker volume mount on the host.
+
 ## Quick start (development)
 
 **One command** (Docker + `.env` + migrate + seed):
@@ -171,7 +173,7 @@ git remote add origin git@github.com:<org>/golewood.ru.git
 git push -u origin main
 ```
 
-On push/PR to `main`, GitHub Actions runs `npm run verify` and E2E (`SEED_E2E=1`). Requires Postgres, Redis and Meilisearch service containers (see `.github/workflows/ci.yml`).
+On push/PR to `main`, GitHub Actions runs `npm run verify`, E2E (`SEED_E2E=1`), and a **Docker build** of the production image. Requires Postgres, Redis and Meilisearch service containers (see `.github/workflows/ci.yml`).
 
 **Production:** checklist and env vars — [`DEPLOY.md`](DEPLOY.md). After deploy: `SITE_URL=https://golewood.ru npm run smoke:prod`.
 
@@ -201,3 +203,7 @@ GET /api/health
 ```
 
 Returns `200` when PostgreSQL, Redis and Meilisearch are available.
+
+## Troubleshooting
+
+**ESLint / `Cannot find native binding` after Docker mounted the project:** remove host `node_modules` and reinstall — `rm -rf node_modules && npm ci` (Linux binaries differ from Alpine).
