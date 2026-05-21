@@ -6,19 +6,21 @@ Marketplace for short-term rental housing (Sutochno.ru analog).
 
 ## Quick start (development)
 
+**One command** (Docker + `.env` + migrate + seed):
+
 ```bash
-# 1. Infrastructure
+npm run bootstrap
+npm run dev
+```
+
+Or step by step:
+
+```bash
 docker compose up -d
-
-# 2. Environment
 cp .env.example .env
-
-# 3. Dependencies & DB
 npm install
-npm run db:migrate   # includes 0037 (2FA: users.two_factor_enabled)
-npm run db:seed   # demo users + listings (optional)
-
-# 4. Dev server
+npm run db:migrate
+npm run db:seed
 npm run dev
 ```
 

@@ -4,6 +4,9 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+# Lockfile is generated with npm 11; stock node:22-alpine ships npm 10.
+RUN npm install -g npm@11
+
 COPY package.json package-lock.json ./
 RUN npm ci
 

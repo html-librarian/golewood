@@ -89,6 +89,7 @@ Optional: `RUN_DB_MIGRATE_ON_START=true` runs migrate on container start (otherw
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
+# Build context uses .dockerignore (excludes e2e, dev artifacts, docs except README)
 ```
 
 ## 3. Database migrations
