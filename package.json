@@ -28,6 +28,7 @@
     "launch:status": "bash scripts/launch-status.sh",
     "launch:verify": "npm run verify:all",
     "github:setup": "bash scripts/github-setup.sh",
+    "secrets:prod": "bash scripts/generate-prod-secrets.sh",
     "prod:up": "bash scripts/prod-up.sh --migrate",
     "smoke:prod": "bash scripts/post-deploy-smoke.sh",
     "bootstrap": "bash scripts/bootstrap-dev.sh",

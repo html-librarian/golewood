@@ -11,6 +11,12 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
+if grep -q 'CHANGE_ME' .env 2>/dev/null; then
+  echo "Replace CHANGE_ME_* placeholders in .env before deploy." >&2
+  echo "Generate secrets: ./scripts/generate-prod-secrets.sh" >&2
+  exit 1
+fi
+
 echo "→ docker compose -f docker-compose.prod.yml up -d --build"
 docker compose -f docker-compose.prod.yml up -d --build
 

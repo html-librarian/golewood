@@ -47,6 +47,7 @@ For E2E: stop the dev server first, or Playwright will reuse it locally (`reuseE
 | `npm run launch:status` | Report: remote, `.env`, preflight (before VPS deploy) |
 | `npm run launch:verify` | Full gate: `verify` + 57 E2E (before first push) |
 | `npm run github:setup` | Create GitHub repo + push via `gh` CLI |
+| `npm run secrets:prod` | Print `openssl` secrets for production `.env` |
 | `npm run prod:up` | VPS: build & start prod compose + `db:migrate` |
 | `npm run smoke:prod` | POST-deploy HTTP smoke (`SITE_URL=https://…`) |
 | `npm run bootstrap` | Docker + `.env` + migrate + seed (first-time local setup) |

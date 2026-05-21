@@ -18,6 +18,16 @@ else
   miss 'git remote (./scripts/github-setup.sh or git-push-main.sh)'
 fi
 
+if command -v gh &>/dev/null; then
+  if gh auth status &>/dev/null 2>&1; then
+    ok 'gh CLI authenticated'
+  else
+    warn 'gh installed — run: gh auth login'
+  fi
+else
+  warn 'gh CLI not installed (brew install gh)'
+fi
+
 commits="$(git rev-list --count HEAD 2>/dev/null || echo 0)"
 ok "git commits on main: ${commits}"
 

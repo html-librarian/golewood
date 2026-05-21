@@ -15,8 +15,8 @@ npm run launch:verify    # полная проверка перед push (опц
 # или: GIT_REMOTE=git@github.com:<org>/golewood.ru.git ./scripts/git-push-main.sh
 
 cp deploy/.env.production.example .env
-# отредактировать .env — затем проверка подхватит файл автоматически:
-# заполнить все CHANGE_ME_* и секреты
+./scripts/generate-prod-secrets.sh   # вставить значения в .env
+# отредактировать остальное (SITE_URL, S3, SMTP, YooKassa)
 npm run preflight:prod   # NODE_ENV=production check:prod, без ошибок
 docker build -t golewood-ru:prod .     # опционально, проверка образа
 ```
