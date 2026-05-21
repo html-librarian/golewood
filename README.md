@@ -171,8 +171,8 @@ See [`.env.example`](.env.example). Key variables:
 ## Git & CI
 
 ```bash
-git remote add origin git@github.com:<org>/golewood.ru.git
-git push -u origin main
+GIT_REMOTE=git@github.com:<org>/golewood.ru.git ./scripts/git-push-main.sh
+# или: git remote add origin … && git push -u origin main
 ```
 
 On push/PR to `main`, GitHub Actions runs `npm run verify`, E2E (`SEED_E2E=1`), and a **Docker build** of the production image. Requires Postgres, Redis and Meilisearch service containers (see `.github/workflows/ci.yml`).

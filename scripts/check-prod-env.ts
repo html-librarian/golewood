@@ -1,7 +1,50 @@
 /**
  * Production env sanity check. Run before deploy:
- *   NODE_ENV=production npm run check:prod
+ *   npm run preflight:prod
+ * Loads `.env` from project root when present (does not override existing env vars).
  */
+
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const root = join(fileURLToPath(new URL('.', import.meta.url)), '..')
+
+const loadDotEnv = (filePath: string) => {
+  if (!existsSync(filePath)) {
+    return
+  }
+
+  for (const line of readFileSync(filePath, 'utf8').split('\n')) {
+    const trimmed = line.trim()
+
+    if (!trimmed || trimmed.startsWith('#')) {
+      continue
+    }
+
+    const eq = trimmed.indexOf('=')
+
+    if (eq === -1) {
+      continue
+    }
+
+    const key = trimmed.slice(0, eq).trim()
+    let value = trimmed.slice(eq + 1).trim()
+
+    if (
+      (value.startsWith('"') && value.endsWith('"'))
+      || (value.startsWith('\'') && value.endsWith('\''))
+    ) {
+      value = value.slice(1, -1)
+    }
+
+    if (process.env[key] === undefined) {
+      process.env[key] = value
+    }
+  }
+}
+
+loadDotEnv(join(root, '.env'))
 
 const isProd = process.env.NODE_ENV === 'production' || process.argv.includes('--prod')
 

@@ -5,8 +5,11 @@
 ## Перед выкладкой (локально или на сервере)
 
 ```bash
-git push -u origin main          # CI должен быть зелёным
+# 0. Репозиторий на GitHub (если ещё не создан)
+GIT_REMOTE=git@github.com:<org>/golewood.ru.git ./scripts/git-push-main.sh
+
 cp deploy/.env.production.example .env
+# отредактировать .env — затем проверка подхватит файл автоматически:
 # заполнить все CHANGE_ME_* и секреты
 npm run preflight:prod   # NODE_ENV=production check:prod, без ошибок
 docker build -t golewood-ru:prod .     # опционально, проверка образа
