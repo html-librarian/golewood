@@ -40,6 +40,7 @@ For E2E: stop the dev server first, or Playwright will reuse it locally (`reuseE
 | `npm run verify:all` | verify + E2E (needs Docker infra + Playwright) |
 | `npm run check:prod` | Validate production env vars (requires `NODE_ENV=production`) |
 | `npm run smoke:prod` | POST-deploy HTTP smoke (`SITE_URL=https://…`) |
+| `npm run bootstrap` | Docker + `.env` + migrate + seed (first-time local setup) |
 | `npm run db:generate` | Generate Drizzle migration |
 | `npm run db:migrate` | Apply migrations |
 | `npm run db:seed` | Seed demo data (users, listings, bookings, reviews) |
@@ -56,7 +57,7 @@ Idempotent seed: upserts demo users/listings, resets guest bookings/reports, rei
 | Host  | +79000000002 | 0000 |
 | Guest | +79000000003 | 0000 |
 
-Also creates 4 listings (2 published, 1 moderation, 1 draft) with cover photos, 3 bookings (pending / confirmed / completed), payments, 1 approved review, 1 pending review, 1 open report for admin. Guest `+79000000003` has **3500** bonus balance; demo host `+79000000002` has **5000** promo points and verified legal profile.
+Also creates listings (published, moderation, draft), property complex **«Глэмпинг «Боровое»»** with two units, 3 bookings (pending / confirmed / completed), payments, reviews, 1 open report for admin. Guest `+79000000003` has **3500** bonus balance; demo host `+79000000002` has **5000** promo points and verified legal profile. With `SEED_E2E=1` (Playwright): gift certificate code `GW-E2E5000` for booking E2E.
 
 ### Sign-in (dev)
 
@@ -160,6 +161,17 @@ See [`.env.example`](.env.example). Key variables:
 - `NUXT_PROMOTION_INDEX_CRON_ENABLED` — in-process Meili promotion fields sync every 6h (default on)
 - `NUXT_OAUTH_GOOGLE_CLIENT_ID`, `NUXT_OAUTH_GOOGLE_CLIENT_SECRET` — Google Calendar import for hosts (redirect URI: `{SITE_URL}/api/host/google-calendar/callback`)
 - `NUXT_S3_*` — S3-compatible photo storage (empty = local `.data/uploads`)
+
+## Git & CI
+
+```bash
+git remote add origin git@github.com:<org>/golewood.ru.git
+git push -u origin main
+```
+
+On push/PR to `main`, GitHub Actions runs `npm run verify` and E2E (`SEED_E2E=1`). Requires Postgres, Redis and Meilisearch service containers (see `.github/workflows/ci.yml`).
+
+**Production:** checklist and env vars — [`DEPLOY.md`](DEPLOY.md). After deploy: `SITE_URL=https://golewood.ru npm run smoke:prod`.
 
 ## Architecture
 

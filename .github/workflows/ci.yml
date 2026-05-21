@@ -9,6 +9,7 @@ env:
   NUXT_DATABASE_URL: postgresql://golewood:golewood@localhost:5432/golewood
   NUXT_REDIS_URL: redis://localhost:6379
   NUXT_MEILI_HOST: http://localhost:7700
+  NUXT_MEILI_API_KEY: ci-meili-master-key-min-16-chars
   NUXT_JWT_SECRET: ci-jwt-secret-not-for-production
   NUXT_AUTH_DEV_CODE: '0000'
   NUXT_PUBLIC_SITE_URL: http://localhost:3000
@@ -45,6 +46,7 @@ jobs:
         env:
           MEILI_ENV: development
           MEILI_NO_ANALYTICS: 'true'
+          MEILI_MASTER_KEY: ci-meili-master-key-min-16-chars
         ports:
           - 7700:7700
 
@@ -91,6 +93,7 @@ jobs:
         env:
           MEILI_ENV: development
           MEILI_NO_ANALYTICS: 'true'
+          MEILI_MASTER_KEY: ci-meili-master-key-min-16-chars
         ports:
           - 7700:7700
 
