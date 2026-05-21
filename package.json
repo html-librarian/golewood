@@ -25,6 +25,7 @@
     "verify:all": "npm run verify && npm run test:e2e",
     "check:prod": "node --experimental-strip-types scripts/check-prod-env.ts --prod",
     "preflight:prod": "NODE_ENV=production npm run check:prod",
+    "launch:status": "bash scripts/launch-status.sh",
     "prod:up": "bash scripts/prod-up.sh --migrate",
     "smoke:prod": "bash scripts/post-deploy-smoke.sh",
     "bootstrap": "bash scripts/bootstrap-dev.sh",

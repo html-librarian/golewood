@@ -947,7 +947,7 @@ app/pages/search/
 
 **Код:** ✅ `npm run verify:all` (57 E2E). **Осталось на стороне инфраструктуры:**
 
-- [ ] `git push` → зелёный CI
+- [ ] `git push` → зелёный CI (`npm run launch:status` — чеклист)
 - [ ] VPS: DNS, `.env`, `check:prod`, `docker compose -f docker-compose.prod.yml up -d --build`
 - [ ] `db:migrate` + reindex Meilisearch
 - [ ] Caddy/TLS, YooKassa webhook, S3, SMTP

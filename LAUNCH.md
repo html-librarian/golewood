@@ -21,15 +21,17 @@ docker build -t golewood-ru:prod .     # опционально, проверк�
 |---|----------|------------------|
 | 1 | DNS A/AAAA на IP VPS | `golewood.ru`, `www` |
 | 2 | `.env` в корне проекта | `cp deploy/.env.production.example .env` |
-| 3 | Проверка env | `NODE_ENV=production npm run check:prod` |
-| 4 | Старт стека + миграции | `npm run prod:up` (или `./scripts/prod-up.sh --migrate`) |
-| 6 | TLS + прокси | Caddy → `127.0.0.1:3000` ([deploy/Caddyfile.example](deploy/Caddyfile.example)) |
-| 7 | YooKassa webhook | `https://<domain>/api/payments/yookassa/webhook` |
-| 8 | S3 для фото | `NUXT_S3_*` в `.env` |
-| 9 | SMTP | `NUXT_SMTP_URL` |
-| 10 | Reindex | `/admin/listings` → **Reindex** или `POST /api/admin/search/reindex` |
-| 11 | Smoke | `SITE_URL=https://<domain> npm run smoke:prod` |
-| 12 | Выплаты хостам | YooKassa split → `/host/payout`, `/admin/host-payouts` |
+| 3 | Проверка env | `npm run preflight:prod` |
+| 4 | Старт стека + миграции | `npm run prod:up` |
+| 5 | TLS + прокси | Caddy → `127.0.0.1:3000` ([deploy/Caddyfile.example](deploy/Caddyfile.example)) |
+| 6 | YooKassa webhook | `https://<domain>/api/payments/yookassa/webhook` |
+| 7 | S3 для фото | `NUXT_S3_*` в `.env` |
+| 8 | SMTP | `NUXT_SMTP_URL` |
+| 9 | Reindex | `/admin/listings` → **Reindex** |
+| 10 | Smoke | `SITE_URL=https://<domain> npm run smoke:prod` |
+| 11 | Выплаты хостам | YooKassa split → `/host/payout`, `/admin/host-payouts` |
+
+Проверить готовность локально: `npm run launch:status`
 
 ## Опционально: MAX (фазы 11–12 в PLAN.md)
 
