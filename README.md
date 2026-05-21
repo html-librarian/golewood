@@ -43,6 +43,8 @@ For E2E: stop the dev server first, or Playwright will reuse it locally (`reuseE
 | `npm run verify` | lint + unit tests + production build |
 | `npm run verify:all` | verify + E2E (needs Docker infra + Playwright) |
 | `npm run check:prod` | Validate production env vars (requires `NODE_ENV=production`) |
+| `npm run preflight:prod` | Same as `check:prod` with `NODE_ENV=production` set |
+| `npm run prod:up` | VPS: build & start prod compose + `db:migrate` |
 | `npm run smoke:prod` | POST-deploy HTTP smoke (`SITE_URL=https://…`) |
 | `npm run bootstrap` | Docker + `.env` + migrate + seed (first-time local setup) |
 | `npm run db:generate` | Generate Drizzle migration |

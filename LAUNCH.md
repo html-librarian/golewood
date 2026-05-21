@@ -8,7 +8,7 @@
 git push -u origin main          # CI должен быть зелёным
 cp deploy/.env.production.example .env
 # заполнить все CHANGE_ME_* и секреты
-NODE_ENV=production npm run check:prod   # без ошибок
+npm run preflight:prod   # NODE_ENV=production check:prod, без ошибок
 docker build -t golewood-ru:prod .     # опционально, проверка образа
 ```
 
@@ -19,8 +19,7 @@ docker build -t golewood-ru:prod .     # опционально, проверк�
 | 1 | DNS A/AAAA на IP VPS | `golewood.ru`, `www` |
 | 2 | `.env` в корне проекта | `cp deploy/.env.production.example .env` |
 | 3 | Проверка env | `NODE_ENV=production npm run check:prod` |
-| 4 | Старт стека | `docker compose -f docker-compose.prod.yml up -d --build` |
-| 5 | Миграции | `docker compose -f docker-compose.prod.yml exec app npm run db:migrate` |
+| 4 | Старт стека + миграции | `npm run prod:up` (или `./scripts/prod-up.sh --migrate`) |
 | 6 | TLS + прокси | Caddy → `127.0.0.1:3000` ([deploy/Caddyfile.example](deploy/Caddyfile.example)) |
 | 7 | YooKassa webhook | `https://<domain>/api/payments/yookassa/webhook` |
 | 8 | S3 для фото | `NUXT_S3_*` в `.env` |

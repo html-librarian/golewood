@@ -25,8 +25,7 @@ Run `NODE_ENV=production npm run check:prod` before deploy.
 1. [ ] DNS A/AAAA → server IP (`golewood.ru`, `www`)
 2. [ ] Copy `deploy/.env.production.example` → `.env`, fill all `CHANGE_ME_*` values
 3. [ ] `NODE_ENV=production npm run check:prod` — no errors
-4. [ ] `docker compose -f docker-compose.prod.yml up -d --build`
-5. [ ] `docker compose -f docker-compose.prod.yml exec app npm run db:migrate`
+4. [ ] `npm run prod:up` (build, start, migrate — see `scripts/prod-up.sh`)
 6. [ ] Caddy (or nginx) → `127.0.0.1:3000`, TLS certificate
 7. [ ] YooKassa webhook: `https://<domain>/api/payments/yookassa/webhook`
 8. [ ] S3 for listing photos (`NUXT_S3_*`)
