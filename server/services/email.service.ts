@@ -37,6 +37,7 @@ export const emailService = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ to, subject, text }),
+      signal: AbortSignal.timeout(25_000),
     })
 
     if (!response.ok) {

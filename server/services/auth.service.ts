@@ -239,7 +239,7 @@ export const authService = {
       email: normalizedEmail,
     })
 
-    await emailService.send({
+    void emailService.send({
       to: normalizedEmail,
       subject: 'Код входа — Golewood',
       text: [

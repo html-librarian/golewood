@@ -11,14 +11,22 @@ if (!smtpUser || !smtpPass) {
   process.exit(1)
 }
 
+const smtpPort = Number(process.env.SMTP_PORT || 465)
+const smtpSecure = process.env.SMTP_SECURE === 'true'
+  || (process.env.SMTP_SECURE !== 'false' && smtpPort === 465)
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST?.trim() || 'smtp.mail.ru',
-  port: Number(process.env.SMTP_PORT || 465),
-  secure: process.env.SMTP_SECURE !== 'false',
+  port: smtpPort,
+  secure: smtpSecure,
+  requireTLS: !smtpSecure && smtpPort === 587,
   auth: {
     user: smtpUser,
     pass: smtpPass,
   },
+  connectionTimeout: 15_000,
+  greetingTimeout: 15_000,
+  socketTimeout: 20_000,
 })
 
 const fromAddress = process.env.SMTP_FROM?.trim() || smtpUser
@@ -67,6 +75,8 @@ http.createServer(async (req, res) => {
       sendJson(res, 400, { error: 'missing_fields' })
       return
     }
+
+    console.log(`[mail-relay] send → ${to} (${process.env.SMTP_HOST || 'smtp.mail.ru'}:${smtpPort})`)
 
     await transporter.sendMail({
       from: fromAddress,

@@ -122,6 +122,21 @@ fetch('http://mail-relay:8787/send', {
 
 **Receiving mail** in that inbox is only for you (support, replies) — the app does not read IMAP; it only **sends** OTP and notifications.
 
+**Hang or 502 on «Получить код»:** the app waits for `mail-relay`, relay waits for `smtp.mail.ru`. Check:
+
+```bash
+docker compose -f docker-compose.prod.yml ps mail-relay
+docker compose -f docker-compose.prod.yml logs mail-relay --tail 30
+# SMTP reachable from relay container (should connect in a few seconds):
+docker compose -f docker-compose.prod.yml exec mail-relay node -e "
+const net=require('net');const s=net.connect(465,'smtp.mail.ru',()=>{console.log('465 OK');s.end();});
+s.setTimeout(8000,()=>{console.error('465 timeout');process.exit(1)});
+s.on('error',e=>{console.error(e.message);process.exit(1)});
+"
+```
+
+If **465 times out**, try port **587** in `.env` (`SMTP_PORT=587`, `SMTP_SECURE=false`), recreate stack. Confirm `SMTP_PASS` is a Mail.ru **app password**, not the web-login password.
+
 Optional: `RUN_DB_MIGRATE_ON_START=true` runs migrate on container start (otherwise run migrate manually after each release).
 
 ## 2. Build and start
