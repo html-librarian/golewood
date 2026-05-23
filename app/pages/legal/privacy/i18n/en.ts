@@ -6,7 +6,7 @@ export default {
     {
       title: '1. Controller and contacts',
       paragraphs: [
-        "The data controller is the entity listed under Company details. Privacy inquiries: support{'@'}golewood.ru.",
+        "The data controller is the entity listed under Company details. Privacy inquiries: golewood@internet.ru.",
       ],
     },
     {
@@ -43,7 +43,7 @@ export default {
     {
       title: '6. Retention and your rights',
       paragraphs: [
-        "Data is kept while you use the service and as required by law. You may request access, correction, deletion, or withdrawal of consent via support{'@'}golewood.ru.",
+        "Data is kept while you use the service and as required by law. You may request access, correction, deletion, or withdrawal of consent via golewood@internet.ru.",
       ],
     },
     {

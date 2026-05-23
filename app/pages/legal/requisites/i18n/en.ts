@@ -1,7 +1,7 @@
 export default {
   title: 'Company details',
   updated: 'Effective as published on the website.',
-  intro: "Golewood platform operator details. For contracts and invoices — support{'@'}golewood.ru.",
+  intro: "Golewood platform operator details. For contracts and invoices — golewood@internet.ru.",
   operatorTitle: 'Platform operator',
   bankTitle: 'Bank details',
   fields: {

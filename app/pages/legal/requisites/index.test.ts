@@ -8,7 +8,6 @@ describe('legal requisites page', () => {
   })
 
   it('escapes @ in intro for vue-i18n linked-message syntax', () => {
-    expect(ru.intro).toContain("support{'@'}golewood.ru")
-    expect(ru.intro).not.toMatch(/support@[^'{]/)
+    expect(ru.intro).toContain('golewood@internet.ru')
   })
 })

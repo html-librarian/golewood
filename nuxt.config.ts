@@ -109,7 +109,7 @@ export default defineNuxtConfig({
     maxNotificationsEnabled: false,
     smsRuApiId: '',
     smtpUrl: '',
-    supportEmail: 'support@golewood.ru',
+    supportEmail: 'golewood@internet.ru',
     s3Bucket: '',
     s3Region: '',
     s3AccessKey: '',
@@ -146,7 +146,7 @@ export default defineNuxtConfig({
       operatorKpp: '',
       operatorOgrn: '',
       operatorLegalAddress: '',
-      supportEmail: 'support@golewood.ru',
+      supportEmail: 'golewood@internet.ru',
     },
   },
 })

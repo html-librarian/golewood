@@ -24,7 +24,7 @@ export default {
     },
     {
       q: 'How do I contact support?',
-      a: "Email support{'@'}golewood.ru or use the form on the Support page. Include your booking ID or listing link.",
+      a: "Email golewood@internet.ru or use the form on the Support page. Include your booking ID or listing link.",
     },
   ],
 } as const

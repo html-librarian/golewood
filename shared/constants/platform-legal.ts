@@ -1,5 +1,5 @@
 /** Public support inbox (help form, legal pages, mailto links). */
-export const PLATFORM_SUPPORT_EMAIL = 'support@golewood.ru' as const
+export const PLATFORM_SUPPORT_EMAIL = 'golewood@internet.ru' as const
 
 export const PLATFORM_LEGAL = {
   legalName: {

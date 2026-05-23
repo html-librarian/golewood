@@ -43,7 +43,7 @@ export default {
       title: '6. Final provisions',
       paragraphs: [
         'The Operator may amend this offer by publishing a new version. Continued use constitutes acceptance.',
-        "Disputes should first be addressed via support{'@'}golewood.ru; otherwise courts at the Operator’s location unless mandatory law provides otherwise.",
+        "Disputes should first be addressed via golewood@internet.ru; otherwise courts at the Operator’s location unless mandatory law provides otherwise.",
       ],
     },
   ],
