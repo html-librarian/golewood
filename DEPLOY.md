@@ -199,7 +199,35 @@ GitHub Actions on push/PR to `main`:
 
 On the VPS, add the **public** deploy key to `~/.ssh/authorized_keys`. The server must have Docker, git clone, and `.env` (never committed).
 
-First deploy is manual (`docker compose up` + `.env`). Later pushes to `main` redeploy automatically when CI passes.
+First deploy is manual (`docker compose up` + `.env`). Later pushes to `main` redeploy automatically when CI passes (pulls image from GHCR — no build on VPS).
+
+### Small VPS: OOM during `docker compose build`
+
+Nuxt build needs ~2–4 GB RAM. **SIGKILL** on `npm run build` = out of memory.
+
+**Option A — swap (first manual deploy):**
+
+```bash
+sudo chmod +x deploy/add-swap.sh
+sudo ./deploy/add-swap.sh 4
+free -h
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+**Option B — pull pre-built image from GitHub (recommended):**
+
+CI pushes `ghcr.io/html-librarian/golewood:latest` on every green `main` build. On VPS:
+
+```bash
+# GitHub → Settings → Developer settings → PAT (read:packages)
+export GHCR_TOKEN=ghp_...
+export GOLEWOOD_USE_REGISTRY=1
+echo "$GHCR_TOKEN" | docker login ghcr.io -u html-librarian --password-stdin
+docker compose -f docker-compose.prod.yml pull app
+docker compose -f docker-compose.prod.yml up -d
+```
+
+Make the package **public** (GitHub repo → Packages → golewood → Change visibility) or use `GHCR_TOKEN` secret in Actions deploy.
 
 Locally:
 

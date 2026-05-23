@@ -4,6 +4,9 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+# Reduce peak RAM during Vite/Nuxt build (small VPS OOM otherwise).
+ENV NODE_OPTIONS=--max-old-space-size=2048
+
 # Lockfile is generated with npm 11; stock node:22-alpine ships npm 10.
 RUN npm install -g npm@11
 

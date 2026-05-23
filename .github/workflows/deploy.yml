@@ -35,4 +35,7 @@ jobs:
             git reset --hard origin/main
             chmod +x scripts/remote-deploy.sh
             export SITE_URL="${{ secrets.DEPLOY_SITE_URL }}"
+            export GOLEWOOD_USE_REGISTRY=1
+            export GHCR_TOKEN="${{ secrets.GHCR_TOKEN }}"
+            export GHCR_USER="${{ secrets.GHCR_USER || 'html-librarian' }}"
             ./scripts/remote-deploy.sh
