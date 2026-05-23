@@ -67,10 +67,12 @@ services:
     volumes:
       - meilisearch_data:/meili_data
     healthcheck:
-      test: ['CMD', 'wget', '--no-verbose', '--spider', 'http://localhost:7700/health']
+      # Official image ships curl, not wget (see docker-compose.yml)
+      test: ['CMD-SHELL', 'curl -sf http://127.0.0.1:7700/health > /dev/null || exit 1']
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 10s
     restart: unless-stopped
 
 volumes:

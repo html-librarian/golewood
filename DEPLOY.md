@@ -214,6 +214,19 @@ free -h
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
+### Meilisearch `unhealthy` on first `up`
+
+If Postgres/Redis are healthy but `golewood-meilisearch-1` fails, check logs:
+
+```bash
+docker compose -f docker-compose.prod.yml logs meilisearch
+```
+
+Common causes:
+
+- **Healthcheck used `wget`** — the Meilisearch image only has `curl`. Update `docker-compose.prod.yml` from the repo and recreate: `docker compose -f docker-compose.prod.yml up -d`.
+- **`NUXT_MEILI_API_KEY` missing or &lt; 16 chars** — Meilisearch refuses to start in production. Regenerate: `openssl rand -hex 24`, set in `.env`, restart.
+
 **Option B — pull pre-built image from GitHub (recommended):**
 
 CI pushes `ghcr.io/html-librarian/golewood:latest` on every green `main` build. On VPS:
