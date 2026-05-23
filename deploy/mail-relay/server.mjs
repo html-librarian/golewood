@@ -87,8 +87,15 @@ http.createServer(async (req, res) => {
 
     sendJson(res, 200, { ok: true })
   } catch (error) {
-    console.error('[mail-relay] send failed:', error)
-    sendJson(res, 502, { error: 'send_failed' })
+    const err = error
+    const details = [
+      err?.message,
+      err?.code,
+      err?.responseCode ? `smtp ${err.responseCode}` : null,
+      err?.response ? String(err.response).slice(0, 200) : null,
+    ].filter(Boolean).join(' | ')
+    console.error(`[mail-relay] send failed: ${details || err}`)
+    sendJson(res, 502, { error: 'send_failed', hint: details?.slice(0, 120) })
   }
 }).listen(port, '0.0.0.0', () => {
   console.log(`[mail-relay] listening on :${port} (from ${fromAddress})`)

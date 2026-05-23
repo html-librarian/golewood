@@ -137,6 +137,14 @@ s.on('error',e=>{console.error(e.message);process.exit(1)});
 
 If **465 times out**, try port **587** in `.env` (`SMTP_PORT=587`, `SMTP_SECURE=false`), recreate stack. Confirm `SMTP_PASS` is a Mail.ru **app password**, not the web-login password.
 
+**Site returns `200` + `{ email, expiresIn }` but no mail:** the API saves the OTP in Redis and sends email in the background; if `mail-relay` returns **502**, the letter never leaves the server. Always check:
+
+```bash
+docker compose -f docker-compose.prod.yml logs mail-relay --tail 20
+```
+
+Typical log lines: `Invalid login` → wrong `SMTP_PASS`; `ETIMEDOUT` / timeout → try port **587**; `535` → enable app password for `golewood@internet.ru`.
+
 Optional: `RUN_DB_MIGRATE_ON_START=true` runs migrate on container start (otherwise run migrate manually after each release).
 
 ## 2. Build and start
