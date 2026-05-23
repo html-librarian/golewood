@@ -77,10 +77,50 @@ NODE_ENV=production npm run check:prod
 | `NUXT_YOOKASSA_MARKETPLACE_MOCK` | **`false`** on real host |
 | `NUXT_YOOKASSA_SHOP_ID`, `NUXT_YOOKASSA_SECRET_KEY` | Live or test shop |
 | `NUXT_S3_*` | Object storage for uploads (strongly recommended) |
-| `NUXT_SMTP_URL` | Transactional email endpoint |
+| `NUXT_SMTP_URL` | App posts here (`http://mail-relay:8787/send` with bundled relay) |
+| `SMTP_USER`, `SMTP_PASS` | Mail.ru / internet.ru mailbox + **app password** for `mail-relay` |
+| `NUXT_SUPPORT_EMAIL` | Inbox shown on `/help/support` (optional) |
 | `NUXT_OAUTH_*` | Yandex/VK sign-in (recommended when SMS is off) |
 
-`docker-compose.prod.yml` binds the app to **127.0.0.1:3000** only. Postgres, Redis and Meilisearch are **not** exposed to the internet.
+`docker-compose.prod.yml` binds the app to **127.0.0.1:3000** only. Postgres, Redis, Meilisearch and `mail-relay` are **not** exposed to the internet.
+
+### Email OTP (Mail.ru, internet.ru, bk.ru)
+
+Registration and sign-in send codes via `emailService` → HTTP `POST` to `NUXT_SMTP_URL`. Production stack includes **`mail-relay`** (SMTP bridge to `smtp.mail.ru:465`).
+
+1. Create mailbox (e.g. `golewood@internet.ru`).
+2. Mail.ru → **Настройки → Безопасность → Пароли для внешних приложений** → create password (not your login password).
+3. In `.env`:
+
+```bash
+NUXT_PUBLIC_EMAIL_AUTH_ENABLED=true
+NUXT_SMTP_URL=http://mail-relay:8787/send
+NUXT_SUPPORT_EMAIL=golewood@internet.ru
+
+SMTP_HOST=smtp.mail.ru
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=golewood@internet.ru
+SMTP_PASS=<app-password>
+SMTP_FROM=golewood@internet.ru
+```
+
+4. `docker compose -f docker-compose.prod.yml up -d --build` (builds `mail-relay` on first run).
+5. Test from the VPS:
+
+```bash
+docker compose -f docker-compose.prod.yml exec app node -e "
+fetch('http://mail-relay:8787/send', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ to: 'you@example.com', subject: 'Golewood test', text: 'OK' }),
+}).then(r => console.log(r.status)).catch(console.error)
+"
+```
+
+6. Open `https://<domain>/auth/login` → email → code arrives within a minute (check spam).
+
+**Receiving mail** in that inbox is only for you (support, replies) — the app does not read IMAP; it only **sends** OTP and notifications.
 
 Optional: `RUN_DB_MIGRATE_ON_START=true` runs migrate on container start (otherwise run migrate manually after each release).
 

@@ -15,6 +15,7 @@ services:
       NUXT_DATABASE_URL: postgresql://${POSTGRES_USER:-golewood}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-golewood}
       NUXT_REDIS_URL: redis://redis:6379
       NUXT_MEILI_HOST: http://meilisearch:7700
+      NUXT_SMTP_URL: ${NUXT_SMTP_URL:-http://mail-relay:8787/send}
       RUN_DB_MIGRATE_ON_START: ${RUN_DB_MIGRATE_ON_START:-false}
     depends_on:
       postgres:
@@ -73,6 +74,26 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    restart: unless-stopped
+
+  # HTTP → SMTP bridge for email OTP (Mail.ru / internet.ru / bk.ru — same smtp.mail.ru)
+  mail-relay:
+    build: ./deploy/mail-relay
+    environment:
+      SMTP_HOST: ${SMTP_HOST:-smtp.mail.ru}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_SECURE: ${SMTP_SECURE:-true}
+      SMTP_USER: ${SMTP_USER:?Set SMTP_USER in .env (e.g. golewood@internet.ru)}
+      SMTP_PASS: ${SMTP_PASS:?Set SMTP_PASS in .env (Mail.ru app password)}
+      SMTP_FROM: ${SMTP_FROM:-${SMTP_USER}}
+    expose:
+      - '8787'
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:8787/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     restart: unless-stopped
 
 volumes:
