@@ -86,6 +86,7 @@ services:
       SMTP_USER: ${SMTP_USER:?Set SMTP_USER in .env (e.g. golewood@internet.ru)}
       SMTP_PASS: ${SMTP_PASS:?Set SMTP_PASS in .env (Mail.ru app password)}
       SMTP_FROM: ${SMTP_FROM:-${SMTP_USER}}
+      SMTP_FORCE_IPV4: ${SMTP_FORCE_IPV4:-true}
     expose:
       - '8787'
     healthcheck:

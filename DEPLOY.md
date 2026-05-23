@@ -144,7 +144,23 @@ If **465 times out**, try port **587** in `.env` (`SMTP_PORT=587`, `SMTP_SECURE=
 docker compose -f docker-compose.prod.yml logs mail-relay --tail 20
 ```
 
-Typical log lines: `Invalid login` → wrong `SMTP_PASS`; `ETIMEDOUT` / timeout → try port **587**; `535` → enable app password for `golewood@internet.ru`.
+Typical log lines: `Invalid login` → wrong `SMTP_PASS`; `535` → app password; `ETIMEDOUT` → see below.
+
+**Working SMTP on another machine but 502 `ETIMEDOUT` on this VPS:** credentials are fine; TCP to the SMTP **host** never completes from Reg.ru. Checklist:
+
+1. Copy **host + port + SSL**, not only login/password — set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE` to match the working project (not only `smtp.mail.ru` if the other app uses Yandex/SendPulse/etc.).
+2. `docker compose -f docker-compose.prod.yml up -d --force-recreate mail-relay` after `.env` changes.
+3. `docker compose … exec mail-relay printenv SMTP_HOST SMTP_PORT SMTP_USER` — must show your values.
+4. TCP test to **that** host (replace host/port):
+
+```bash
+python3 -c "import socket;s=socket.socket();s.settimeout(8);s.connect(('smtp.mail.ru',587));print('OK')"
+```
+
+5. Relay logs on start: `smtp host:port secure=… ipv4=true user=…` — `docker compose logs mail-relay --tail 5`.
+6. `SMTP_FORCE_IPV4=true` (default) — fixes some VPS IPv6 timeouts; set `false` only if you know you need IPv6.
+
+If step 4 is **TIMEOUT** on the VPS, no app change will help — Reg.ru must open outbound SMTP or use an **HTTPS** mail API instead of SMTP from this server.
 
 Optional: `RUN_DB_MIGRATE_ON_START=true` runs migrate on container start (otherwise run migrate manually after each release).
 

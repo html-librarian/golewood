@@ -11,12 +11,14 @@ if (!smtpUser || !smtpPass) {
   process.exit(1)
 }
 
+const smtpHost = process.env.SMTP_HOST?.trim() || 'smtp.mail.ru'
 const smtpPort = Number(process.env.SMTP_PORT || 465)
 const smtpSecure = process.env.SMTP_SECURE === 'true'
   || (process.env.SMTP_SECURE !== 'false' && smtpPort === 465)
+const smtpForceIpv4 = process.env.SMTP_FORCE_IPV4 !== 'false'
 
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST?.trim() || 'smtp.mail.ru',
+  host: smtpHost,
   port: smtpPort,
   secure: smtpSecure,
   requireTLS: !smtpSecure && smtpPort === 587,
@@ -24,9 +26,12 @@ const transporter = nodemailer.createTransport({
     user: smtpUser,
     pass: smtpPass,
   },
+  /** VPS often has broken IPv6 routes to SMTP — ETIMEDOUT without reaching auth. */
+  ...(smtpForceIpv4 ? { family: 4 } : {}),
   connectionTimeout: 15_000,
   greetingTimeout: 15_000,
   socketTimeout: 20_000,
+  tls: smtpSecure ? { servername: smtpHost } : undefined,
 })
 
 const fromAddress = process.env.SMTP_FROM?.trim() || smtpUser
@@ -76,7 +81,7 @@ http.createServer(async (req, res) => {
       return
     }
 
-    console.log(`[mail-relay] send → ${to} (${process.env.SMTP_HOST || 'smtp.mail.ru'}:${smtpPort})`)
+    console.log(`[mail-relay] send → ${to} (${smtpHost}:${smtpPort})`)
 
     await transporter.sendMail({
       from: fromAddress,
@@ -98,5 +103,8 @@ http.createServer(async (req, res) => {
     sendJson(res, 502, { error: 'send_failed', hint: details?.slice(0, 120) })
   }
 }).listen(port, '0.0.0.0', () => {
-  console.log(`[mail-relay] listening on :${port} (from ${fromAddress})`)
+  console.log(
+    `[mail-relay] listening on :${port} | smtp ${smtpHost}:${smtpPort}`
+    + ` secure=${smtpSecure} ipv4=${smtpForceIpv4} user=${smtpUser} from=${fromAddress}`,
+  )
 })
