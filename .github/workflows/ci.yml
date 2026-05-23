@@ -58,6 +58,7 @@ jobs:
           node-version: '22'
           cache: npm
 
+      - run: npm install -g npm@11
       - run: npm ci
       - run: npm run db:migrate
       - run: npm run verify
@@ -105,6 +106,7 @@ jobs:
           node-version: '22'
           cache: npm
 
+      - run: npm install -g npm@11
       - run: npm ci
       - run: npm run db:migrate
       - run: npx playwright install chromium --with-deps

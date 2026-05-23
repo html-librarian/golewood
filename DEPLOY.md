@@ -181,7 +181,25 @@ SITE_URL=https://golewood.ru ./scripts/post-deploy-smoke.sh
 
 ## 10. CI parity
 
-GitHub Actions: `npm run verify` + E2E with `SEED_E2E=1`.
+GitHub Actions on push/PR to `main`:
+
+- **CI** — `npm run verify` + E2E + Docker build
+- **Deploy** — after green CI on `main`, SSH to VPS and `./scripts/remote-deploy.sh`
+
+### GitHub secrets (Settings → Secrets → Actions)
+
+| Secret | Example | Purpose |
+|--------|---------|---------|
+| `DEPLOY_HOST` | `123.45.67.89` | VPS IP or hostname |
+| `DEPLOY_USER` | `root` | SSH user |
+| `DEPLOY_SSH_KEY` | private key | Deploy key (see below) |
+| `DEPLOY_PATH` | `/var/opt/golewood` | Project dir on VPS (optional) |
+| `DEPLOY_SITE_URL` | `https://golewood.ru` | Post-deploy smoke (optional) |
+| `DEPLOY_PORT` | `22` | SSH port (optional) |
+
+On the VPS, add the **public** deploy key to `~/.ssh/authorized_keys`. The server must have Docker, git clone, and `.env` (never committed).
+
+First deploy is manual (`docker compose up` + `.env`). Later pushes to `main` redeploy automatically when CI passes.
 
 Locally:
 
