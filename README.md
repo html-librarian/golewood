@@ -48,6 +48,7 @@ For E2E: stop the dev server first, or Playwright will reuse it locally (`reuseE
 | `npm run launch:verify` | Full gate: `verify` + 57 E2E (before first push) |
 | `npm run github:setup` | Create GitHub repo + push via `gh` CLI |
 | `npm run secrets:prod` | Print `openssl` secrets for production `.env` |
+| `npm run setup:prod-env` | Create `.env` from template + random secrets (`--domain`, `--force`) |
 | `npm run prod:up` | VPS: build & start prod compose + `db:migrate` |
 | `npm run smoke:prod` | POST-deploy HTTP smoke (`SITE_URL=https://…`) |
 | `npm run bootstrap` | Docker + `.env` + migrate + seed (first-time local setup) |
@@ -181,7 +182,7 @@ GIT_REMOTE=git@github.com:<org>/golewood.ru.git ./scripts/git-push-main.sh
 
 On push/PR to `main`, GitHub Actions runs `npm run verify`, E2E (`SEED_E2E=1`), and a **Docker build** of the production image. Requires Postgres, Redis and Meilisearch service containers (see `.github/workflows/ci.yml`).
 
-**Production:** quick checklist — [`LAUNCH.md`](LAUNCH.md), full guide — [`DEPLOY.md`](DEPLOY.md). After deploy: `SITE_URL=https://golewood.ru npm run smoke:prod`.
+**Production:** MVP checklist — [`LAUNCH-MVP.md`](LAUNCH-MVP.md), full — [`LAUNCH.md`](LAUNCH.md), deploy — [`DEPLOY.md`](DEPLOY.md). After deploy: `SITE_URL=https://golewood.ru npm run smoke:prod`.
 
 ## Architecture
 

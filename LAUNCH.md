@@ -1,6 +1,6 @@
 # Запуск golewood.ru в production
 
-Код и тесты готовы. Ниже — порядок действий на VPS. Подробности: [DEPLOY.md](DEPLOY.md).
+Код и тесты готовы. Ниже — порядок действий на VPS. Подробности: [DEPLOY.md](DEPLOY.md). **MVP-чеклист:** [LAUNCH-MVP.md](LAUNCH-MVP.md).
 
 ```bash
 npm run launch:status    # что уже есть / чего не хватает
@@ -14,9 +14,9 @@ npm run launch:verify    # полная проверка перед push (опц
 ./scripts/github-setup.sh <org>/golewood.ru   # нужен: brew install gh && gh auth login
 # или: GIT_REMOTE=git@github.com:<org>/golewood.ru.git ./scripts/git-push-main.sh
 
-cp deploy/.env.production.example .env
-./scripts/generate-prod-secrets.sh   # вставить значения в .env
-# отредактировать остальное (SITE_URL, S3, SMTP, YooKassa)
+npm run setup:prod-env -- --domain golewood.ru
+# или staging: npm run setup:prod-env -- --domain staging.golewood.ru
+# отредактировать .env: YooKassa, S3, SMTP, NUXT_PUBLIC_OPERATOR_*
 npm run preflight:prod   # NODE_ENV=production check:prod, без ошибок
 docker build -t golewood-ru:prod .     # опционально, проверка образа
 ```

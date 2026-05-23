@@ -45,8 +45,8 @@ Run `NODE_ENV=production npm run check:prod` before deploy.
 On the server (project root):
 
 ```bash
-cp deploy/.env.production.example .env
-# edit .env — passwords, JWT, Meili key, SITE_URL, YooKassa, S3, SMTP
+npm run setup:prod-env -- --domain golewood.ru
+# edit .env — YooKassa, S3, SMTP, operator requisites (secrets are auto-generated)
 ```
 
 Generate secrets:
@@ -196,6 +196,24 @@ npm run verify:all
 - `postgres_data` — **back up regularly**
 - `redis_data` — OTP, rate limits (can rebuild)
 - `meilisearch_data` — can rebuild via reindex
+
+## PostgreSQL backup (systemd)
+
+Generate `.env` first: `npm run setup:prod-env -- --domain golewood.ru`
+
+```bash
+sudo mkdir -p /var/backups/golewood
+chmod +x deploy/backup-postgres.sh
+sudo cp deploy/systemd/golewood-backup.* /etc/systemd/system/
+# Edit golewood-backup.service if project path is not /opt/golewood
+sudo systemctl enable --now golewood-backup.timer
+sudo systemctl start golewood-backup.service   # test run
+ls -la /var/backups/golewood/
+```
+
+Default schedule: daily at 03:15 UTC, keep 14 days. Override: `BACKUP_DIR`, `RETAIN_DAYS` in the service file.
+
+Copy dumps off-site (S3, second VPS) before relying on a single disk.
 
 ## Photo storage
 

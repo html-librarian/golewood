@@ -1,0 +1,12 @@
+[Unit]
+Description=Golewood PostgreSQL backup
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/golewood
+EnvironmentFile=/opt/golewood/.env
+Environment=BACKUP_DIR=/var/backups/golewood
+Environment=RETAIN_DAYS=14
+ExecStart=/opt/golewood/deploy/backup-postgres.sh
