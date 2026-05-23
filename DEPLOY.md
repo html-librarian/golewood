@@ -79,7 +79,7 @@ NODE_ENV=production npm run check:prod
 | `NUXT_S3_*` | Object storage for uploads (strongly recommended) |
 | `NUXT_SMTP_URL` | App posts here (`http://mail-relay:8787/send` with bundled relay) |
 | `SMTP_USER`, `SMTP_PASS` | Mail.ru / internet.ru mailbox + **app password** for `mail-relay` |
-| `NUXT_SUPPORT_EMAIL` | Inbox shown on `/help/support` (optional) |
+| `NUXT_PUBLIC_SUPPORT_EMAIL`, `NUXT_SUPPORT_EMAIL` | `support@golewood.ru` — UI, legal, contact form (not the SMTP login) |
 | `NUXT_OAUTH_*` | Yandex/VK sign-in (recommended when SMS is off) |
 
 `docker-compose.prod.yml` binds the app to **127.0.0.1:3000** only. Postgres, Redis, Meilisearch and `mail-relay` are **not** exposed to the internet.
@@ -95,7 +95,8 @@ Registration and sign-in send codes via `emailService` → HTTP `POST` to `NUXT_
 ```bash
 NUXT_PUBLIC_EMAIL_AUTH_ENABLED=true
 NUXT_SMTP_URL=http://mail-relay:8787/send
-NUXT_SUPPORT_EMAIL=golewood@internet.ru
+NUXT_PUBLIC_SUPPORT_EMAIL=support@golewood.ru
+NUXT_SUPPORT_EMAIL=support@golewood.ru
 
 SMTP_HOST=smtp.mail.ru
 SMTP_PORT=465

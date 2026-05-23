@@ -1,3 +1,6 @@
+/** Public support inbox (help form, legal pages, mailto links). */
+export const PLATFORM_SUPPORT_EMAIL = 'support@golewood.ru' as const
+
 export const PLATFORM_LEGAL = {
   legalName: {
     ru: 'ООО «Голевуд»',
@@ -10,7 +13,7 @@ export const PLATFORM_LEGAL = {
     ru: 'г. Москва, ул. Примерная, д. 1',
     en: '1 Example St, Moscow',
   },
-  email: 'support@golewood.ru',
+  email: PLATFORM_SUPPORT_EMAIL,
   bankName: {
     ru: 'АО «Пример Банк»',
     en: 'Example Bank',

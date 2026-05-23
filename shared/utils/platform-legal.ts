@@ -1,4 +1,4 @@
-import { PLATFORM_LEGAL } from '#shared/constants/platform-legal'
+import { PLATFORM_LEGAL, PLATFORM_SUPPORT_EMAIL } from '#shared/constants/platform-legal'
 
 export type PlatformLegalDetails = {
   legalName: string
@@ -48,7 +48,7 @@ export const buildPlatformLegalDetails = (
     kpp: trimEnv(config.operatorKpp) || PLATFORM_LEGAL.kpp,
     ogrn: trimEnv(config.operatorOgrn) || PLATFORM_LEGAL.ogrn,
     legalAddress: trimEnv(config.operatorLegalAddress) || pick(PLATFORM_LEGAL.legalAddress),
-    email: trimEnv(config.supportEmail) || PLATFORM_LEGAL.email,
+    email: trimEnv(config.supportEmail) || PLATFORM_SUPPORT_EMAIL,
     bankName: pick(PLATFORM_LEGAL.bankName),
     bankAccount: PLATFORM_LEGAL.bankAccount,
     bik: PLATFORM_LEGAL.bik,
