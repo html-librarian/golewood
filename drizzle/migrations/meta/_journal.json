@@ -379,6 +379,13 @@
       "when": 1779420000000,
       "tag": "0053_user_home_city",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1779423600000,
+      "tag": "0054_seed_russia_cities",
+      "breakpoints": true
     }
   ]
 }

@@ -33,6 +33,11 @@ COPY --from=builder --chown=nuxtjs:nodejs /app/drizzle.config.ts ./drizzle.confi
 COPY --from=builder --chown=nuxtjs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nuxtjs:nodejs /app/node_modules ./node_modules
 COPY --chown=nuxtjs:nodejs scripts/docker-entrypoint.sh ./scripts/docker-entrypoint.sh
+# Ops: db:seed:cities (idempotent catalog upsert)
+COPY --from=builder --chown=nuxtjs:nodejs /app/scripts/seed-cities.ts ./scripts/seed-cities.ts
+COPY --from=builder --chown=nuxtjs:nodejs /app/shared/catalog/cities-ru.json ./shared/catalog/cities-ru.json
+COPY --from=builder --chown=nuxtjs:nodejs /app/shared/catalog/countries.ts ./shared/catalog/countries.ts
+COPY --from=builder --chown=nuxtjs:nodejs /app/server/db/schema ./server/db/schema
 
 RUN chmod +x ./scripts/docker-entrypoint.sh
 

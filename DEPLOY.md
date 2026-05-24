@@ -191,14 +191,35 @@ Safe on production: idempotent upsert (insert missing, update `name_en` / `sort_
 
 `scripts/remote-deploy.sh` (GitHub Actions deploy) runs **`db:seed:cities` after every `db:migrate`**.
 
-**One-time on an already-running host** (before the next deploy with the updated script):
+**One-time on an already-running host** (pick one):
+
+1. **Migration** (after `git pull` with `0054_seed_russia_cities.sql` — works even on an old image, because `drizzle/` is in the container):
 
 ```bash
-cd /path/to/golewood.ru
+cd /var/opt/golewood
+git pull --ff-only origin main
+docker compose -f docker-compose.prod.yml exec -T app npm run db:migrate
+```
+
+2. **`db:seed:cities`** (needs a **rebuilt** app image that includes `scripts/seed-cities.ts` — see `Dockerfile` runner stage):
+
+```bash
 docker compose -f docker-compose.prod.yml exec -T app npm run db:seed:cities
 ```
 
-Verify: open account → «Ваш город» — search should list hundreds of cities, not only Москва / СПб / Казань / Сочи.
+3. **Workaround without rebuild** — mount scripts from the host checkout (repo on VPS must contain `scripts/seed-cities.ts`):
+
+```bash
+cd /var/opt/golewood
+docker compose -f docker-compose.prod.yml run --rm --no-deps \
+  -v "$PWD/scripts/seed-cities.ts:/app/scripts/seed-cities.ts:ro" \
+  -v "$PWD/shared/catalog:/app/shared/catalog:ro" \
+  -v "$PWD/server/db/schema:/app/server/db/schema:ro" \
+  --entrypoint npm \
+  app run db:seed:cities
+```
+
+Verify: account → «Ваш город» — search should list hundreds of cities, not only four.
 
 ## 4. HTTPS reverse proxy (Caddy)
 
