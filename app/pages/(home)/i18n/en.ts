@@ -15,5 +15,5 @@ export default {
   trustPayment: 'Card payment',
   trustSupport: '24/7 support',
   discoveryTitle: 'Where to go',
-  discoverySubtitle: 'Pick a destination or amenity — we open search with filters already applied',
+  discoverySubtitle: 'Pick a place, scenery, or amenity — matching stays in one tap',
 } as const

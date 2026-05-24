@@ -15,5 +15,5 @@ export default {
   trustPayment: 'Оплата картой',
   trustSupport: 'Поддержка 24/7',
   discoveryTitle: 'Куда поехать',
-  discoverySubtitle: 'Выберите направление или условия — откроем поиск с уже выбранными фильтрами',
+  discoverySubtitle: 'Город, природа или удобства — сразу покажем подходящие объявления',
 } as const
