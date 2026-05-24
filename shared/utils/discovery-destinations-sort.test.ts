@@ -26,7 +26,19 @@ describe('sortDiscoveryDestinations', () => {
     expect(sorted[0]?.id).toBe('kazan')
   })
 
-  it('keeps order when no match', () => {
-    expect(sortDiscoveryDestinations(filters, { profileCity: 'Тула' }).map(f => f.id)).toEqual(['sochi', 'kazan', 'spb'])
+  it('prepends a card when profile city is not in the list', () => {
+    const sorted = sortDiscoveryDestinations(filters, { profileCity: 'Курск' })
+
+    expect(sorted).toHaveLength(4)
+    expect(sorted[0]?.params.city).toBe('Курск')
+    expect(sorted[0]?.id).toBe('priority-курск')
+    expect(sorted[1]?.id).toBe('sochi')
+  })
+
+  it('prepends geo city when it is not in the list', () => {
+    const sorted = sortDiscoveryDestinations(filters, { geoCity: 'Тула' })
+
+    expect(sorted[0]?.params.city).toBe('Тула')
+    expect(sorted[0]?.id).toBe('priority-тула')
   })
 })
