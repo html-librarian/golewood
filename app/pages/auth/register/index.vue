@@ -6,6 +6,7 @@ import en from './i18n/en'
 definePageMeta({ pageTransition: false })
 
 const { t } = usePageI18n({ ru, en })
+const { t: $t } = useI18n()
 const localePath = useLocalePath()
 const { sendCode, verifyCode, fetchMe, user } = useAuth()
 const { phoneAuthEnabled, emailSignInEnabled } = useAuthFeatures()
@@ -30,7 +31,9 @@ const onEmailSuccess = async () => {
   await navigateTo(localePath(target))
 }
 
-const name = ref('')
+const lastName = ref('')
+const firstName = ref('')
+const patronymic = ref('')
 const phone = ref('')
 const code = ref('')
 const step = ref<'form' | 'code'>('form')
@@ -58,7 +61,13 @@ const handleVerify = async () => {
   error.value = ''
 
   try {
-    await verifyCode({ phone: phone.value, code: code.value, name: name.value })
+    await verifyCode({
+      phone: phone.value,
+      code: code.value,
+      lastName: lastName.value,
+      firstName: firstName.value,
+      patronymic: patronymic.value || undefined,
+    })
     await navigateTo(localePath('/account'))
   } catch {
     error.value = t('errorInvalidCode')
@@ -116,11 +125,15 @@ const handleVerify = async () => {
           class="flex flex-col gap-4"
           @submit.prevent="step === 'form' ? handleSendCode() : handleVerify()"
         >
-          <FormInput
+          <FormUserName
             v-if="step === 'form'"
-            v-model="name"
-            :label="t('nameLabel')"
-            autocomplete="name"
+            v-model:last-name="lastName"
+            v-model:first-name="firstName"
+            v-model:patronymic="patronymic"
+            :last-name-label="$t('common.lastName')"
+            :first-name-label="$t('common.firstName')"
+            :patronymic-label="$t('common.patronymic')"
+            :patronymic-optional-hint="$t('common.patronymicOptional')"
           />
 
           <FormPhoneInput

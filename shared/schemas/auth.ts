@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { normalizeEmail } from '#shared/utils/email'
+import { userNamePartsSchema } from './user-name'
 
 export const phoneSchema = z
   .string()
@@ -20,8 +21,7 @@ export const sendCodeSchema = z.object({
 export const verifyCodeSchema = z.object({
   phone: phoneSchema,
   code: z.string().trim().length(4),
-  name: z.string().trim().min(2).max(100).optional(),
-})
+}).merge(userNamePartsSchema.partial())
 
 export const sendEmailCodeSchema = z.object({
   email: emailSchema,
@@ -30,12 +30,11 @@ export const sendEmailCodeSchema = z.object({
 export const verifyEmailCodeSchema = z.object({
   email: emailSchema,
   code: z.string().trim().length(4),
-  name: z.string().trim().min(2).max(100).optional(),
   /** Real mobile for new email registration. */
   phone: phoneSchema.optional(),
   /** Merge email login with an existing phone account that has no email yet. */
   linkPhone: phoneSchema.optional(),
-})
+}).merge(userNamePartsSchema.partial())
 
 export const emailMagicSchema = z.object({
   token: z.string().trim().min(10),

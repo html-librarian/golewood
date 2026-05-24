@@ -5,6 +5,7 @@ import { users } from '../db/schema'
 import { getDb } from '../utils/db'
 import { mapUser } from '../utils/auth'
 import { normalizePhone } from '#shared/utils/phone'
+import { toUserNameDbColumns } from '../utils/user-name'
 
 const assertPhoneAvailable = async (phone: string, exceptUserId: string) => {
   const db = getDb()
@@ -23,13 +24,12 @@ export const accountProfileService = {
   completeProfile: async (userId: string, input: CompleteProfileInput): Promise<User> => {
     const db = getDb()
     const normalizedPhone = normalizePhone(input.phone)
-    const trimmedName = input.name.trim()
 
     await assertPhoneAvailable(normalizedPhone, userId)
 
     const [updated] = await db.update(users)
       .set({
-        name: trimmedName,
+        ...toUserNameDbColumns(input),
         phone: normalizedPhone,
         updatedAt: new Date(),
       })

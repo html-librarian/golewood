@@ -38,8 +38,6 @@ const navLinks = computed(() => {
   return links
 })
 
-const burgerNavLinks = computed(() => navLinks.value.filter(link => link.to !== '/search'))
-
 const isActive = (path: string) => {
   const target = localePath(path)
   return route.path === target || route.path.startsWith(`${target}/`)
@@ -63,7 +61,7 @@ const userDisplayName = computed(() =>
   user.value ? formatUserDisplayName(user.value) : '',
 )
 
-const userInitials = computed(() => formatUserInitials(user.value?.name))
+const userInitials = computed(() => formatUserInitials(user.value ?? undefined))
 
 watch(() => route.fullPath, () => {
   closeMobileMenu()
@@ -87,63 +85,69 @@ onBeforeUnmount(() => {
     ref="headerRef"
     class="sticky top-0 z-50 border-b border-stone-200/70 bg-white/85 backdrop-blur-xl dark:border-stone-800/80 dark:bg-stone-950/85"
   >
-    <div class="layout-container flex items-center justify-between gap-3 py-3">
-      <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-        <NuxtLink
-          :to="localePath('/')"
-          class="group flex h-9 shrink-0 items-center gap-2.5"
-        >
-          <span class="flex size-9 items-center justify-center rounded-xl bg-brand-700 text-white shadow-sm transition group-hover:bg-brand-800 dark:bg-brand-600">
-            <Icon
-              name="ph:tree-evergreen-duotone"
-              class="size-5"
-            />
-          </span>
-          <span class="font-display text-xl font-semibold leading-none tracking-tight text-stone-900 dark:text-stone-50">
-            Golewood
-          </span>
-        </NuxtLink>
-
-        <NuxtLink
-          :to="localePath('/search')"
-          class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 md:hidden dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
-          :class="{ 'border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-500 dark:bg-brand-950/50 dark:text-brand-200': isActive('/search') }"
-          :aria-label="$t('common.search')"
-          data-testid="nav-search-icon"
-        >
+    <div class="layout-container flex items-center gap-2 py-3 sm:gap-3">
+      <NuxtLink
+        :to="localePath('/')"
+        class="group flex h-9 shrink-0 items-center gap-2"
+      >
+        <span class="flex size-9 items-center justify-center rounded-xl bg-brand-700 text-white shadow-sm transition group-hover:bg-brand-800 dark:bg-brand-600">
           <Icon
-            name="ph:magnifying-glass-duotone"
+            name="ph:tree-evergreen-duotone"
             class="size-5"
           />
-        </NuxtLink>
+        </span>
+        <span class="font-display text-lg font-semibold leading-none tracking-tight text-stone-900 sm:text-xl dark:text-stone-50">
+          Golewood
+        </span>
+      </NuxtLink>
 
-        <nav class="hidden h-9 items-center gap-1 md:flex">
-          <NuxtLink
+      <NuxtLink
+        :to="localePath('/search')"
+        class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 xl:hidden dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
+        :class="{ 'border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-500 dark:bg-brand-950/50 dark:text-brand-200': isActive('/search') }"
+        :aria-label="$t('common.search')"
+        data-testid="nav-search-icon"
+      >
+        <Icon
+          name="ph:magnifying-glass-duotone"
+          class="size-5"
+        />
+      </NuxtLink>
+
+      <nav
+        class="hidden min-w-0 flex-1 justify-center px-1 xl:flex"
+        aria-label="Main"
+      >
+        <ul class="flex max-w-full flex-wrap items-center justify-center gap-0.5">
+          <li
             v-for="link in navLinks"
             :key="link.to"
-            :to="localePath(link.to)"
-            class="nav-link relative"
-            :class="{ 'nav-link-active': isActive(link.to) }"
           >
-            {{ $t(link.label) }}
-            <span
-              v-if="link.to === '/messages' && unreadCount > 0"
-              data-testid="messages-unread-badge"
-              class="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white"
+            <NuxtLink
+              :to="localePath(link.to)"
+              class="nav-link relative whitespace-nowrap px-2.5"
+              :class="{ 'nav-link-active': isActive(link.to) }"
             >
-              {{ unreadCount > 9 ? '9+' : unreadCount }}
-            </span>
-          </NuxtLink>
-        </nav>
-      </div>
+              {{ $t(link.label) }}
+              <span
+                v-if="link.to === '/messages' && unreadCount > 0"
+                data-testid="messages-unread-badge"
+                class="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white"
+              >
+                {{ unreadCount > 9 ? '9+' : unreadCount }}
+              </span>
+            </NuxtLink>
+          </li>
+        </ul>
+      </nav>
 
-      <div class="flex h-9 shrink-0 items-center gap-2">
-        <div class="flex h-9 items-center rounded-xl border border-stone-200 bg-stone-50 p-0.5 dark:border-stone-700 dark:bg-stone-900">
+      <div class="ml-auto flex h-9 shrink-0 items-center gap-1.5 sm:gap-2">
+        <div class="hidden h-9 items-center rounded-xl border border-stone-200 bg-stone-50 p-0.5 sm:flex dark:border-stone-700 dark:bg-stone-900">
           <button
             v-for="item in locales"
             :key="item.code"
             type="button"
-            class="flex h-full items-center rounded-lg px-2.5 text-xs font-medium transition"
+            class="flex h-full items-center rounded-lg px-2 text-xs font-medium transition"
             :class="locale === item.code
               ? 'bg-white text-brand-800 shadow-sm dark:bg-stone-800 dark:text-brand-200'
               : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200'"
@@ -155,7 +159,7 @@ onBeforeUnmount(() => {
 
         <button
           type="button"
-          class="flex size-9 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
+          class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
           :title="$t('common.theme')"
           @click="toggleTheme"
         >
@@ -178,18 +182,18 @@ onBeforeUnmount(() => {
         <NuxtLink
           v-else
           :to="localePath('/account')"
-          class="flex h-9 max-w-[120px] shrink-0 items-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 px-2 text-xs font-medium text-stone-700 transition hover:bg-stone-100 sm:max-w-[140px] sm:px-2.5 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:bg-stone-800"
-          :title="$t('common.account')"
+          class="flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 px-2 text-xs font-medium text-stone-700 transition hover:bg-stone-100 sm:px-2.5 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:bg-stone-800"
+          :title="userDisplayName || $t('common.account')"
         >
           <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[10px] font-semibold text-brand-800 dark:bg-brand-900 dark:text-brand-200">
             {{ userInitials }}
           </span>
-          <span class="hidden truncate sm:inline">{{ userDisplayName }}</span>
+          <span class="hidden max-w-[7.5rem] truncate 2xl:inline">{{ userDisplayName }}</span>
         </NuxtLink>
 
         <button
           type="button"
-          class="relative flex size-9 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 md:hidden dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
+          class="relative flex size-9 shrink-0 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 xl:hidden dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
           :aria-label="mobileMenuOpen ? $t('common.closeMenu') : $t('common.menu')"
           :aria-expanded="mobileMenuOpen"
           data-testid="nav-burger"
@@ -210,7 +214,7 @@ onBeforeUnmount(() => {
     <Teleport to="body">
       <div
         v-if="mobileMenuOpen"
-        class="fixed inset-0 z-200 md:hidden"
+        class="fixed inset-0 z-200 xl:hidden"
         data-testid="nav-mobile-menu"
       >
         <button
@@ -221,10 +225,14 @@ onBeforeUnmount(() => {
         />
 
         <nav
-          class="absolute right-0 top-0 flex h-full w-[min(100%,18rem)] flex-col gap-1 border-l border-stone-200 bg-white p-4 shadow-xl dark:border-stone-800 dark:bg-stone-950"
+          class="absolute right-0 top-0 flex h-full w-[min(100%,20rem)] flex-col gap-1 overflow-y-auto border-l border-stone-200 bg-white p-4 pt-[max(1rem,env(safe-area-inset-top))] shadow-xl dark:border-stone-800 dark:bg-stone-950"
         >
+          <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">
+            {{ $t('common.menu') }}
+          </p>
+
           <NuxtLink
-            v-for="link in burgerNavLinks"
+            v-for="link in navLinks"
             :key="link.to"
             :to="localePath(link.to)"
             class="nav-link relative rounded-xl px-3 py-2.5"
@@ -239,6 +247,23 @@ onBeforeUnmount(() => {
               {{ unreadCount > 9 ? '9+' : unreadCount }}
             </span>
           </NuxtLink>
+
+          <div class="mt-4 flex items-center gap-2 border-t border-stone-200 pt-4 dark:border-stone-800">
+            <div class="flex h-9 flex-1 items-center rounded-xl border border-stone-200 bg-stone-50 p-0.5 dark:border-stone-700 dark:bg-stone-900">
+              <button
+                v-for="item in locales"
+                :key="item.code"
+                type="button"
+                class="flex h-full flex-1 items-center justify-center rounded-lg text-xs font-medium transition"
+                :class="locale === item.code
+                  ? 'bg-white text-brand-800 shadow-sm dark:bg-stone-800 dark:text-brand-200'
+                  : 'text-stone-500 dark:text-stone-400'"
+                @click="setLocale(item.code)"
+              >
+                {{ item.code.toUpperCase() }}
+              </button>
+            </div>
+          </div>
 
           <NuxtLink
             v-if="!isAuthenticated"

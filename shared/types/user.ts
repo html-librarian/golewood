@@ -5,7 +5,11 @@ export interface User {
   id: string
   phone: string
   email: string | null
+  /** Denormalized «Фамилия Имя Отчество» for display and legacy clients. */
   name: string | null
+  lastName: string | null
+  firstName: string | null
+  patronymic: string | null
   role: UserRole
   bonusBalance: number
   maxUserId: number | null

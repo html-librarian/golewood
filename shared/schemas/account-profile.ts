@@ -1,8 +1,8 @@
-import { z } from 'zod'
+import type { z } from 'zod'
 import { phoneSchema } from './auth'
+import { userNamePartsSchema } from './user-name'
 
-export const completeProfileSchema = z.object({
-  name: z.string().trim().min(2).max(100),
+export const completeProfileSchema = userNamePartsSchema.extend({
   phone: phoneSchema,
 })
 

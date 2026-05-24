@@ -78,7 +78,7 @@ const isActive = (match: (path: string) => boolean) => match(route.path)
 <template>
   <nav
     v-if="showNav"
-    class="fixed inset-x-0 bottom-0 z-50 border-t border-stone-200/80 bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden dark:border-stone-800/80 dark:bg-stone-950/90"
+    class="fixed inset-x-0 bottom-0 z-50 border-t border-stone-200/80 bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden dark:border-stone-800/80 dark:bg-stone-950/90"
     aria-label="Mobile navigation"
   >
     <ul class="mx-auto flex max-w-lg items-stretch justify-around px-2 pt-1">

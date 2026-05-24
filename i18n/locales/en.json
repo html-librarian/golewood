@@ -26,7 +26,11 @@
     "emDash": "—",
     "loading": "Loading…",
     "menu": "Menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "lastName": "Last name",
+    "firstName": "First name",
+    "patronymic": "Patronymic",
+    "patronymicOptional": "Optional"
   },
   "story": {
     "anonymous": "Guest",

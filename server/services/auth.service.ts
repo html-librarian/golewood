@@ -22,6 +22,7 @@ import {
   verifyToken,
 } from '../utils/jwt'
 import { mapUser } from '../utils/auth'
+import { assertAuthNameProvided, resolveAuthNameColumns, type AuthNameInput } from './auth-name'
 import { normalizeEmail } from '#shared/utils/email'
 import { normalizePhone } from '#shared/utils/phone'
 import { assertEmailAvailable } from './account-email.service'
@@ -60,9 +61,20 @@ const assertPhoneAvailableForSignup = async (phone: string) => {
   }
 }
 
+const applyNameIfMissing = (
+  userRow: typeof users.$inferSelect,
+  input: AuthNameInput,
+): Partial<typeof users.$inferInsert> | null => {
+  if (userRow.lastName || userRow.name) {
+    return null
+  }
+
+  return resolveAuthNameColumns(input)
+}
+
 const completeEmailLogin = async (
   normalizedEmail: string,
-  options?: { name?: string, linkPhone?: string, phone?: string },
+  options?: AuthNameInput & { linkPhone?: string, phone?: string },
 ): Promise<typeof users.$inferSelect> => {
   const db = getDb()
   let userRow = await findUserByEmail(normalizedEmail)
@@ -86,8 +98,10 @@ const completeEmailLogin = async (
         updatedAt: new Date(),
       }
 
-      if (options.name && !phoneUser.name) {
-        patch.name = options.name
+      const nameCols = options ? applyNameIfMissing(phoneUser, options) : null
+
+      if (nameCols) {
+        Object.assign(patch, nameCols)
       }
 
       const [updated] = await db.update(users)
@@ -102,15 +116,12 @@ const completeEmailLogin = async (
   if (!userRow) {
     await assertEmailAvailable(normalizedEmail)
 
-    const trimmedName = options?.name?.trim()
-
     if (!options?.phone) {
       throw createError({ statusCode: 400, statusMessage: 'Phone is required' })
     }
 
-    if (!trimmedName || trimmedName.length < 2) {
-      throw createError({ statusCode: 400, statusMessage: 'Name is required' })
-    }
+    assertAuthNameProvided(options)
+    const nameCols = resolveAuthNameColumns(options)!
 
     const normalizedPhone = normalizePhone(options.phone)
     await assertPhoneAvailableForSignup(normalizedPhone)
@@ -118,18 +129,22 @@ const completeEmailLogin = async (
     const [createdUser] = await db.insert(users).values({
       phone: normalizedPhone,
       email: normalizedEmail,
-      name: trimmedName,
+      ...nameCols,
       role: 'guest',
     }).returning()
 
     userRow = createdUser
-  } else if (options?.name && !userRow.name) {
-    const [updatedUser] = await db.update(users)
-      .set({ name: options.name, updatedAt: new Date() })
-      .where(eq(users.id, userRow.id))
-      .returning()
+  } else if (options) {
+    const nameCols = applyNameIfMissing(userRow, options)
 
-    userRow = updatedUser
+    if (nameCols) {
+      const [updatedUser] = await db.update(users)
+        .set({ ...nameCols, updatedAt: new Date() })
+        .where(eq(users.id, userRow.id))
+        .returning()
+
+      userRow = updatedUser
+    }
   } else if (!userRow.email) {
     const [updatedUser] = await db.update(users)
       .set({ email: normalizedEmail, updatedAt: new Date() })
@@ -190,7 +205,7 @@ export const authService = {
     }
   },
 
-  verifyCode: async ({ phone, code, name }: VerifyCodeInput, meta?: SessionClientMeta): Promise<LoginResult> => {
+  verifyCode: async ({ phone, code, lastName, firstName, patronymic }: VerifyCodeInput, meta?: SessionClientMeta): Promise<LoginResult> => {
     const normalizedPhone = normalizePhone(phone)
     const redis = getRedis()
     const storedCode = await redis.get(otpKey(normalizedPhone))
@@ -207,26 +222,28 @@ export const authService = {
     let userRow = existingUser
 
     if (!userRow) {
-      const trimmedName = name?.trim()
-
-      if (!trimmedName || trimmedName.length < 2) {
-        throw createError({ statusCode: 400, statusMessage: 'Name is required' })
-      }
+      const nameInput = { lastName, firstName, patronymic }
+      assertAuthNameProvided(nameInput)
+      const nameCols = resolveAuthNameColumns(nameInput)!
 
       const [createdUser] = await db.insert(users).values({
         phone: normalizedPhone,
-        name: trimmedName,
+        ...nameCols,
         role: 'guest',
       }).returning()
 
       userRow = createdUser
-    } else if (name && !userRow.name) {
-      const [updatedUser] = await db.update(users)
-        .set({ name, updatedAt: new Date() })
-        .where(eq(users.id, userRow.id))
-        .returning()
+    } else {
+      const nameCols = applyNameIfMissing(userRow, { lastName, firstName, patronymic })
 
-      userRow = updatedUser
+      if (nameCols) {
+        const [updatedUser] = await db.update(users)
+          .set({ ...nameCols, updatedAt: new Date() })
+          .where(eq(users.id, userRow.id))
+          .returning()
+
+        userRow = updatedUser
+      }
     }
 
     return authService.completeLogin(userRow, meta)
@@ -266,7 +283,7 @@ export const authService = {
   },
 
   verifyEmailCode: async (
-    { email, code, name, phone, linkPhone }: VerifyEmailCodeInput,
+    { email, code, lastName, firstName, patronymic, phone, linkPhone }: VerifyEmailCodeInput,
     meta?: SessionClientMeta,
   ): Promise<LoginResult> => {
     const normalizedEmail = normalizeEmail(email)
@@ -279,13 +296,19 @@ export const authService = {
 
     await redis.del(emailOtpKey(normalizedEmail))
 
-    const userRow = await completeEmailLogin(normalizedEmail, { name, phone, linkPhone })
+    const userRow = await completeEmailLogin(normalizedEmail, {
+      lastName,
+      firstName,
+      patronymic,
+      phone,
+      linkPhone,
+    })
     return authService.completeLogin(userRow, meta)
   },
 
   verifyEmailMagic: async (
     payload: EmailMagicPayload,
-    options?: { linkPhone?: string, phone?: string, name?: string },
+    options?: AuthNameInput & { linkPhone?: string, phone?: string },
     meta?: SessionClientMeta,
   ): Promise<LoginResult> => {
     if (payload.purpose !== 'email-login') {
@@ -293,6 +316,7 @@ export const authService = {
     }
 
     const userRow = await completeEmailLogin(payload.email, {
+      ...options,
       name: options?.name ?? payload.name,
       linkPhone: options?.linkPhone,
       phone: options?.phone,

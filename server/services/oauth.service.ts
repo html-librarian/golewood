@@ -5,7 +5,10 @@ import { and, eq } from 'drizzle-orm'
 import { normalizeEmail } from '#shared/utils/email'
 import { oauthAccounts, users } from '../db/schema'
 import { getDb } from '../utils/db'
+import { userNamePartsFromWestern } from '#shared/utils/user-name'
 import { authService } from './auth.service'
+import { resolveAuthNameColumns } from './auth-name'
+import { toUserNameDbColumns } from '../utils/user-name'
 import { syntheticOAuthPhone } from '#shared/utils/synthetic-phone-oauth'
 import { forbidInProduction } from '../utils/dev-guards'
 
@@ -98,15 +101,25 @@ const fetchVkProfile = async (code: string): Promise<OAuthProfile> => {
   return {
     providerUserId: String(tokenData.user_id),
     name: profile ? `${profile.first_name ?? ''} ${profile.last_name ?? ''}`.trim() : null,
+    firstName: profile?.first_name ?? null,
+    lastName: profile?.last_name ?? null,
     email: tokenData.email ?? null,
   }
+}
+
+const oauthProfileNameColumns = (profile: OAuthProfile) => {
+  if (profile.lastName?.trim() && profile.firstName?.trim()) {
+    return toUserNameDbColumns(userNamePartsFromWestern(profile.firstName, profile.lastName))
+  }
+
+  return profile.name ? resolveAuthNameColumns({ name: profile.name }) : null
 }
 
 const mergeOAuthProfile = async (
   userRow: typeof users.$inferSelect,
   profile: OAuthProfile,
 ): Promise<typeof users.$inferSelect> => {
-  const updates: { email?: string, name?: string, updatedAt?: Date } = {}
+  const updates: Partial<typeof users.$inferInsert> = {}
   let hasUpdates = false
 
   if (profile.email && !userRow.email) {
@@ -114,9 +127,13 @@ const mergeOAuthProfile = async (
     hasUpdates = true
   }
 
-  if (profile.name && !userRow.name) {
-    updates.name = profile.name
-    hasUpdates = true
+  if (!userRow.lastName && !userRow.name) {
+    const nameCols = oauthProfileNameColumns(profile)
+
+    if (nameCols) {
+      Object.assign(updates, nameCols)
+      hasUpdates = true
+    }
   }
 
   if (!hasUpdates) {
@@ -163,10 +180,17 @@ const findOrCreateUser = async (provider: OAuthProvider, profile: OAuthProfile) 
     attempts++
   }
 
+  const nameCols = oauthProfileNameColumns(profile) ?? {
+    name: profile.name,
+    lastName: null,
+    firstName: null,
+    patronymic: null,
+  }
+
   const [userRow] = await db.insert(users).values({
     phone,
     email: profile.email ? normalizeEmail(profile.email) : null,
-    name: profile.name,
+    ...nameCols,
     role: 'guest',
   }).returning()
 

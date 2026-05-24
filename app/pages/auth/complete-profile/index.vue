@@ -1,14 +1,20 @@
 <script setup lang="ts">
+import { resolveUserNameParts } from '#shared/utils/user-name'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
 definePageMeta({ middleware: 'auth', pageTransition: false })
 
 const { t } = usePageI18n({ ru, en })
+const { t: $t } = useI18n()
 const localePath = useLocalePath()
 const { user, completeProfile } = useAuth()
 
-const name = ref(user.value?.name ?? '')
+const initialParts = resolveUserNameParts(user.value ?? {})
+
+const lastName = ref(initialParts.lastName ?? '')
+const firstName = ref(initialParts.firstName ?? '')
+const patronymic = ref(initialParts.patronymic ?? '')
 const phone = ref('')
 const loading = ref(false)
 const error = ref('')
@@ -18,7 +24,12 @@ const handleSubmit = async () => {
   error.value = ''
 
   try {
-    await completeProfile({ name: name.value, phone: phone.value })
+    await completeProfile({
+      lastName: lastName.value,
+      firstName: firstName.value,
+      patronymic: patronymic.value || undefined,
+      phone: phone.value,
+    })
     await navigateTo(localePath('/account'))
   } catch (err: unknown) {
     const status = err && typeof err === 'object' && 'statusCode' in err
@@ -49,12 +60,15 @@ const handleSubmit = async () => {
         data-testid="complete-profile-form"
         @submit.prevent="handleSubmit()"
       >
-        <FormInput
-          v-model="name"
-          :label="t('nameLabel')"
-          autocomplete="name"
+        <FormUserName
+          v-model:last-name="lastName"
+          v-model:first-name="firstName"
+          v-model:patronymic="patronymic"
           :disabled="loading"
-          :error="error"
+          :last-name-label="$t('common.lastName')"
+          :first-name-label="$t('common.firstName')"
+          :patronymic-label="$t('common.patronymic')"
+          :patronymic-optional-hint="$t('common.patronymicOptional')"
         />
 
         <FormPhoneInput
@@ -62,6 +76,13 @@ const handleSubmit = async () => {
           :label="t('phoneLabel')"
           :disabled="loading"
         />
+
+        <p
+          v-if="error"
+          class="text-sm text-red-600 dark:text-red-400"
+        >
+          {{ error }}
+        </p>
 
         <UiButton
           type="submit"

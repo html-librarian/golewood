@@ -26,7 +26,11 @@
     "emDash": "—",
     "loading": "Загрузка…",
     "menu": "Меню",
-    "closeMenu": "Закрыть меню"
+    "closeMenu": "Закрыть меню",
+    "lastName": "Фамилия",
+    "firstName": "Имя",
+    "patronymic": "Отчество",
+    "patronymicOptional": "Необязательно"
   },
   "story": {
     "anonymous": "Гость",

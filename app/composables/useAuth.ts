@@ -145,7 +145,13 @@ export const useAuth = () => {
       body: { phone },
     })
 
-  const verifyCode = async (payload: { phone: string, code: string, name?: string }) => {
+  const verifyCode = async (payload: {
+    phone: string
+    code: string
+    lastName?: string
+    firstName?: string
+    patronymic?: string
+  }) => {
     const result = await $fetch<LoginResult>('/api/auth/verify', {
       method: 'POST',
       body: payload,
@@ -168,7 +174,9 @@ export const useAuth = () => {
   const verifyEmailCode = async (payload: {
     email: string
     code: string
-    name?: string
+    lastName?: string
+    firstName?: string
+    patronymic?: string
     phone?: string
     linkPhone?: string
   }) => {
@@ -181,7 +189,12 @@ export const useAuth = () => {
     return session
   }
 
-  const completeProfile = async (payload: { name: string, phone: string }) => {
+  const completeProfile = async (payload: {
+    lastName: string
+    firstName: string
+    patronymic?: string
+    phone: string
+  }) => {
     const updated = await $fetch<User>('/api/account/complete-profile', {
       method: 'POST',
       headers: authHeaders.value,

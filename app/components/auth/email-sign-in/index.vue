@@ -7,9 +7,12 @@ const emit = defineEmits<{
   success: []
 }>()
 
+const { t: $t } = useI18n()
 const { sendEmailCode, verifyEmailCode } = useAuth()
 
-const name = ref('')
+const lastName = ref('')
+const firstName = ref('')
+const patronymic = ref('')
 const phone = ref('')
 const email = ref('')
 const linkPhone = ref('')
@@ -45,7 +48,9 @@ const handleVerify = async () => {
     await verifyEmailCode({
       email: email.value,
       code: code.value,
-      name: props.registerMode ? name.value : undefined,
+      lastName: props.registerMode ? lastName.value : undefined,
+      firstName: props.registerMode ? firstName.value : undefined,
+      patronymic: props.registerMode && patronymic.value ? patronymic.value : undefined,
       phone: props.registerMode ? phone.value : undefined,
       linkPhone: props.allowPhoneLink && showPhoneLink.value && linkPhone.value
         ? linkPhone.value
@@ -72,12 +77,15 @@ const handleVerify = async () => {
     class="flex flex-col gap-4"
     @submit.prevent="step === 'email' ? handleSendCode() : handleVerify()"
   >
-    <FormInput
+    <FormUserName
       v-if="registerMode && step === 'email'"
-      v-model="name"
-      :label="labels.nameLabel ?? ''"
-      autocomplete="name"
-      required
+      v-model:last-name="lastName"
+      v-model:first-name="firstName"
+      v-model:patronymic="patronymic"
+      :last-name-label="$t('common.lastName')"
+      :first-name-label="$t('common.firstName')"
+      :patronymic-label="$t('common.patronymic')"
+      :patronymic-optional-hint="$t('common.patronymicOptional')"
     />
 
     <FormPhoneInput
@@ -104,11 +112,11 @@ const handleVerify = async () => {
 
     <FormInput
       v-model="email"
-      :label="labels.emailLabel"
       type="email"
+      :label="labels.emailLabel"
       autocomplete="email"
       :disabled="step === 'code' || loading"
-      :error="step === 'email' ? error : undefined"
+      required
     />
 
     <FormInput
@@ -118,6 +126,7 @@ const handleVerify = async () => {
       maxlength="4"
       autocomplete="one-time-code"
       :error="error"
+      required
     />
 
     <p
@@ -126,13 +135,14 @@ const handleVerify = async () => {
     >
       {{ labels.devCode }}: <strong>{{ devCode }}</strong>
     </p>
+
     <p
       v-if="devMagicUrl"
       class="break-all rounded-lg bg-stone-100 px-3 py-2 text-xs text-stone-700 dark:bg-stone-800 dark:text-stone-300"
     >
       <a
         :href="devMagicUrl"
-        class="font-medium text-brand-700 dark:text-brand-400"
+        class="text-brand-700 underline dark:text-brand-300"
       >{{ devMagicUrl }}</a>
     </p>
 

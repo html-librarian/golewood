@@ -1,32 +1,38 @@
 import { isPlaceholderPhone } from './synthetic-phone-detect'
+import { buildFullName, formatNameInitials, resolveUserNameParts } from './user-name'
 
-/** First letters of first and last word (FIO-style), or single letter for one word. */
-export const formatUserInitials = (name: string | null | undefined): string => {
-  const trimmed = name?.trim()
-
-  if (!trimmed) {
-    return '?'
-  }
-
-  const parts = trimmed.split(/\s+/).filter(Boolean)
-
-  if (parts.length >= 2) {
-    const first = parts[0]?.charAt(0) ?? ''
-    const last = parts[parts.length - 1]?.charAt(0) ?? ''
-    return `${first}${last}`.toUpperCase()
-  }
-
-  return trimmed.charAt(0).toUpperCase()
+export type UserDisplaySource = {
+  name?: string | null
+  lastName?: string | null
+  firstName?: string | null
+  patronymic?: string | null
+  phone?: string | null
 }
 
-export const formatUserDisplayName = (user: {
-  name?: string | null
-  phone?: string | null
-}): string => {
-  const name = user.name?.trim()
+/** First letters of family name and given name (Голев Максим → ГМ). */
+export const formatUserInitials = (user: UserDisplaySource | string | null | undefined): string => {
+  if (typeof user === 'string' || user === null || user === undefined) {
+    return formatNameInitials(resolveUserNameParts({ name: user ?? null }))
+  }
 
-  if (name) {
-    return name
+  return formatNameInitials(resolveUserNameParts(user))
+}
+
+export const formatUserDisplayName = (user: UserDisplaySource): string => {
+  const parts = resolveUserNameParts(user)
+
+  if (parts.lastName && parts.firstName) {
+    return buildFullName({
+      lastName: parts.lastName,
+      firstName: parts.firstName,
+      patronymic: parts.patronymic,
+    })
+  }
+
+  const legacy = user.name?.trim()
+
+  if (legacy) {
+    return legacy
   }
 
   if (user.phone && !isPlaceholderPhone(user.phone)) {
@@ -36,7 +42,8 @@ export const formatUserDisplayName = (user: {
   return ''
 }
 
-export const needsProfileCompletion = (user: {
-  name?: string | null
-  phone?: string | null
-}): boolean => !user.name?.trim() || isPlaceholderPhone(user.phone ?? '')
+export const needsProfileCompletion = (user: UserDisplaySource): boolean => {
+  const parts = resolveUserNameParts(user)
+
+  return !parts.lastName || !parts.firstName || isPlaceholderPhone(user.phone ?? '')
+}

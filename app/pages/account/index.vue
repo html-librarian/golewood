@@ -14,7 +14,7 @@ const userDisplayName = computed(() =>
   user.value ? formatUserDisplayName(user.value) : '',
 )
 
-const userInitials = computed(() => formatUserInitials(user.value?.name))
+const userInitials = computed(() => formatUserInitials(user.value ?? undefined))
 
 const phoneDisplay = computed(() => {
   if (!user.value?.phone) {
