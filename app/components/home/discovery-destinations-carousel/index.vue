@@ -77,7 +77,7 @@ watch(() => props.filters.length, () => nextTick(updateScrollState))
   >
     <div
       ref="trackRef"
-      class="flex gap-3 overflow-x-auto scroll-smooth pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory"
+      class="flex gap-3 overflow-x-auto scroll-smooth pb-1 pr-4 [-ms-overflow-style:none] [scrollbar-width:none] md:pr-6 lg:pr-8 [&::-webkit-scrollbar]:hidden snap-x snap-mandatory 2xl:pr-10"
     >
       <NuxtLink
         v-for="filter in filters"
@@ -130,7 +130,7 @@ watch(() => props.filters.length, () => nextTick(updateScrollState))
     <button
       v-if="canScrollNext"
       type="button"
-      class="absolute right-0 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200/80 bg-white/95 text-stone-700 shadow-md backdrop-blur-sm transition hover:bg-white dark:border-stone-700 dark:bg-stone-900/95 dark:text-stone-200"
+      class="absolute right-4 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200/80 bg-white/95 text-stone-700 shadow-md backdrop-blur-sm transition hover:bg-white md:right-6 lg:right-8 dark:border-stone-700 dark:bg-stone-900/95 dark:text-stone-200 2xl:right-10"
       :aria-label="t('common.carouselNext')"
       @click="scrollByStep(1)"
     >

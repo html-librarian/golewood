@@ -72,6 +72,12 @@
     @apply py-8 md:py-10;
   }
 
+  /** Карусель до правого края viewport; левый край — по padding контейнера (zoon-style). */
+  .bleed-viewport-right {
+    margin-right: calc(50% - 50vw);
+    max-width: none;
+  }
+
   .surface-card {
     @apply rounded-2xl border border-stone-200/80 bg-white shadow-(--shadow-soft) dark:border-stone-800 dark:bg-stone-900;
   }

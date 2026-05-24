@@ -237,7 +237,7 @@ const trustItems = computed(() => [
       </div>
     </section>
 
-    <section class="border-t border-stone-200 bg-white py-10 dark:border-stone-800 dark:bg-stone-950 md:py-12">
+    <section class="overflow-x-clip border-t border-stone-200 bg-white py-10 dark:border-stone-800 dark:bg-stone-950 md:py-12">
       <div class="page-container space-y-6">
         <div class="text-center">
           <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50 md:text-2xl">
