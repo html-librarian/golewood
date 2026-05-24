@@ -6,6 +6,7 @@ import { normalizeEmail } from '#shared/utils/email'
 import { oauthAccounts, users } from '../db/schema'
 import { getDb } from '../utils/db'
 import { authService } from './auth.service'
+import { syntheticOAuthPhone } from '#shared/utils/synthetic-phone-oauth'
 import { forbidInProduction } from '../utils/dev-guards'
 
 const getOAuthConfig = () => {
@@ -101,11 +102,6 @@ const fetchVkProfile = async (code: string): Promise<OAuthProfile> => {
   }
 }
 
-const syntheticPhone = (provider: OAuthProvider, providerUserId: string) => {
-  const digits = providerUserId.replace(/\D/g, '').slice(-9).padStart(9, '0')
-  return `+79${digits}`
-}
-
 const mergeOAuthProfile = async (
   userRow: typeof users.$inferSelect,
   profile: OAuthProfile,
@@ -153,7 +149,7 @@ const findOrCreateUser = async (provider: OAuthProvider, profile: OAuthProfile) 
     return mergeOAuthProfile(linked.user, profile)
   }
 
-  let phone = syntheticPhone(provider, profile.providerUserId)
+  let phone = syntheticOAuthPhone(provider, profile.providerUserId)
   let attempts = 0
 
   while (attempts < 5) {
@@ -163,7 +159,7 @@ const findOrCreateUser = async (provider: OAuthProvider, profile: OAuthProfile) 
       break
     }
 
-    phone = syntheticPhone(provider, `${profile.providerUserId}-${attempts}`)
+    phone = syntheticOAuthPhone(provider, `${profile.providerUserId}-${attempts}`)
     attempts++
   }
 

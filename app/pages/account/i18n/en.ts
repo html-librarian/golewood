@@ -2,6 +2,7 @@ export default {
   title: 'Account',
   subtitle: 'Profile and security settings',
   phone: 'Phone',
+  phoneNotSet: 'Not set',
   email: 'Email',
   role: 'Role',
   roles: {
@@ -14,7 +15,8 @@ export default {
   phoneLink: {
     title: 'Phone',
     subtitle: 'Confirm your current number first, then a code to the new phone',
-    syntheticHint: 'Service number from email sign-in — you can replace it with a real contact number (no SMS).',
+    syntheticHint: 'Add your real mobile — a placeholder from email or OAuth sign-in is stored now.',
+    emailCodeHint: 'The verification code will be sent to your account email.',
     currentSubtitle: 'Confirm your current number {masked}',
     currentCodeLabel: 'Code from current number',
     sendCurrentCode: 'Send code to current number',

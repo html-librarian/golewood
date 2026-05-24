@@ -2,6 +2,7 @@ export default {
   title: 'Личный кабинет',
   subtitle: 'Профиль и настройки безопасности',
   phone: 'Телефон',
+  phoneNotSet: 'Не указан',
   email: 'Email',
   role: 'Роль',
   roles: {
@@ -14,7 +15,8 @@ export default {
   phoneLink: {
     title: 'Телефон',
     subtitle: 'Сначала подтверждение текущего номера, затем код на новый телефон',
-    syntheticHint: 'Служебный номер от входа по email — можно заменить на реальный контактный (без SMS).',
+    syntheticHint: 'Укажите реальный мобильный — сейчас сохранён служебный номер от входа по email или OAuth.',
+    emailCodeHint: 'Код подтверждения придёт на email, привязанный к аккаунту.',
     currentSubtitle: 'Подтверждение текущего номера {masked}',
     currentCodeLabel: 'Код с текущего номера',
     sendCurrentCode: 'Отправить код на текущий номер',

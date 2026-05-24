@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computeOverallRating } from '#shared/utils/review-rating'
+import { formatUserInitials } from '#shared/utils/user-display'
 import type { ReviewReply } from '#shared/types/review'
 import type { ReviewCardProps } from './types'
 
@@ -64,9 +65,13 @@ const guestsLabel = computed(() => {
   return t('review.stayGuests', { count: props.review.stay.guests })
 })
 
-const authorInitial = computed(() =>
-  (props.review.authorName ?? t('review.anonymousGuest')).charAt(0).toUpperCase(),
-)
+const authorInitial = computed(() => {
+  if (props.review.authorName) {
+    return formatUserInitials(props.review.authorName)
+  }
+
+  return formatUserInitials(t('review.anonymousGuest'))
+})
 
 const authorName = computed(() => props.review.authorName ?? t('review.anonymousGuest'))
 </script>

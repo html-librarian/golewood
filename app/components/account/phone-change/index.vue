@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { isSyntheticEmailPhone } from '#shared/utils/synthetic-phone-detect'
+import { isPlaceholderPhone } from '#shared/utils/synthetic-phone-detect'
 import type { PhoneChangeStatus } from '#shared/types/account-phone'
 import type { AccountPhoneChangeProps } from './types'
 
-const props = defineProps<AccountPhoneChangeProps>()
+const props = withDefaults(defineProps<AccountPhoneChangeProps>(), {
+  verifyViaEmail: false,
+})
 
 const {
   fetchChangeStatus,
@@ -24,7 +26,9 @@ const error = ref('')
 const devCode = ref<string | null>(null)
 const changeStatus = ref<PhoneChangeStatus | null>(null)
 
-const showSyntheticHint = computed(() => isSyntheticEmailPhone(props.currentPhone))
+const showPlaceholderHint = computed(() => isPlaceholderPhone(props.currentPhone))
+
+const canChangePhone = computed(() => phoneAuthEnabled.value || props.verifyViaEmail)
 
 const maskedCurrentPhone = computed(
   () => changeStatus.value?.maskedCurrentPhone ?? null,
@@ -171,15 +175,21 @@ const submitLabel = computed(() => {
         {{ labels.subtitle }}
       </p>
       <p
-        v-if="showSyntheticHint"
+        v-if="showPlaceholderHint"
         class="mt-2 text-sm text-brand-800 dark:text-brand-200"
       >
         {{ labels.syntheticHint }}
       </p>
+      <p
+        v-else-if="verifyViaEmail"
+        class="mt-2 text-sm text-stone-600 dark:text-stone-400"
+      >
+        {{ labels.emailCodeHint }}
+      </p>
     </div>
 
     <p
-      v-if="!phoneAuthEnabled"
+      v-if="!canChangePhone"
       class="text-sm text-stone-600 dark:text-stone-400"
     >
       {{ labels.smsDisabled }}

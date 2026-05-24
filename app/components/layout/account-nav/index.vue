@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatUserDisplayName, formatUserInitials } from '#shared/utils/user-display'
 import type { AccountNavLink } from '~/composables/useAccountNavLinks'
 import ru from './i18n/ru'
 import en from './i18n/en'
@@ -12,6 +13,12 @@ const { links, user, roleLabelKey } = useAccountNavLinks()
 const roleLabel = computed(() =>
   roleLabelKey.value ? t(roleLabelKey.value) : '',
 )
+
+const userDisplayName = computed(() =>
+  user.value ? formatUserDisplayName(user.value) : '',
+)
+
+const userInitials = computed(() => formatUserInitials(user.value?.name))
 
 const linkLabel = (link: AccountNavLink) => t(link.labelKey)
 
@@ -35,11 +42,11 @@ const isActive = (path: string) => {
     <div class="surface-card mb-4 hidden p-4 lg:block">
       <div class="flex items-center gap-3">
         <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-100 text-base font-semibold text-brand-800 dark:bg-brand-900 dark:text-brand-200">
-          {{ (user.name ?? user.phone).slice(0, 1).toUpperCase() }}
+          {{ userInitials }}
         </span>
         <div class="min-w-0">
           <p class="truncate text-sm font-semibold text-stone-900 dark:text-stone-50">
-            {{ user.name ?? user.phone }}
+            {{ userDisplayName }}
           </p>
           <p
             v-if="roleLabel"

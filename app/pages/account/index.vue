@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatUserDisplayName, formatUserInitials } from '#shared/utils/user-display'
+import { isPlaceholderPhone } from '#shared/utils/synthetic-phone-detect'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
@@ -6,7 +8,25 @@ definePageMeta({ layout: 'account', middleware: 'auth', pageTransition: false })
 
 const { t } = usePageI18n({ ru, en })
 const { user } = useAuth()
-const { phoneAuthEnabled } = useAuthFeatures()
+const { phoneAuthEnabled, emailAuthEnabled } = useAuthFeatures()
+
+const userDisplayName = computed(() =>
+  user.value ? formatUserDisplayName(user.value) : '',
+)
+
+const userInitials = computed(() => formatUserInitials(user.value?.name))
+
+const phoneDisplay = computed(() => {
+  if (!user.value?.phone) {
+    return ''
+  }
+
+  return isPlaceholderPhone(user.value.phone) ? '' : user.value.phone
+})
+
+const showPhoneChange = computed(() =>
+  Boolean(user.value && (phoneAuthEnabled.value || emailAuthEnabled.value)),
+)
 
 const roleLabel = computed(() => {
   const role = user.value?.role
@@ -25,6 +45,7 @@ const phoneLinkLabels = computed(() => ({
   title: t('phoneLink.title'),
   subtitle: t('phoneLink.subtitle'),
   syntheticHint: t('phoneLink.syntheticHint'),
+  emailCodeHint: t('phoneLink.emailCodeHint'),
   currentSubtitle: t('phoneLink.currentSubtitle'),
   currentCodeLabel: t('phoneLink.currentCodeLabel'),
   sendCurrentCode: t('phoneLink.sendCurrentCode'),
@@ -127,11 +148,11 @@ const sessionsLabels = computed(() => ({
     >
       <div class="flex items-center gap-3">
         <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-100 text-lg font-semibold text-brand-800 dark:bg-brand-900 dark:text-brand-200">
-          {{ (user.name ?? user.phone).slice(0, 1).toUpperCase() }}
+          {{ userInitials }}
         </span>
         <div class="min-w-0">
           <p class="truncate text-lg font-semibold text-stone-900 dark:text-stone-50">
-            {{ user.name ?? user.phone }}
+            {{ userDisplayName }}
           </p>
           <p class="text-sm text-stone-500 dark:text-stone-400">
             {{ roleLabel }}
@@ -145,7 +166,7 @@ const sessionsLabels = computed(() => ({
             {{ t('phone') }}
           </dt>
           <dd class="font-medium text-stone-900 dark:text-stone-100">
-            {{ user.phone }}
+            {{ phoneDisplay || t('phoneNotSet') }}
           </dd>
         </div>
         <div v-if="user.email">
@@ -168,9 +189,10 @@ const sessionsLabels = computed(() => ({
     </section>
 
     <AccountPhoneChange
-      v-if="user && phoneAuthEnabled"
+      v-if="showPhoneChange"
       :labels="phoneLinkLabels"
-      :current-phone="user.phone"
+      :current-phone="user!.phone"
+      :verify-via-email="!phoneAuthEnabled && emailAuthEnabled"
     />
 
     <AccountEmailLink

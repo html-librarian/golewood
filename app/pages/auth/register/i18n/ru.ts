@@ -1,7 +1,7 @@
 export default {
   title: 'Регистрация',
   subtitle: 'Создайте аккаунт за пару минут',
-  subtitleEmail: 'Укажите email — отправим код для регистрации',
+  subtitleEmail: 'Имя, телефон и email — отправим код для регистрации',
   subtitleOAuth: 'Зарегистрируйтесь через Яндекс или VK',
   oauthYandex: 'Яндекс',
   oauthVk: 'VK',

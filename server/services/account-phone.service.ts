@@ -7,8 +7,9 @@ import { getRedis } from '../utils/redis'
 import { otpDevExtras } from '../utils/dev-guards'
 import { mapUser } from '../utils/auth'
 import { maskPhoneForVerification, normalizePhone } from '#shared/utils/phone'
-import { isSyntheticEmailPhone } from '#shared/utils/synthetic-phone-detect'
+import { isPlaceholderPhone } from '#shared/utils/synthetic-phone-detect'
 import { generateOtpCode, getOtpTtl } from '../utils/jwt'
+import { emailService } from './email.service'
 import { smsService } from './sms.service'
 
 const CHANGE_PHONE_OLD_VERIFIED_TTL = 15 * 60
@@ -17,7 +18,20 @@ const changePhoneOtpKey = (userId: string, phone: string) => `otp:change-phone:$
 const changePhoneOldOtpKey = (userId: string) => `otp:change-phone-old:${userId}`
 const changePhoneOldVerifiedKey = (userId: string) => `change-phone:old-verified:${userId}`
 
-const requiresCurrentPhoneVerification = (phone: string) => !isSyntheticEmailPhone(phone)
+const requiresCurrentPhoneVerification = (phone: string) => !isPlaceholderPhone(phone)
+
+const isEmailAuthEnabled = () => {
+  const config = useRuntimeConfig()
+  return Boolean(config.public.emailAuthEnabled || config.authDevCode || config.smtpUrl)
+}
+
+const assertPhoneChangeEnabled = () => {
+  const config = useRuntimeConfig()
+
+  if (!config.public.smsAuthEnabled && !isEmailAuthEnabled()) {
+    throw createError({ statusCode: 403, statusMessage: 'Phone change is disabled' })
+  }
+}
 
 const assertPhoneAvailable = async (phone: string, exceptUserId: string) => {
   const db = getDb()
@@ -49,6 +63,20 @@ const assertSmsChangeEnabled = () => {
   if (!config.public.smsAuthEnabled) {
     throw createError({ statusCode: 403, statusMessage: 'Phone verification is disabled' })
   }
+}
+
+const getUserContactRow = async (userId: string) => {
+  const db = getDb()
+  const [userRow] = await db.select({
+    phone: users.phone,
+    email: users.email,
+  }).from(users).where(eq(users.id, userId)).limit(1)
+
+  if (!userRow) {
+    throw createError({ statusCode: 404, statusMessage: 'User not found' })
+  }
+
+  return userRow
 }
 
 const assertOldPhoneVerified = async (userId: string, currentPhone: string) => {
@@ -131,7 +159,7 @@ export const accountPhoneService = {
   },
 
   sendChangeCode: async (userId: string, phone: string) => {
-    assertSmsChangeEnabled()
+    assertPhoneChangeEnabled()
 
     const normalizedPhone = normalizePhone(phone)
     const db = getDb()
@@ -160,6 +188,18 @@ export const accountPhoneService = {
         phone: normalizedPhone,
         message: `Golewood: код смены телефона ${code}`,
         channel: 'auth',
+      }).catch(() => undefined)
+    } else {
+      const contact = await getUserContactRow(userId)
+
+      if (!contact.email) {
+        throw createError({ statusCode: 400, statusMessage: 'Email is required to change phone' })
+      }
+
+      void emailService.send({
+        to: contact.email,
+        subject: 'Код смены телефона — Golewood',
+        text: `Код для подтверждения нового номера ${normalizedPhone}: ${code}. Действует ${Math.floor(getOtpTtl() / 60)} мин.`,
       }).catch(() => undefined)
     }
 

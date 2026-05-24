@@ -2,6 +2,7 @@ export interface AccountPhoneChangeLabels {
   title: string
   subtitle: string
   syntheticHint: string
+  emailCodeHint: string
   currentSubtitle: string
   currentCodeLabel: string
   sendCurrentCode: string
@@ -21,4 +22,6 @@ export interface AccountPhoneChangeLabels {
 export interface AccountPhoneChangeProps {
   labels: AccountPhoneChangeLabels
   currentPhone: string
+  /** Send OTP to account email instead of SMS (production without SMS.ru). */
+  verifyViaEmail?: boolean
 }

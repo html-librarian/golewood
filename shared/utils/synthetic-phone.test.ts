@@ -19,5 +19,6 @@ describe('isSyntheticEmailPhone', () => {
   it('detects synthetic phones', () => {
     expect(isSyntheticEmailPhone(syntheticPhoneFromEmail('x@y.z'))).toBe(true)
     expect(isSyntheticEmailPhone('+79000000002')).toBe(false)
+    expect(isSyntheticEmailPhone('+799812345678')).toBe(false)
   })
 })

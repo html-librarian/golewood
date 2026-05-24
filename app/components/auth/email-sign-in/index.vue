@@ -10,6 +10,7 @@ const emit = defineEmits<{
 const { sendEmailCode, verifyEmailCode } = useAuth()
 
 const name = ref('')
+const phone = ref('')
 const email = ref('')
 const linkPhone = ref('')
 const showPhoneLink = ref(false)
@@ -45,6 +46,7 @@ const handleVerify = async () => {
       email: email.value,
       code: code.value,
       name: props.registerMode ? name.value : undefined,
+      phone: props.registerMode ? phone.value : undefined,
       linkPhone: props.allowPhoneLink && showPhoneLink.value && linkPhone.value
         ? linkPhone.value
         : undefined,
@@ -75,6 +77,14 @@ const handleVerify = async () => {
       v-model="name"
       :label="labels.nameLabel ?? ''"
       autocomplete="name"
+      required
+    />
+
+    <FormPhoneInput
+      v-if="registerMode && step === 'email'"
+      v-model="phone"
+      :label="labels.phoneLabel ?? ''"
+      required
     />
 
     <template v-if="allowPhoneLink && step === 'email' && !registerMode">

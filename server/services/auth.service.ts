@@ -24,7 +24,6 @@ import {
 import { mapUser } from '../utils/auth'
 import { normalizeEmail } from '#shared/utils/email'
 import { normalizePhone } from '#shared/utils/phone'
-import { syntheticPhoneFromEmail } from '#shared/utils/synthetic-phone'
 import { assertEmailAvailable } from './account-email.service'
 import { buildEmailMagicUrl, type EmailMagicPayload } from '../utils/magic-link'
 import { emailService } from './email.service'
@@ -51,35 +50,19 @@ const findUserByEmail = async (email: string) => {
   return row ?? null
 }
 
-const insertEmailUser = async (email: string, name?: string) => {
+const assertPhoneAvailableForSignup = async (phone: string) => {
   const db = getDb()
-  let phone = syntheticPhoneFromEmail(email)
-  let attempts = 0
+  const normalizedPhone = normalizePhone(phone)
+  const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.phone, normalizedPhone)).limit(1)
 
-  while (attempts < 5) {
-    const [existingPhone] = await db.select({ id: users.id }).from(users).where(eq(users.phone, phone)).limit(1)
-
-    if (!existingPhone) {
-      break
-    }
-
-    phone = syntheticPhoneFromEmail(`${email}-${attempts}`)
-    attempts++
+  if (existing) {
+    throw createError({ statusCode: 409, statusMessage: 'Phone is already used by another account' })
   }
-
-  const [createdUser] = await db.insert(users).values({
-    phone,
-    email: normalizeEmail(email),
-    name: name ?? null,
-    role: 'guest',
-  }).returning()
-
-  return createdUser
 }
 
 const completeEmailLogin = async (
   normalizedEmail: string,
-  options?: { name?: string, linkPhone?: string },
+  options?: { name?: string, linkPhone?: string, phone?: string },
 ): Promise<typeof users.$inferSelect> => {
   const db = getDb()
   let userRow = await findUserByEmail(normalizedEmail)
@@ -118,7 +101,28 @@ const completeEmailLogin = async (
 
   if (!userRow) {
     await assertEmailAvailable(normalizedEmail)
-    userRow = await insertEmailUser(normalizedEmail, options?.name)
+
+    const trimmedName = options?.name?.trim()
+
+    if (!options?.phone) {
+      throw createError({ statusCode: 400, statusMessage: 'Phone is required' })
+    }
+
+    if (!trimmedName || trimmedName.length < 2) {
+      throw createError({ statusCode: 400, statusMessage: 'Name is required' })
+    }
+
+    const normalizedPhone = normalizePhone(options.phone)
+    await assertPhoneAvailableForSignup(normalizedPhone)
+
+    const [createdUser] = await db.insert(users).values({
+      phone: normalizedPhone,
+      email: normalizedEmail,
+      name: trimmedName,
+      role: 'guest',
+    }).returning()
+
+    userRow = createdUser
   } else if (options?.name && !userRow.name) {
     const [updatedUser] = await db.update(users)
       .set({ name: options.name, updatedAt: new Date() })
@@ -203,9 +207,15 @@ export const authService = {
     let userRow = existingUser
 
     if (!userRow) {
+      const trimmedName = name?.trim()
+
+      if (!trimmedName || trimmedName.length < 2) {
+        throw createError({ statusCode: 400, statusMessage: 'Name is required' })
+      }
+
       const [createdUser] = await db.insert(users).values({
         phone: normalizedPhone,
-        name: name ?? null,
+        name: trimmedName,
         role: 'guest',
       }).returning()
 
@@ -256,7 +266,7 @@ export const authService = {
   },
 
   verifyEmailCode: async (
-    { email, code, name, linkPhone }: VerifyEmailCodeInput,
+    { email, code, name, phone, linkPhone }: VerifyEmailCodeInput,
     meta?: SessionClientMeta,
   ): Promise<LoginResult> => {
     const normalizedEmail = normalizeEmail(email)
@@ -269,13 +279,13 @@ export const authService = {
 
     await redis.del(emailOtpKey(normalizedEmail))
 
-    const userRow = await completeEmailLogin(normalizedEmail, { name, linkPhone })
+    const userRow = await completeEmailLogin(normalizedEmail, { name, phone, linkPhone })
     return authService.completeLogin(userRow, meta)
   },
 
   verifyEmailMagic: async (
     payload: EmailMagicPayload,
-    options?: { linkPhone?: string },
+    options?: { linkPhone?: string, phone?: string, name?: string },
     meta?: SessionClientMeta,
   ): Promise<LoginResult> => {
     if (payload.purpose !== 'email-login') {
@@ -283,8 +293,9 @@ export const authService = {
     }
 
     const userRow = await completeEmailLogin(payload.email, {
-      name: payload.name,
+      name: options?.name ?? payload.name,
       linkPhone: options?.linkPhone,
+      phone: options?.phone,
     })
 
     return authService.completeLogin(userRow, meta)

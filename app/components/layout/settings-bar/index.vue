@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatUserDisplayName, formatUserInitials } from '#shared/utils/user-display'
+
 const route = useRoute()
 const { locale, locales, setLocale } = useI18n()
 const colorMode = useColorMode()
@@ -56,6 +58,12 @@ const toggleMobileMenu = () => {
 }
 
 const { headerRef } = useSiteHeaderHeight()
+
+const userDisplayName = computed(() =>
+  user.value ? formatUserDisplayName(user.value) : '',
+)
+
+const userInitials = computed(() => formatUserInitials(user.value?.name))
 
 watch(() => route.fullPath, () => {
   closeMobileMenu()
@@ -174,9 +182,9 @@ onBeforeUnmount(() => {
           :title="$t('common.account')"
         >
           <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[10px] font-semibold text-brand-800 dark:bg-brand-900 dark:text-brand-200">
-            {{ (user?.name ?? user?.phone ?? '?').slice(0, 1).toUpperCase() }}
+            {{ userInitials }}
           </span>
-          <span class="hidden truncate sm:inline">{{ user?.name ?? user?.phone }}</span>
+          <span class="hidden truncate sm:inline">{{ userDisplayName }}</span>
         </NuxtLink>
 
         <button

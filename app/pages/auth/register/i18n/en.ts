@@ -1,7 +1,7 @@
 export default {
   title: 'Register',
   subtitle: 'Create your account in a couple of minutes',
-  subtitleEmail: 'Enter your email — we will send a registration code',
+  subtitleEmail: 'Name, phone, and email — we will send a registration code',
   subtitleOAuth: 'Register with Yandex or VK',
   oauthYandex: 'Yandex',
   oauthVk: 'VK',

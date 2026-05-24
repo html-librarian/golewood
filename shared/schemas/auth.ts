@@ -31,6 +31,8 @@ export const verifyEmailCodeSchema = z.object({
   email: emailSchema,
   code: z.string().trim().length(4),
   name: z.string().trim().min(2).max(100).optional(),
+  /** Real mobile for new email registration. */
+  phone: phoneSchema.optional(),
   /** Merge email login with an existing phone account that has no email yet. */
   linkPhone: phoneSchema.optional(),
 })

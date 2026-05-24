@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { needsProfileCompletion } from '#shared/utils/user-display'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
@@ -6,7 +7,7 @@ definePageMeta({ pageTransition: false })
 
 const { t } = usePageI18n({ ru, en })
 const localePath = useLocalePath()
-const { sendCode, verifyCode } = useAuth()
+const { sendCode, verifyCode, fetchMe, user } = useAuth()
 const { phoneAuthEnabled, emailSignInEnabled } = useAuthFeatures()
 
 const emailLabels = computed(() => ({
@@ -18,10 +19,15 @@ const emailLabels = computed(() => ({
   errorSendCode: t('errorSendCode'),
   errorInvalidCode: t('errorInvalidCode'),
   nameLabel: t('nameLabel'),
+  phoneLabel: t('phoneLabel'),
 }))
 
 const onEmailSuccess = async () => {
-  await navigateTo(localePath('/account'))
+  await fetchMe()
+  const target = user.value && needsProfileCompletion(user.value)
+    ? '/auth/complete-profile'
+    : '/account'
+  await navigateTo(localePath(target))
 }
 
 const name = ref('')

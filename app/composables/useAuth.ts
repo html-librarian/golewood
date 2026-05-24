@@ -169,6 +169,7 @@ export const useAuth = () => {
     email: string
     code: string
     name?: string
+    phone?: string
     linkPhone?: string
   }) => {
     const session = await $fetch<AuthSession>('/api/auth/verify-email', {
@@ -178,6 +179,17 @@ export const useAuth = () => {
 
     applySession(session)
     return session
+  }
+
+  const completeProfile = async (payload: { name: string, phone: string }) => {
+    const updated = await $fetch<User>('/api/account/complete-profile', {
+      method: 'POST',
+      headers: authHeaders.value,
+      body: payload,
+    })
+
+    user.value = updated
+    return updated
   }
 
   const logout = async () => {
@@ -207,6 +219,7 @@ export const useAuth = () => {
     isMfaChallenge,
     sendEmailCode,
     verifyEmailCode,
+    completeProfile,
     fetchMe,
     logout,
   }
