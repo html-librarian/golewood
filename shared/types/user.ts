@@ -10,6 +10,8 @@ export interface User {
   lastName: string | null
   firstName: string | null
   patronymic: string | null
+  /** Preferred city for search and home discovery (catalog name, e.g. «Сочи»). */
+  homeCity: string | null
   role: UserRole
   bonusBalance: number
   maxUserId: number | null

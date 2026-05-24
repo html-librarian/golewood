@@ -30,7 +30,9 @@
     "lastName": "Фамилия",
     "firstName": "Имя",
     "patronymic": "Отчество",
-    "patronymicOptional": "Необязательно"
+    "patronymicOptional": "Необязательно",
+    "carouselPrev": "Назад",
+    "carouselNext": "Вперёд"
   },
   "story": {
     "anonymous": "Гость",

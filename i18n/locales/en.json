@@ -30,7 +30,9 @@
     "lastName": "Last name",
     "firstName": "First name",
     "patronymic": "Patronymic",
-    "patronymicOptional": "Optional"
+    "patronymicOptional": "Optional",
+    "carouselPrev": "Previous",
+    "carouselNext": "Next"
   },
   "story": {
     "anonymous": "Guest",

@@ -1,4 +1,5 @@
 import type { CompleteProfileInput } from '#shared/schemas/account-profile'
+import type { UpdateHomeCityInput } from '#shared/schemas/account-home-city'
 import type { User } from '#shared/types/user'
 import { eq } from 'drizzle-orm'
 import { users } from '../db/schema'
@@ -33,6 +34,22 @@ export const accountProfileService = {
         phone: normalizedPhone,
         updatedAt: new Date(),
       })
+      .where(eq(users.id, userId))
+      .returning()
+
+    if (!updated) {
+      throw createError({ statusCode: 404, statusMessage: 'User not found' })
+    }
+
+    return mapUser(updated)
+  },
+
+  updateHomeCity: async (userId: string, input: UpdateHomeCityInput): Promise<User> => {
+    const db = getDb()
+    const homeCity = input.homeCity?.trim() || null
+
+    const [updated] = await db.update(users)
+      .set({ homeCity, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning()
 

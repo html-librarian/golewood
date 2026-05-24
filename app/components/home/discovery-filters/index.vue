@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { HomeDiscoveryFilter } from '#shared/catalog/home-discovery'
+import { sortDiscoveryDestinations } from '#shared/utils/discovery-destinations-sort'
 import { buildSearchRouteQuery } from '#shared/utils/search-query'
 import type { HomeDiscoveryFiltersEmits, HomeDiscoveryFiltersProps } from './types'
 
@@ -8,13 +9,20 @@ const emit = defineEmits<HomeDiscoveryFiltersEmits>()
 
 const { locale } = useI18n()
 const localePath = useLocalePath()
-const { setCity } = useUserCity()
+const { setCity, city: cookieCity, source: citySource } = useUserCity()
+const { user } = useAuth()
 
 const labelFor = (filter: HomeDiscoveryFilter) =>
   locale.value === 'en' ? filter.labelEn : filter.labelRu
 
 const titleFor = (group: HomeDiscoveryFiltersProps['groups'][number]) =>
   locale.value === 'en' ? group.titleEn : group.titleRu
+
+const sortedDestinations = (filters: HomeDiscoveryFilter[]) =>
+  sortDiscoveryDestinations(filters, {
+    geoCity: citySource.value === 'geo' ? cookieCity.value : null,
+    profileCity: user.value?.homeCity ?? null,
+  })
 
 const searchLink = (filter: HomeDiscoveryFilter) =>
   localePath({
@@ -46,7 +54,16 @@ const onSelect = (filter: HomeDiscoveryFilter) => {
         {{ titleFor(group) }}
       </h2>
 
-      <ul class="grid grid-cols-3 gap-x-3 gap-y-7 sm:grid-cols-4 sm:gap-x-5 sm:gap-y-8 md:gap-x-6">
+      <HomeDiscoveryDestinationsCarousel
+        v-if="group.id === 'destinations'"
+        :filters="sortedDestinations(group.filters)"
+        @select="onSelect"
+      />
+
+      <ul
+        v-else
+        class="grid grid-cols-3 gap-x-3 gap-y-7 sm:grid-cols-4 sm:gap-x-5 sm:gap-y-8 md:gap-x-6"
+      >
         <li
           v-for="filter in group.filters"
           :key="filter.id"

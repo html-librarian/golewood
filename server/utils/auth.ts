@@ -13,6 +13,7 @@ export const mapUser = (row: typeof users.$inferSelect): User => ({
   lastName: row.lastName,
   firstName: row.firstName,
   patronymic: row.patronymic,
+  homeCity: row.homeCity,
   role: row.role,
   bonusBalance: row.bonusBalance,
   maxUserId: row.maxUserId ?? null,

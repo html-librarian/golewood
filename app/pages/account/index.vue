@@ -188,6 +188,20 @@ const sessionsLabels = computed(() => ({
       </dl>
     </section>
 
+    <section class="surface-card p-5">
+      <h2 class="mb-1 text-base font-semibold text-stone-900 dark:text-stone-50">
+        {{ t('homeCity.title') }}
+      </h2>
+      <AccountHomeCity
+        :initial-city="user?.homeCity"
+        :label="t('homeCity.cityLabel')"
+        :hint="t('homeCity.hint')"
+        :save-label="t('homeCity.save')"
+        :saved-label="t('homeCity.saved')"
+        :error-save="t('homeCity.errorSave')"
+      />
+    </section>
+
     <AccountPhoneChange
       v-if="showPhoneChange"
       :labels="phoneLinkLabels"

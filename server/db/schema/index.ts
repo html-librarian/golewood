@@ -31,6 +31,7 @@ export const users = pgTable('users', {
   lastName: varchar('last_name', { length: 64 }),
   firstName: varchar('first_name', { length: 64 }),
   patronymic: varchar('patronymic', { length: 64 }),
+  homeCity: varchar('home_city', { length: 128 }),
   hostProfileDescription: text('host_profile_description').notNull().default(''),
   role: userRoleEnum('role').notNull().default('guest'),
   bonusBalance: integer('bonus_balance').notNull().default(0),

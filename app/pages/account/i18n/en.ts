@@ -5,6 +5,14 @@ export default {
   phoneNotSet: 'Not set',
   email: 'Email',
   role: 'Role',
+  homeCity: {
+    title: 'Your city',
+    cityLabel: 'City',
+    hint: 'Shown first in “Where to go” on the home page when geolocation is not confirmed.',
+    save: 'Save city',
+    saved: 'Saved',
+    errorSave: 'Could not save city',
+  },
   roles: {
     guest: 'Guest',
     host: 'Host',
