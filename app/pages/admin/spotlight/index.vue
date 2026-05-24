@@ -322,7 +322,39 @@ const openFilePicker = () => {
         >
         <div class="min-w-0 flex-1 space-y-1">
           <p class="font-semibold text-stone-900 dark:text-stone-50">
-            {{ photo.listingTitle }} · {{ photo.listingCity }}
+            {{ photo.listingTitle ?? photo.placeName ?? '—' }}
+            <span v-if="photo.listingCity"> · {{ photo.listingCity }}</span>
+          </p>
+          <p
+            v-if="photo.listingId"
+            class="text-xs text-brand-700 dark:text-brand-300"
+          >
+            <NuxtLink :to="`/listings/${photo.listingId}`">
+              /listings/{{ photo.listingId }}
+            </NuxtLink>
+          </p>
+          <p
+            v-else-if="photo.externalSiteUrl || photo.externalInstagram"
+            class="flex flex-wrap gap-x-3 text-xs text-stone-600 dark:text-stone-400"
+          >
+            <a
+              v-if="photo.externalSiteUrl"
+              :href="photo.externalSiteUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-brand-700 hover:underline dark:text-brand-300"
+            >
+              {{ photo.externalSiteUrl }}
+            </a>
+            <a
+              v-if="photo.externalInstagram"
+              :href="photo.externalInstagram"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-brand-700 hover:underline dark:text-brand-300"
+            >
+              Instagram
+            </a>
           </p>
           <p
             v-if="photo.caption"

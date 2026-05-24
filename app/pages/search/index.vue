@@ -162,10 +162,35 @@ const runSearch = async (page = 1) => {
 
   try {
     await pushSearchRoute(formToSearchParams(page))
+    if (!isLgUp.value) {
+      mobileSearchExpanded.value = false
+      filtersOpen.value = false
+    }
   } finally {
     loading.value = false
   }
 }
+
+const mobileSearchSummary = computed(() => {
+  const parts: string[] = []
+
+  if (form.city.trim()) {
+    parts.push(form.city.trim())
+  } else {
+    parts.push($t('search.cityPlaceholder'))
+  }
+
+  if (form.checkIn && form.checkOut) {
+    parts.push(`${form.checkIn} — ${form.checkOut}`)
+  } else {
+    parts.push(t('datesAny'))
+  }
+
+  const guests = Number(form.guests) || 2
+  parts.push(t('guestsCount', { n: guests }))
+
+  return parts.join(' · ')
+})
 
 const applyPreferredCityToSearch = async () => {
   const cityName = preferredCity.value
@@ -290,6 +315,7 @@ const mapPinsRef = ref<{ resize: () => void } | null>(null)
 const filtersOpen = ref(false)
 const mobileView = ref<'list' | 'map'>('list')
 const isLgUp = ref(false)
+const mobileSearchExpanded = ref(false)
 
 const activeFiltersCount = computed(() => {
   let count = 0
@@ -361,7 +387,12 @@ const updateBreakpoint = () => {
 
   if (isLgUp.value) {
     filtersOpen.value = false
+    mobileSearchExpanded.value = false
   }
+}
+
+const collapseMobileSearch = () => {
+  mobileSearchExpanded.value = false
 }
 
 const setMobileView = (view: 'list' | 'map') => {
@@ -410,6 +441,12 @@ watch(mobileView, (view) => {
     nextTick(() => mapPinsRef.value?.resize())
   }
 })
+
+watch(routeSearchKey, () => {
+  if (!isLgUp.value) {
+    collapseMobileSearch()
+  }
+})
 </script>
 
 <template>
@@ -419,8 +456,126 @@ watch(mobileView, (view) => {
     </h1>
 
     <div class="sticky top-(--site-header-height) z-30 overflow-visible border-b border-stone-200 bg-stone-50/95 backdrop-blur-md dark:border-stone-800 dark:bg-stone-950/95">
-      <div class="layout-container py-4">
+      <div class="layout-container space-y-2 py-2 lg:space-y-0 lg:py-4">
+        <template v-if="!isLgUp">
+          <button
+            v-if="!mobileSearchExpanded"
+            type="button"
+            class="flex w-full min-w-0 items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-left shadow-sm dark:border-stone-700 dark:bg-stone-900"
+            data-testid="search-bar-collapsed"
+            @click="mobileSearchExpanded = true"
+          >
+            <Icon
+              name="ph:magnifying-glass-duotone"
+              class="size-5 shrink-0 text-brand-700 dark:text-brand-400"
+            />
+            <span class="min-w-0 flex-1 truncate text-sm text-stone-800 dark:text-stone-100">
+              {{ mobileSearchSummary }}
+            </span>
+            <Icon
+              name="ph:caret-down-bold"
+              class="size-4 shrink-0 text-stone-400"
+            />
+          </button>
+
+          <div
+            v-else
+            class="space-y-2"
+          >
+            <SearchBar
+              v-model:city="form.city"
+              v-model:check-in="form.checkIn"
+              v-model:check-out="form.checkOut"
+              v-model:guests="form.guests"
+              :city-hint="cityHint"
+              variant="toolbar"
+              :loading="loading"
+              @update:city="onCityChange"
+              @submit="runSearch()"
+            />
+            <button
+              type="button"
+              class="text-xs font-medium text-brand-700 hover:underline dark:text-brand-300"
+              @click="mobileSearchExpanded = false"
+            >
+              {{ t('collapseSearch') }}
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <UiButton
+              type="button"
+              variant="outline"
+              size="sm"
+              class="shrink-0"
+              data-testid="search-filters-toggle"
+              @click="filtersOpen = !filtersOpen"
+            >
+              <Icon
+                name="ph:funnel-duotone"
+                class="mr-1.5 size-4"
+              />
+              {{ t('filters') }}
+              <span
+                v-if="activeFiltersCount"
+                class="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-brand-700 px-1.5 py-0.5 text-[10px] font-bold text-white dark:bg-brand-500"
+              >
+                {{ activeFiltersCount }}
+              </span>
+            </UiButton>
+
+            <div
+              class="flex min-w-0 flex-1 rounded-xl border border-stone-200 bg-white p-1 dark:border-stone-800 dark:bg-stone-900"
+              role="tablist"
+              data-testid="search-view-tabs"
+            >
+              <button
+                type="button"
+                role="tab"
+                :aria-selected="mobileView === 'list'"
+                :class="tabButtonClass(mobileView === 'list')"
+                data-testid="search-view-list"
+                @click="setMobileView('list')"
+              >
+                <Icon
+                  name="ph:list-bullets-duotone"
+                  class="size-4"
+                />
+                {{ t('list') }}
+              </button>
+              <button
+                type="button"
+                role="tab"
+                :aria-selected="mobileView === 'map'"
+                :class="tabButtonClass(mobileView === 'map')"
+                data-testid="search-view-map"
+                @click="setMobileView('map')"
+              >
+                <Icon
+                  name="ph:map-trifold-duotone"
+                  class="size-4"
+                />
+                {{ t('map') }}
+              </button>
+            </div>
+          </div>
+
+          <div
+            v-show="filtersOpen"
+            class="max-h-[min(55vh,28rem)] overflow-y-auto rounded-xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900"
+          >
+            <SearchFilters
+              v-model:min-price="form.minPrice"
+              v-model:max-price="form.maxPrice"
+              v-model:amenities="form.amenities"
+              v-model:accommodation-types="form.accommodationTypes"
+              v-model:team-badge-slugs="form.teamBadgeSlugs"
+            />
+          </div>
+        </template>
+
         <SearchBar
+          v-else
           v-model:city="form.city"
           v-model:check-in="form.checkIn"
           v-model:check-out="form.checkOut"
@@ -443,83 +598,6 @@ watch(mobileView, (view) => {
         v-model:team-badge-slugs="form.teamBadgeSlugs"
         class="hidden lg:sticky lg:top-32 lg:block lg:self-start"
       />
-
-      <div class="flex flex-col gap-3 lg:hidden">
-        <p class="text-sm font-medium text-stone-600 dark:text-stone-400">
-          {{ resultsSummary }}
-        </p>
-
-        <div class="flex flex-wrap items-center gap-2">
-          <UiButton
-            type="button"
-            variant="outline"
-            size="sm"
-            class="shrink-0"
-            data-testid="search-filters-toggle"
-            @click="filtersOpen = !filtersOpen"
-          >
-            <Icon
-              name="ph:funnel-duotone"
-              class="mr-1.5 size-4"
-            />
-            {{ t('filters') }}
-            <span
-              v-if="activeFiltersCount"
-              class="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-brand-700 px-1.5 py-0.5 text-[10px] font-bold text-white dark:bg-brand-500"
-            >
-              {{ activeFiltersCount }}
-            </span>
-          </UiButton>
-
-          <div
-            class="flex min-w-0 flex-1 rounded-xl border border-stone-200 bg-white p-1 dark:border-stone-800 dark:bg-stone-900"
-            role="tablist"
-            data-testid="search-view-tabs"
-          >
-            <button
-              type="button"
-              role="tab"
-              :aria-selected="mobileView === 'list'"
-              :class="tabButtonClass(mobileView === 'list')"
-              data-testid="search-view-list"
-              @click="setMobileView('list')"
-            >
-              <Icon
-                name="ph:list-bullets-duotone"
-                class="size-4"
-              />
-              {{ t('list') }}
-            </button>
-            <button
-              type="button"
-              role="tab"
-              :aria-selected="mobileView === 'map'"
-              :class="tabButtonClass(mobileView === 'map')"
-              data-testid="search-view-map"
-              @click="setMobileView('map')"
-            >
-              <Icon
-                name="ph:map-trifold-duotone"
-                class="size-4"
-              />
-              {{ t('map') }}
-            </button>
-          </div>
-        </div>
-
-        <div
-          v-show="filtersOpen"
-          class="rounded-xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900"
-        >
-          <SearchFilters
-            v-model:min-price="form.minPrice"
-            v-model:max-price="form.maxPrice"
-            v-model:amenities="form.amenities"
-            v-model:accommodation-types="form.accommodationTypes"
-            v-model:team-badge-slugs="form.teamBadgeSlugs"
-          />
-        </div>
-      </div>
 
       <div
         class="flex min-w-0 flex-col"

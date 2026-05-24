@@ -386,6 +386,20 @@
       "when": 1779423600000,
       "tag": "0054_seed_russia_cities",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1779427200000,
+      "tag": "0055_home_promo_banners",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1779430800000,
+      "tag": "0056_spotlight_external_links",
+      "breakpoints": true
     }
   ]
 }

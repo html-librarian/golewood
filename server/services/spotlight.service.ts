@@ -1,12 +1,14 @@
 import type { SpotlightHero, SpotlightPhoto, SpotlightPhotoStatus, SpotlightVoteState } from '#shared/types/spotlight'
 import type { SpotlightVoteInput } from '#shared/schemas/spotlight'
-import { and, asc, desc, eq, ne, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, sql } from 'drizzle-orm'
 import { randomUUID } from 'node:crypto'
-import { bookings, listings, spotlightMonths, spotlightPhotos, spotlightVotes, users } from '../db/schema'
+import { listings, spotlightMonths, spotlightPhotos, spotlightVotes, users } from '../db/schema'
 import { getDb } from '../utils/db'
 import { processListingPhoto } from '../utils/image'
 import { saveSpotlightPhoto } from '../utils/storage'
 import { getCurrentMonthKey } from '#shared/utils/spotlight-month'
+import { parseListingIdFromInput } from '#shared/utils/spotlight-listing-link'
+import { spotlightUploadSchema } from '#shared/schemas/spotlight'
 
 const mapPhoto = (
   row: typeof spotlightPhotos.$inferSelect,
@@ -15,6 +17,9 @@ const mapPhoto = (
   id: row.id,
   userId: row.userId,
   listingId: row.listingId,
+  placeName: row.placeName,
+  externalSiteUrl: row.externalSiteUrl,
+  externalInstagram: row.externalInstagram,
   imageUrl: row.imageUrl,
   caption: row.caption,
   status: row.status as SpotlightPhotoStatus,
@@ -35,20 +40,20 @@ const assertMonthOpen = async (monthKey: string) => {
   }
 }
 
-const assertUserBookedListing = async (userId: string, listingId: string) => {
-  const db = getDb()
-  const [booking] = await db.select({ id: bookings.id })
-    .from(bookings)
-    .where(and(
-      eq(bookings.guestId, userId),
-      eq(bookings.listingId, listingId),
-      ne(bookings.status, 'cancelled'),
-    ))
-    .limit(1)
-
-  if (!booking) {
-    throw createError({ statusCode: 400, statusMessage: 'Upload is only allowed for listings you have booked' })
+const resolveUploadListingId = (input: {
+  listingId?: string
+  listingUrl?: string
+}) => {
+  const fromId = input.listingId?.trim()
+  if (fromId) {
+    return fromId
   }
+
+  if (input.listingUrl?.trim()) {
+    return parseListingIdFromInput(input.listingUrl)
+  }
+
+  return null
 }
 
 const assertPublishedListing = async (listingId: string) => {
@@ -79,7 +84,7 @@ export const spotlightService = {
       authorName: users.name,
     })
       .from(spotlightPhotos)
-      .innerJoin(listings, eq(spotlightPhotos.listingId, listings.id))
+      .leftJoin(listings, eq(spotlightPhotos.listingId, listings.id))
       .innerJoin(users, eq(spotlightPhotos.userId, users.id))
       .where(and(
         eq(spotlightPhotos.monthKey, month),
@@ -99,7 +104,7 @@ export const spotlightService = {
     }
 
     return rows.map(row => mapPhoto(row.photo, {
-      listingTitle: row.listingTitle,
+      listingTitle: row.listingTitle ?? row.photo.placeName,
       listingCity: row.listingCity,
       authorName: row.authorName,
       userVoted: votedPhotoId === row.photo.id,
@@ -115,13 +120,13 @@ export const spotlightService = {
       authorName: users.name,
     })
       .from(spotlightPhotos)
-      .innerJoin(listings, eq(spotlightPhotos.listingId, listings.id))
+      .leftJoin(listings, eq(spotlightPhotos.listingId, listings.id))
       .innerJoin(users, eq(spotlightPhotos.userId, users.id))
       .where(eq(spotlightPhotos.status, 'pending'))
       .orderBy(desc(spotlightPhotos.createdAt))
 
     return rows.map(row => mapPhoto(row.photo, {
-      listingTitle: row.listingTitle,
+      listingTitle: row.listingTitle ?? row.photo.placeName,
       listingCity: row.listingCity,
       authorName: row.authorName,
     }))
@@ -156,16 +161,42 @@ export const spotlightService = {
 
   upload: async (
     userId: string,
-    input: { listingId: string, caption?: string, consent: boolean, file: { data: Buffer, filename?: string, type?: string } },
+    input: {
+      listingId?: string
+      listingUrl?: string
+      placeName?: string
+      externalSiteUrl?: string | null
+      externalInstagram?: string | null
+      caption?: string
+      consent: boolean
+      file: { data: Buffer, filename?: string, type?: string }
+    },
   ) => {
-    if (!input.consent) {
-      throw createError({ statusCode: 400, statusMessage: 'Publication consent is required' })
+    const parsed = spotlightUploadSchema.safeParse({
+      listingId: input.listingId,
+      listingUrl: input.listingUrl,
+      placeName: input.placeName,
+      externalSiteUrl: input.externalSiteUrl ?? undefined,
+      externalInstagram: input.externalInstagram ?? undefined,
+      caption: input.caption,
+      consent: input.consent,
+    })
+
+    if (!parsed.success) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: parsed.error.issues.map(issue => issue.message).join('; '),
+      })
     }
 
     const monthKey = getCurrentMonthKey()
     await assertMonthOpen(monthKey)
-    await assertPublishedListing(input.listingId)
-    await assertUserBookedListing(userId, input.listingId)
+
+    const resolvedListingId = resolveUploadListingId(parsed.data)
+
+    if (resolvedListingId) {
+      await assertPublishedListing(resolvedListingId)
+    }
 
     const photoId = randomUUID()
     const processed = await processListingPhoto(input.file.data, input.file.filename)
@@ -179,9 +210,12 @@ export const spotlightService = {
     const [row] = await db.insert(spotlightPhotos).values({
       id: photoId,
       userId,
-      listingId: input.listingId,
+      listingId: resolvedListingId,
+      placeName: resolvedListingId ? null : (parsed.data.placeName?.trim() || null),
+      externalSiteUrl: resolvedListingId ? null : parsed.data.externalSiteUrl,
+      externalInstagram: resolvedListingId ? null : parsed.data.externalInstagram,
       imageUrl,
-      caption: input.caption?.trim() ?? '',
+      caption: parsed.data.caption?.trim() ?? '',
       status: 'pending',
       monthKey,
       consentGiven: true,
@@ -304,7 +338,7 @@ export const spotlightService = {
     })
       .from(spotlightMonths)
       .innerJoin(spotlightPhotos, eq(spotlightMonths.winnerPhotoId, spotlightPhotos.id))
-      .innerJoin(listings, eq(spotlightPhotos.listingId, listings.id))
+      .leftJoin(listings, eq(spotlightPhotos.listingId, listings.id))
       .innerJoin(users, eq(spotlightPhotos.userId, users.id))
       .where(sql`${spotlightMonths.winnerPhotoId} IS NOT NULL`)
       .orderBy(desc(spotlightMonths.monthKey))
@@ -325,7 +359,7 @@ export const spotlightService = {
       monthKey: monthRow.monthKey,
       imageUrl: monthRow.photo.imageUrl,
       caption: monthRow.photo.caption,
-      listingTitle: monthRow.listingTitle,
+      listingTitle: monthRow.listingTitle ?? monthRow.photo.placeName,
       listingCity: monthRow.listingCity,
       authorName: monthRow.authorName,
     }

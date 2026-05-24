@@ -267,6 +267,58 @@ const saveHomeDiscoveryImageS3 = async (itemId: string, filename: string, data: 
   return buildPublicUrl(key)
 }
 
+const saveHomePromoImageLocal = async (
+  bannerId: string,
+  breakpoint: string,
+  filename: string,
+  data: Buffer,
+) => {
+  const dir = join(getUploadsDir(), 'home-promos', bannerId)
+  await mkdir(dir, { recursive: true })
+  await writeFile(join(dir, `${breakpoint}-${filename}`), data)
+  return `/uploads/home-promos/${bannerId}/${breakpoint}-${filename}`
+}
+
+const saveHomePromoImageS3 = async (
+  bannerId: string,
+  breakpoint: string,
+  filename: string,
+  data: Buffer,
+  contentType?: string,
+) => {
+  const { bucket } = getS3Config()
+  const key = `home-promos/${bannerId}/${breakpoint}-${filename}`
+
+  await getS3Client().send(new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    Body: data,
+    ContentType: contentType || 'application/octet-stream',
+  }))
+
+  return buildPublicUrl(key)
+}
+
+export const saveHomePromoImage = async (
+  bannerId: string,
+  breakpoint: 'desktop' | 'tablet' | 'mobile',
+  file: { data: Buffer, filename?: string, type?: string },
+) => {
+  const ext = resolvePhotoExtension(file.filename)
+
+  if (!ALLOWED_PHOTO_EXTENSIONS.has(ext)) {
+    throw createError({ statusCode: 400, statusMessage: 'Unsupported file type' })
+  }
+
+  const filename = `${randomUUID()}${ext}`
+
+  if (isS3StorageEnabled()) {
+    return saveHomePromoImageS3(bannerId, breakpoint, filename, file.data, file.type)
+  }
+
+  return saveHomePromoImageLocal(bannerId, breakpoint, filename, file.data)
+}
+
 export const saveHomeDiscoveryImage = async (
   itemId: string,
   file: { data: Buffer, filename?: string, type?: string },

@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import type { SpotlightCardEmits, SpotlightCardProps } from './types'
 
-defineProps<SpotlightCardProps>()
+const props = defineProps<SpotlightCardProps>()
 const emit = defineEmits<SpotlightCardEmits>()
 const localePath = useLocalePath()
+
+const displayTitle = computed(() =>
+  props.photo.listingTitle ?? props.photo.placeName ?? '',
+)
+
+const hasListingLink = computed(() => Boolean(props.photo.listingId))
 </script>
 
 <template>
@@ -11,7 +17,7 @@ const localePath = useLocalePath()
     <div class="relative aspect-4/3 bg-stone-100 dark:bg-stone-800">
       <img
         :src="photo.imageUrl"
-        :alt="photo.listingTitle ?? ''"
+        :alt="displayTitle"
         class="size-full object-cover"
         loading="lazy"
       >
@@ -26,15 +32,47 @@ const localePath = useLocalePath()
     <div class="space-y-3 p-4">
       <div>
         <NuxtLink
-          v-if="photo.listingId"
+          v-if="hasListingLink"
           :to="localePath(`/listings/${photo.listingId}`)"
           class="font-semibold text-stone-900 hover:text-brand-700 dark:text-stone-50 dark:hover:text-brand-300"
         >
-          {{ photo.listingTitle }}
+          {{ displayTitle }}
         </NuxtLink>
-        <p class="text-sm text-stone-500 dark:text-stone-400">
+        <p
+          v-else-if="displayTitle"
+          class="font-semibold text-stone-900 dark:text-stone-50"
+        >
+          {{ displayTitle }}
+        </p>
+        <p
+          v-if="photo.listingCity"
+          class="text-sm text-stone-500 dark:text-stone-400"
+        >
           {{ photo.listingCity }}
         </p>
+        <div
+          v-if="!hasListingLink && (photo.externalSiteUrl || photo.externalInstagram)"
+          class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm"
+        >
+          <a
+            v-if="photo.externalSiteUrl"
+            :href="photo.externalSiteUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-medium text-brand-700 hover:underline dark:text-brand-300"
+          >
+            {{ $t('spotlight.externalSite') }}
+          </a>
+          <a
+            v-if="photo.externalInstagram"
+            :href="photo.externalInstagram"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-medium text-brand-700 hover:underline dark:text-brand-300"
+          >
+            Instagram
+          </a>
+        </div>
         <p
           v-if="photo.caption"
           class="mt-2 text-sm text-stone-600 dark:text-stone-300"

@@ -9,6 +9,7 @@ const { t } = usePageI18n({ ru, en })
 const { t: $t, locale } = useI18n()
 const localePath = useLocalePath()
 const { fetchDiscoveryGroups } = useHomeDiscovery()
+const { fetchHomePromos } = useHomePromos()
 const { fetchPublished } = useListings()
 const { fetchHomeHero } = useHomeHero()
 const { city: preferredCity, isGeoDefault, setCity, clearCity } = useUserCity()
@@ -75,6 +76,10 @@ const heroCredit = computed(() => {
   const credit = locale.value === 'en' ? hero.value.creditEn : hero.value.creditRu
   return credit?.trim() || null
 })
+
+const { data: homePromos } = await useAsyncData('home-promos', () => fetchHomePromos())
+
+const homePromosResolved = computed(() => homePromos.value ?? { featured: null, carousel: [] })
 
 const { data: discoveryGroups } = await useAsyncData('home-discovery', () => fetchDiscoveryGroups())
 
@@ -236,6 +241,8 @@ const trustItems = computed(() => [
         </ul>
       </div>
     </section>
+
+    <HomePromoBanners :section="homePromosResolved" />
 
     <section class="overflow-x-clip border-t border-stone-200 bg-white py-10 dark:border-stone-800 dark:bg-stone-950 md:py-12">
       <div class="page-container space-y-6">

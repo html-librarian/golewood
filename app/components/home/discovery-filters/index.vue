@@ -45,7 +45,7 @@ const onSelect = (filter: HomeDiscoveryFilter) => {
 
       <div
         v-if="group.id === 'destinations'"
-        class="bleed-viewport-right"
+        class="bleed-viewport-right pt-1"
       >
         <HomeDiscoveryDestinationsCarousel
           :filters="sortedDestinations(group.filters)"

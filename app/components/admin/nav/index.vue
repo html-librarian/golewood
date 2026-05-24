@@ -111,6 +111,12 @@ const sections = computed((): NavSection[] => {
           roles: ['admin'],
         },
         {
+          to: localePath('/admin/home-promos'),
+          label: 'admin.nav.homePromos',
+          icon: 'ph:images-duotone',
+          roles: ['admin'],
+        },
+        {
           to: localePath('/admin/team-badges'),
           label: 'admin.nav.teamBadges',
           icon: 'ph:seal-check-duotone',

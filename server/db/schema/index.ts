@@ -267,6 +267,31 @@ export const homeHeroSettings = pgTable('home_hero_settings', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
+export const homePromoSlotEnum = pgEnum('home_promo_slot', ['featured', 'carousel'])
+export const homePromoBackgroundEnum = pgEnum('home_promo_background', ['image', 'gradient'])
+
+export const homePromoBanners = pgTable('home_promo_banners', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  slot: homePromoSlotEnum('slot').notNull(),
+  titleRu: varchar('title_ru', { length: 255 }),
+  titleEn: varchar('title_en', { length: 255 }),
+  subtitleRu: varchar('subtitle_ru', { length: 255 }),
+  subtitleEn: varchar('subtitle_en', { length: 255 }),
+  ctaRu: varchar('cta_ru', { length: 64 }),
+  ctaEn: varchar('cta_en', { length: 64 }),
+  linkHref: varchar('link_href', { length: 512 }).notNull(),
+  linkExternal: boolean('link_external').notNull().default(false),
+  backgroundMode: homePromoBackgroundEnum('background_mode').notNull().default('gradient'),
+  tone: varchar('tone', { length: 160 }).notNull().default('from-brand-600 to-teal-700'),
+  imageDesktopUrl: varchar('image_desktop_url', { length: 512 }),
+  imageTabletUrl: varchar('image_tablet_url', { length: 512 }),
+  imageMobileUrl: varchar('image_mobile_url', { length: 512 }),
+  active: boolean('active').notNull().default(true),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
 export const homeDiscoveryItems = pgTable('home_discovery_items', {
   id: uuid('id').primaryKey().defaultRandom(),
   itemKey: varchar('item_key', { length: 64 }).notNull().unique(),
@@ -561,7 +586,10 @@ export const messages = pgTable('messages', {
 export const spotlightPhotos = pgTable('spotlight_photos', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  listingId: uuid('listing_id').notNull().references(() => listings.id, { onDelete: 'cascade' }),
+  listingId: uuid('listing_id').references(() => listings.id, { onDelete: 'set null' }),
+  placeName: varchar('place_name', { length: 255 }),
+  externalSiteUrl: varchar('external_site_url', { length: 512 }),
+  externalInstagram: varchar('external_instagram', { length: 255 }),
   imageUrl: varchar('image_url', { length: 512 }).notNull(),
   caption: text('caption').notNull().default(''),
   status: spotlightPhotoStatusEnum('status').notNull().default('pending'),

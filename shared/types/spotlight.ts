@@ -4,15 +4,18 @@ export type SpotlightPhotoStatus = typeof SPOTLIGHT_PHOTO_STATUSES[number]
 export interface SpotlightPhoto {
   id: string
   userId: string
-  listingId: string
+  listingId: string | null
+  placeName: string | null
+  externalSiteUrl: string | null
+  externalInstagram: string | null
   imageUrl: string
   caption: string
   status: SpotlightPhotoStatus
   monthKey: string
   voteCount: number
   createdAt: string
-  listingTitle?: string
-  listingCity?: string
+  listingTitle?: string | null
+  listingCity?: string | null
   authorName?: string | null
   userVoted?: boolean
 }

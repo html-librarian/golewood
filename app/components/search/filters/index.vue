@@ -17,8 +17,42 @@ const { data: amenityCatalog } = await useAsyncData('search-amenities', () => fe
 const { data: accommodationTypeCatalog } = await useAsyncData('search-accommodation-types', () => fetchAccommodationTypes())
 const { data: teamBadges } = await useAsyncData('search-team-badges', () => fetchTeamBadges())
 
-const COMFORT_PREVIEW = 6
-const expandedComfort = ref(false)
+const FILTER_SECTION_PREVIEW = 5
+
+const expandedSections = ref<Set<string>>(new Set())
+
+const isSectionExpanded = (sectionKey: string) => expandedSections.value.has(sectionKey)
+
+const toggleSection = (sectionKey: string) => {
+  const next = new Set(expandedSections.value)
+
+  if (next.has(sectionKey)) {
+    next.delete(sectionKey)
+  } else {
+    next.add(sectionKey)
+  }
+
+  expandedSections.value = next
+}
+
+const sectionHasMore = (count: number) => count > FILTER_SECTION_PREVIEW
+
+const visibleSectionItems = <T,>(
+  sectionKey: string,
+  items: T[],
+  isSelected: (item: T) => boolean,
+  itemKey: (item: T) => string,
+) => {
+  if (isSectionExpanded(sectionKey) || items.length <= FILTER_SECTION_PREVIEW) {
+    return items
+  }
+
+  const preview = items.slice(0, FILTER_SECTION_PREVIEW)
+  const previewKeys = new Set(preview.map(itemKey))
+  const selectedHidden = items.filter(item => isSelected(item) && !previewKeys.has(itemKey(item)))
+
+  return [...preview, ...selectedHidden]
+}
 
 const amenityLabel = (item: AmenityCatalogItem) =>
   locale.value === 'en' ? item.labelEn : item.labelRu
@@ -46,13 +80,7 @@ const groupedAmenities = computed(() => {
     .filter(group => group.items.length > 0)
 })
 
-const visibleComfortItems = (items: AmenityCatalogItem[]) => {
-  if (expandedComfort.value || items.length <= COMFORT_PREVIEW) {
-    return items
-  }
-
-  return items.slice(0, COMFORT_PREVIEW)
-}
+const amenitySectionKey = (category: AmenityCategory) => `amenity:${category}`
 
 const accommodationLabel = (item: { slug: string, labelRu: string, labelEn: string }) =>
   locale.value === 'en' ? item.labelEn : item.labelRu
@@ -111,7 +139,7 @@ const toggleTeamBadge = (slug: string) => {
       </p>
       <ul class="space-y-2">
         <li
-          v-for="badge in teamBadges"
+          v-for="badge in visibleSectionItems('team-badges', teamBadges, b => teamBadgeSlugs.includes(b.slug), b => b.slug)"
           :key="badge.id"
         >
           <FormCheckbox
@@ -128,6 +156,16 @@ const toggleTeamBadge = (slug: string) => {
           </FormCheckbox>
         </li>
       </ul>
+      <UiButton
+        v-if="teamBadges && sectionHasMore(teamBadges.length)"
+        type="button"
+        variant="outline"
+        size="sm"
+        class="w-full"
+        @click="toggleSection('team-badges')"
+      >
+        {{ isSectionExpanded('team-badges') ? $t('search.showLess') : $t('search.showMore') }}
+      </UiButton>
     </div>
 
     <div
@@ -139,7 +177,12 @@ const toggleTeamBadge = (slug: string) => {
       </p>
       <ul class="space-y-2">
         <li
-          v-for="item in accommodationTypeCatalog"
+          v-for="item in visibleSectionItems(
+            'accommodation-types',
+            accommodationTypeCatalog,
+            i => accommodationTypes.includes(i.slug),
+            i => i.slug,
+          )"
           :key="item.slug"
         >
           <FormCheckbox
@@ -156,6 +199,16 @@ const toggleTeamBadge = (slug: string) => {
           </FormCheckbox>
         </li>
       </ul>
+      <UiButton
+        v-if="accommodationTypeCatalog && sectionHasMore(accommodationTypeCatalog.length)"
+        type="button"
+        variant="outline"
+        size="sm"
+        class="w-full"
+        @click="toggleSection('accommodation-types')"
+      >
+        {{ isSectionExpanded('accommodation-types') ? $t('search.showLess') : $t('search.showMore') }}
+      </UiButton>
     </div>
 
     <div
@@ -169,7 +222,12 @@ const toggleTeamBadge = (slug: string) => {
 
       <ul class="space-y-2">
         <li
-          v-for="amenity in group.category === 'comfort' ? visibleComfortItems(group.items) : group.items"
+          v-for="amenity in visibleSectionItems(
+            amenitySectionKey(group.category),
+            group.items,
+            a => amenities.includes(a.slug),
+            a => a.slug,
+          )"
           :key="amenity.slug"
         >
           <FormCheckbox
@@ -181,14 +239,14 @@ const toggleTeamBadge = (slug: string) => {
       </ul>
 
       <UiButton
-        v-if="group.category === 'comfort' && group.items.length > COMFORT_PREVIEW"
+        v-if="sectionHasMore(group.items.length)"
         type="button"
         variant="outline"
         size="sm"
         class="w-full"
-        @click="expandedComfort = !expandedComfort"
+        @click="toggleSection(amenitySectionKey(group.category))"
       >
-        {{ expandedComfort ? $t('search.showLess') : $t('search.showMore') }}
+        {{ isSectionExpanded(amenitySectionKey(group.category)) ? $t('search.showLess') : $t('search.showMore') }}
       </UiButton>
     </div>
   </aside>

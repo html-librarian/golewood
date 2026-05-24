@@ -43,19 +43,27 @@ const onSelect = (filter: HomeDiscoveryFilter) => {
         @click="onSelect(filter)"
       >
         <span
-          class="relative aspect-square w-full overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/10 transition group-hover:shadow-md dark:ring-white/10"
-          :class="filter.imageUrl ? 'bg-stone-200 dark:bg-stone-800' : `bg-linear-to-br text-white ${filter.tone}`"
+          class="relative aspect-square w-full rounded-2xl shadow-sm ring-1 ring-black/10 transition group-hover:shadow-md dark:ring-white/10"
         >
-          <img
-            v-if="filter.imageUrl"
-            :src="filter.imageUrl"
-            alt=""
-            class="size-full object-cover transition duration-500 ease-out will-change-transform group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          <span
+            class="absolute inset-0 overflow-hidden rounded-2xl"
+            :class="filter.imageUrl ? 'bg-stone-200 dark:bg-stone-800' : `bg-linear-to-br text-white ${filter.tone}`"
           >
-          <Icon
-            v-else
-            :name="filter.icon"
-            class="absolute left-1/2 top-1/2 size-8 -translate-x-1/2 -translate-y-1/2 sm:size-9"
+            <img
+              v-if="filter.imageUrl"
+              :src="filter.imageUrl"
+              alt=""
+              class="size-full object-cover transition duration-500 ease-out will-change-transform group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            >
+            <Icon
+              v-else
+              :name="filter.icon"
+              class="absolute left-1/2 top-1/2 z-[1] size-8 -translate-x-1/2 -translate-y-1/2 sm:size-9"
+            />
+          </span>
+          <span
+            class="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_-72px_56px_-24px_rgba(0,0,0,0.72)]"
+            aria-hidden="true"
           />
         </span>
         <span class="line-clamp-2 text-center text-xs font-medium leading-snug text-stone-700 group-hover:text-brand-700 sm:text-sm dark:text-stone-300 dark:group-hover:text-brand-300">

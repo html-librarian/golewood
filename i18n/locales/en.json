@@ -44,6 +44,7 @@
     "vote": "Vote",
     "voted": "Voted",
     "anonymous": "Guest",
+    "externalSite": "Website",
     "heroCredit": "Photo of the month · {listing}",
     "link": "Photo of the month"
   },
@@ -336,6 +337,7 @@
       "news": "Listing news",
       "amenities": "Amenities",
       "homeDiscovery": "Home quick filters",
+      "homePromos": "Home promo banners",
       "teamBadges": "Team badges",
       "spotlight": "Photo of the month",
       "blog": "Blog"

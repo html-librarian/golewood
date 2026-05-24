@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { BookingWithListing } from '#shared/types/booking'
 import type { SpotlightUploadEmits, SpotlightUploadProps } from './types'
 import ru from './i18n/ru'
 import en from './i18n/en'
@@ -10,10 +9,15 @@ const emit = defineEmits<SpotlightUploadEmits>()
 const { t } = usePageI18n({ ru, en })
 const localePath = useLocalePath()
 const { isAuthenticated } = useAuth()
-const { fetchGuestBookings } = useBookings()
 const { uploadPhoto } = useSpotlight()
 
-const listingId = ref(props.listingId ?? '')
+type SourceMode = 'listing' | 'external'
+
+const sourceMode = ref<SourceMode>('listing')
+const listingUrl = ref(props.listingId ? `${localePath(`/listings/${props.listingId}`)}` : '')
+const placeName = ref('')
+const externalSiteUrl = ref('')
+const externalInstagram = ref('')
 const caption = ref('')
 const consent = ref(false)
 const file = ref<File | null>(null)
@@ -21,78 +25,34 @@ const loading = ref(false)
 const error = ref('')
 const success = ref(false)
 
-const { data: bookings, pending: bookingsPending } = await useAsyncData(
-  'spotlight-upload-bookings',
-  async () => {
-    if (!isAuthenticated.value) {
-      return [] as BookingWithListing[]
-    }
-
-    try {
-      return await fetchGuestBookings()
-    } catch {
-      return [] as BookingWithListing[]
-    }
-  },
-  { watch: [isAuthenticated], default: () => [] as BookingWithListing[] },
-)
-
-const listingOptions = computed(() => {
-  const map = new Map<string, { value: string, label: string }>()
-
-  for (const booking of bookings.value ?? []) {
-    if (booking.status === 'cancelled') {
-      continue
-    }
-
-    map.set(booking.listing.id, {
-      value: booking.listing.id,
-      label: `${booking.listing.title} — ${booking.listing.city}`,
-    })
+watch(() => props.listingId, (id) => {
+  if (id) {
+    sourceMode.value = 'listing'
+    listingUrl.value = localePath(`/listings/${id}`)
   }
-
-  return [...map.values()].sort((a, b) => a.label.localeCompare(b.label, 'ru'))
 })
-
-const hasListingChoice = computed(() => listingOptions.value.length > 0)
-
-const canShowUploadForm = computed(() =>
-  isAuthenticated.value
-  && !bookingsPending.value
-  && hasListingChoice.value,
-)
-
-const introText = computed(() => {
-  if (canShowUploadForm.value) {
-    return t('uploadHint')
-  }
-
-  if (!isAuthenticated.value) {
-    return t('loginHint')
-  }
-
-  return ''
-})
-
-const syncListingSelection = () => {
-  const options = listingOptions.value
-
-  if (props.listingId && options.some(option => option.value === props.listingId)) {
-    listingId.value = props.listingId
-    return
-  }
-
-  if (!listingId.value && options.length === 1) {
-    listingId.value = options[0]!.value
-  }
-}
-
-watch(listingOptions, syncListingSelection, { immediate: true })
 
 const onFileChange = (event: Event) => {
   const input = event.target as HTMLInputElement
   file.value = input.files?.[0] ?? null
 }
+
+const hasListingLink = computed(() => listingUrl.value.trim().length > 0)
+const hasExternalLink = computed(() =>
+  externalSiteUrl.value.trim().length > 0 || externalInstagram.value.trim().length > 0,
+)
+
+const canSubmit = computed(() => {
+  if (!consent.value || !file.value) {
+    return false
+  }
+
+  if (sourceMode.value === 'listing') {
+    return hasListingLink.value
+  }
+
+  return hasExternalLink.value
+})
 
 const submit = async () => {
   if (!isAuthenticated.value) {
@@ -100,7 +60,7 @@ const submit = async () => {
     return
   }
 
-  if (!listingId.value.trim() || !file.value || !consent.value) {
+  if (!canSubmit.value) {
     error.value = t('uploadError')
     return
   }
@@ -111,16 +71,28 @@ const submit = async () => {
 
   try {
     const formData = new FormData()
-    formData.append('listingId', listingId.value.trim())
-    formData.append('caption', caption.value.trim())
     formData.append('consent', 'true')
-    formData.append('file', file.value)
+    formData.append('caption', caption.value.trim())
+    formData.append('file', file.value!)
+
+    if (sourceMode.value === 'listing') {
+      if (props.listingId) {
+        formData.append('listingId', props.listingId)
+      }
+      formData.append('listingUrl', listingUrl.value.trim())
+    } else {
+      formData.append('placeName', placeName.value.trim())
+      formData.append('externalSiteUrl', externalSiteUrl.value.trim())
+      formData.append('externalInstagram', externalInstagram.value.trim())
+    }
 
     await uploadPhoto(formData)
     success.value = true
     caption.value = ''
     file.value = null
     consent.value = false
+    externalSiteUrl.value = ''
+    externalInstagram.value = ''
     emit('uploaded')
   } catch {
     error.value = t('uploadFailed')
@@ -138,11 +110,8 @@ const submit = async () => {
     <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
       {{ t('uploadTitle') }}
     </h2>
-    <p
-      v-if="introText"
-      class="text-sm text-stone-600 dark:text-stone-400"
-    >
-      {{ introText }}
+    <p class="text-sm text-stone-600 dark:text-stone-400">
+      {{ isAuthenticated ? t('uploadHint') : t('loginHint') }}
     </p>
 
     <p
@@ -152,39 +121,61 @@ const submit = async () => {
       {{ t('uploadSuccess') }}
     </p>
 
-    <FormSelect
-      v-if="hasListingChoice"
-      :id="'spotlight-listing'"
-      v-model="listingId"
-      :label="t('listing')"
-      :options="listingOptions"
-      :placeholder="t('listingPlaceholder')"
-      :disabled="Boolean(props.listingId && listingOptions.some(option => option.value === props.listingId))"
-      required
-    />
+    <template v-if="isAuthenticated">
+      <div class="flex flex-wrap gap-2">
+        <UiButton
+          type="button"
+          size="sm"
+          :variant="sourceMode === 'listing' ? 'primary' : 'secondary'"
+          @click="sourceMode = 'listing'"
+        >
+          {{ t('sourceListing') }}
+        </UiButton>
+        <UiButton
+          type="button"
+          size="sm"
+          :variant="sourceMode === 'external' ? 'primary' : 'secondary'"
+          @click="sourceMode = 'external'"
+        >
+          {{ t('sourceExternal') }}
+        </UiButton>
+      </div>
 
-    <div
-      v-else-if="isAuthenticated && !bookingsPending"
-      class="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 dark:border-stone-700 dark:bg-stone-900/50 dark:text-stone-300"
-    >
-      <p>{{ t('noBookings') }}</p>
-      <NuxtLink
-        :to="localePath('/search')"
-        class="mt-2 inline-block font-medium text-brand-700 hover:underline dark:text-brand-400"
-      >
-        {{ t('findListing') }}
-      </NuxtLink>
-    </div>
+      <template v-if="sourceMode === 'listing'">
+        <FormInput
+          v-model="listingUrl"
+          :label="t('listingUrl')"
+          :placeholder="t('listingUrlPlaceholder')"
+          :disabled="Boolean(props.listingId)"
+          required
+        />
+        <p class="text-xs text-stone-500 dark:text-stone-400">
+          {{ t('listingUrlHint') }}
+        </p>
+      </template>
 
-    <div
-      v-else-if="bookingsPending"
-      class="space-y-2"
-    >
-      <UiSkeleton class="h-4 w-24" />
-      <UiSkeleton class="h-11 w-full" />
-    </div>
+      <template v-else>
+        <FormInput
+          v-model="placeName"
+          :label="t('placeName')"
+          :placeholder="t('placeNamePlaceholder')"
+        />
+        <FormInput
+          v-model="externalSiteUrl"
+          :label="t('externalSite')"
+          :placeholder="t('externalSitePlaceholder')"
+          type="url"
+        />
+        <FormInput
+          v-model="externalInstagram"
+          :label="t('externalInstagram')"
+          :placeholder="t('externalInstagramPlaceholder')"
+        />
+        <p class="text-xs text-stone-500 dark:text-stone-400">
+          {{ t('externalHint') }}
+        </p>
+      </template>
 
-    <template v-if="canShowUploadForm">
       <FormTextarea
         v-model="caption"
         :label="t('caption')"
@@ -219,13 +210,14 @@ const submit = async () => {
       <UiButton
         type="submit"
         :loading="loading"
+        :disabled="!canSubmit"
       >
         {{ t('submit') }}
       </UiButton>
     </template>
 
     <NuxtLink
-      v-else-if="!isAuthenticated"
+      v-else
       :to="localePath('/auth/login')"
       class="block"
     >
