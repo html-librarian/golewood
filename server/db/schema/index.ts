@@ -271,6 +271,7 @@ export const homeDiscoveryItems = pgTable('home_discovery_items', {
   labelEn: varchar('label_en', { length: 128 }).notNull(),
   icon: varchar('icon', { length: 128 }).notNull(),
   tone: varchar('tone', { length: 160 }).notNull(),
+  imageUrl: varchar('image_url', { length: 512 }),
   params: jsonb('params').$type<Record<string, unknown>>().notNull().default({}),
   active: boolean('active').notNull().default(true),
   sortOrder: integer('sort_order').notNull().default(0),

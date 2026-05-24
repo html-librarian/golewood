@@ -10,6 +10,7 @@ export type HomeDiscoveryAdminItem = {
   labelEn: string
   icon: string
   tone: string
+  imageUrl: string | null
   params: HomeDiscoveryParams
   active: boolean
   sortOrder: number

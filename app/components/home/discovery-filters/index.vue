@@ -57,10 +57,17 @@ const onSelect = (filter: HomeDiscoveryFilter) => {
             @click="onSelect(filter)"
           >
             <span
-              class="flex size-14 items-center justify-center rounded-full bg-linear-to-br text-white shadow-sm ring-1 ring-black/5 transition group-hover:scale-105 group-hover:shadow-md sm:size-16"
-              :class="filter.tone"
+              class="flex size-14 items-center justify-center overflow-hidden rounded-full shadow-sm ring-1 ring-black/5 transition group-hover:scale-105 group-hover:shadow-md sm:size-16"
+              :class="filter.imageUrl ? 'bg-stone-200 dark:bg-stone-800' : `bg-linear-to-br text-white ${filter.tone}`"
             >
+              <img
+                v-if="filter.imageUrl"
+                :src="filter.imageUrl"
+                alt=""
+                class="size-full object-cover"
+              >
               <Icon
+                v-else
                 :name="filter.icon"
                 class="size-7 sm:size-8"
               />

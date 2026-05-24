@@ -6,6 +6,8 @@ export type HomeDiscoveryFilter = {
   labelEn: string
   icon: string
   tone: string
+  /** Custom circle image; when set, replaces icon + gradient on the home page. */
+  imageUrl?: string | null
   params: Pick<SearchParams, 'city' | 'amenities' | 'teamBadgeSlugs' | 'accommodationTypes'>
 }
 
