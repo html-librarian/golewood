@@ -46,18 +46,18 @@ const onSelect = (filter: HomeDiscoveryFilter) => {
         {{ titleFor(group) }}
       </h2>
 
-      <ul class="grid grid-cols-4 gap-x-2 gap-y-5 sm:gap-x-4 sm:gap-y-6">
+      <ul class="grid grid-cols-3 gap-x-3 gap-y-7 sm:grid-cols-4 sm:gap-x-5 sm:gap-y-8 md:gap-x-6">
         <li
           v-for="filter in group.filters"
           :key="filter.id"
         >
           <NuxtLink
             :to="searchLink(filter)"
-            class="group flex flex-col items-center gap-2 text-center"
+            class="group flex flex-col items-center gap-2.5 text-center sm:gap-3"
             @click="onSelect(filter)"
           >
             <span
-              class="flex size-14 items-center justify-center overflow-hidden rounded-full shadow-sm ring-1 ring-black/5 transition group-hover:scale-105 group-hover:shadow-md sm:size-16"
+              class="flex size-24 items-center justify-center overflow-hidden rounded-full shadow-md ring-1 ring-black/10 transition group-hover:scale-105 group-hover:shadow-lg sm:size-28 md:size-32"
               :class="filter.imageUrl ? 'bg-stone-200 dark:bg-stone-800' : `bg-linear-to-br text-white ${filter.tone}`"
             >
               <img
@@ -69,10 +69,10 @@ const onSelect = (filter: HomeDiscoveryFilter) => {
               <Icon
                 v-else
                 :name="filter.icon"
-                class="size-7 sm:size-8"
+                class="size-11 sm:size-12 md:size-14"
               />
             </span>
-            <span class="text-xs font-medium leading-snug text-stone-700 group-hover:text-brand-700 dark:text-stone-300 dark:group-hover:text-brand-300 sm:text-sm">
+            <span class="max-w-[6.5rem] text-xs font-medium leading-snug text-stone-700 group-hover:text-brand-700 sm:max-w-none sm:text-sm dark:text-stone-300 dark:group-hover:text-brand-300">
               {{ labelFor(filter) }}
             </span>
           </NuxtLink>

@@ -244,7 +244,7 @@ watch(groups, (value) => {
           <div class="grid gap-4 sm:grid-cols-[auto_1fr]">
             <div class="flex flex-col items-center gap-2">
               <span
-                class="flex size-16 items-center justify-center overflow-hidden rounded-full shadow-sm ring-1 ring-black/5"
+                class="flex size-24 items-center justify-center overflow-hidden rounded-full shadow-md ring-1 ring-black/10 sm:size-28"
                 :class="item.imageUrl
                   ? 'bg-stone-200 dark:bg-stone-800'
                   : `bg-linear-to-br text-white ${ensureDraft(item).tone}`"
@@ -258,7 +258,7 @@ watch(groups, (value) => {
                 <Icon
                   v-else
                   :name="ensureDraft(item).icon"
-                  class="size-8"
+                  class="size-11 sm:size-12"
                 />
               </span>
               <span class="text-center text-xs font-medium text-stone-600 dark:text-stone-400">

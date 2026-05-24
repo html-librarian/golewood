@@ -149,6 +149,10 @@
     "teamCatalogOnly": "Только каталог Golewood",
     "showMore": "Показать ещё",
     "showLess": "Свернуть",
+    "filterPriceFrom": "от {price}",
+    "filterPriceTo": "до {price}",
+    "filterPriceRange": "{min} – {max}",
+    "removeFilter": "Убрать фильтр «{label}»",
     "mapExpand": "На весь экран",
     "mapClose": "Свернуть карту",
     "sort": {

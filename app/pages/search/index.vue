@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Amenity } from '#shared/types/listing'
 import type { SearchParams, SearchSort } from '#shared/types/search'
+import type { SearchActiveFilterTag } from '#shared/utils/search-active-filters'
 import {
   buildSearchRouteQuery,
   normalizeSearchPage,
@@ -326,6 +327,21 @@ const clearSearchFilters = async () => {
   await runSearch(1)
 }
 
+const removeActiveFilter = async (tag: SearchActiveFilterTag) => {
+  if (tag.kind === 'price') {
+    form.minPrice = ''
+    form.maxPrice = ''
+  } else if (tag.kind === 'amenity' && tag.slug) {
+    form.amenities = form.amenities.filter(slug => slug !== tag.slug)
+  } else if (tag.kind === 'accommodationType' && tag.slug) {
+    form.accommodationTypes = form.accommodationTypes.filter(slug => slug !== tag.slug)
+  } else if (tag.kind === 'teamBadge' && tag.slug) {
+    form.teamBadgeSlugs = form.teamBadgeSlugs.filter(slug => slug !== tag.slug)
+  }
+
+  await runSearch(1)
+}
+
 const showListPanel = computed(() => isLgUp.value || mobileView.value === 'list')
 const showMapPanel = computed(() => isLgUp.value || mobileView.value === 'map')
 
@@ -530,6 +546,17 @@ watch(mobileView, (view) => {
         >
           {{ searchErrorMessage }}
         </div>
+
+        <SearchActiveFilters
+          v-if="hasActiveFilters"
+          class="mb-4"
+          :min-price="form.minPrice"
+          :max-price="form.maxPrice"
+          :amenities="form.amenities"
+          :accommodation-types="form.accommodationTypes"
+          :team-badge-slugs="form.teamBadgeSlugs"
+          @remove="removeActiveFilter"
+        />
 
         <div
           v-if="showSkeleton"

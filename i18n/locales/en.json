@@ -149,6 +149,10 @@
     "teamCatalogOnly": "Golewood catalog only",
     "showMore": "Show more",
     "showLess": "Show less",
+    "filterPriceFrom": "from {price}",
+    "filterPriceTo": "up to {price}",
+    "filterPriceRange": "{min} – {max}",
+    "removeFilter": "Remove filter “{label}”",
     "mapExpand": "Full screen",
     "mapClose": "Exit full screen",
     "sort": {
