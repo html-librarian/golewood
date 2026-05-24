@@ -10,6 +10,8 @@ describe('mapListing', () => {
       id: '550e8400-e29b-41d4-a716-446655440000',
       hostId: '660e8400-e29b-41d4-a716-446655440001',
       title: 'Дом у моря',
+      metaTitle: null,
+      metaDescription: null,
       description: 'Описание',
       status: 'published',
       pricePerNight: 5000,
@@ -23,6 +25,8 @@ describe('mapListing', () => {
       extraGuestPricePerNight: 800,
       bedrooms: 2,
       amenities: ['wifi'],
+      accommodationType: null,
+      contacts: { phone: '+79001234567' },
       houseRules: 'Без курения',
       checkInTime: '15:00',
       checkOutTime: '12:00',
@@ -49,6 +53,7 @@ describe('mapListing', () => {
     expect(listing.maxGuestsWithExtra).toBe(6)
     expect(listing.checkInTime).toBe('15:00')
     expect(listing.checkOutTime).toBe('12:00')
+    expect(listing.contacts.phone).toBe('+79001234567')
     expect(listing.createdAt).toBe(createdAt.toISOString())
   })
 })

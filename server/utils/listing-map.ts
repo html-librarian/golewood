@@ -1,4 +1,5 @@
 import type { Amenity, CancellationPolicy, Listing } from '#shared/types/listing'
+import { normalizeListingContacts } from '#shared/utils/listing-contacts'
 // Drizzle $inferSelect requires the table value, not a type-only import.
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- listings table binding
 import { listings } from '../db/schema'
@@ -11,6 +12,8 @@ export const mapListing = (row: ListingRow): Listing => ({
   kind: row.kind,
   propertyListingId: row.propertyListingId,
   title: row.title,
+  metaTitle: row.metaTitle,
+  metaDescription: row.metaDescription,
   description: row.description,
   status: row.status,
   pricePerNight: row.pricePerNight,
@@ -34,6 +37,7 @@ export const mapListing = (row: ListingRow): Listing => ({
   transferOffered: row.transferOffered,
   transferPrice: row.transferPrice,
   transferPriceOnRequest: row.transferPriceOnRequest,
+  contacts: normalizeListingContacts(row.contacts),
   managedByTeam: row.managedByTeam,
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),

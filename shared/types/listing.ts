@@ -1,5 +1,6 @@
 import type { BlogPostCard } from './blog'
 import type { HostVerificationPublic } from './host-verification'
+import type { ListingContacts } from './listing-contacts'
 import type { ListingPromotionMeta } from './promotion'
 import type { TeamBadge } from './team-badge'
 
@@ -52,6 +53,8 @@ export interface Listing {
   /** Для property в выдаче: минимальная цена среди домиков */
   priceFrom?: number | null
   title: string
+  metaTitle?: string | null
+  metaDescription?: string | null
   description: string
   status: ListingStatus
   pricePerNight: number
@@ -78,6 +81,7 @@ export interface Listing {
   transferOffered: boolean
   transferPrice: number | null
   transferPriceOnRequest: boolean
+  contacts: ListingContacts
   managedByTeam: boolean
   teamBadge?: TeamBadge | null
   teamBadgeBlogPost?: BlogPostCard | null

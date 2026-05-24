@@ -222,7 +222,7 @@
   }
 
   .listing-map-popup .maplibregl-popup-close-button {
-    @apply absolute -right-1 -top-1 z-20 m-0 flex size-7 items-center justify-center rounded-full border border-stone-200/80 bg-white/95 text-base leading-none text-stone-700 shadow-md backdrop-blur-sm hover:bg-white hover:text-stone-900 dark:border-stone-600 dark:bg-stone-900/95 dark:text-stone-200 dark:hover:bg-stone-900 dark:hover:text-white;
+    @apply absolute -top-0.5 -right-0.5 z-20 m-0 flex size-7 items-center justify-center rounded-full border border-stone-200/80 bg-white/95 text-base leading-none text-stone-700 shadow-md backdrop-blur-sm hover:bg-white hover:text-stone-900 dark:border-stone-600 dark:bg-stone-900/95 dark:text-stone-200 dark:hover:bg-stone-900 dark:hover:text-white;
   }
 
 }

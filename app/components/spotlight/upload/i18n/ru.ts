@@ -4,6 +4,7 @@ export default {
   loginHint: 'Войдите в аккаунт, чтобы отправить фото на конкурс.',
   sourceListing: 'Объявление на Golewood',
   sourceExternal: 'Пока нет на сайте',
+  sourceModeAria: 'Тип объявления для фото',
   listingUrl: 'Ссылка на объявление',
   listingUrlPlaceholder: 'https://golewood.ru/listings/…',
   listingUrlHint: 'Скопируйте адрес страницы объявления из браузера.',

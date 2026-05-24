@@ -1,3 +1,4 @@
+import type { ListingContacts } from '#shared/types/listing-contacts'
 import { type AnyPgColumn, pgEnum, pgTable, uuid, varchar, timestamp, integer, bigint, text, doublePrecision, jsonb, customType, unique, boolean } from 'drizzle-orm/pg-core'
 
 const geographyPoint = customType<{ data: unknown, driverData: unknown }>({
@@ -98,6 +99,8 @@ export const listings = pgTable('listings', {
   kind: listingKindEnum('kind').notNull().default('standalone'),
   propertyListingId: uuid('property_listing_id').references((): AnyPgColumn => listings.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
+  metaTitle: varchar('meta_title', { length: 255 }),
+  metaDescription: varchar('meta_description', { length: 320 }),
   description: text('description').notNull().default(''),
   status: listingStatusEnum('status').notNull().default('draft'),
   pricePerNight: integer('price_per_night').notNull(),
@@ -126,6 +129,7 @@ export const listings = pgTable('listings', {
   managedByTeam: boolean('managed_by_team').notNull().default(false),
   calendarExportToken: uuid('calendar_export_token').notNull().defaultRandom(),
   location: geographyPoint('location'),
+  contacts: jsonb('contacts').$type<ListingContacts>().notNull().default({}),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 })

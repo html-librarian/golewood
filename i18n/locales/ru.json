@@ -83,6 +83,31 @@
     "like": "Нравится",
     "dislike": "Не нравится"
   },
+  "listingSharePreview": {
+    "label": "Превью в соцсетях",
+    "titlePlaceholder": "Заголовок объявления",
+    "descriptionPlaceholder": "Краткое описание для ВКонтакте, Telegram и поиска",
+    "hint": "Так примерно увидят ссылку в ВК и мессенджерах. Добавьте фото на следующем шаге — оно попадёт в превью."
+  },
+  "listingContacts": {
+    "title": "Контакты и ссылки",
+    "hint": "Необязательно. Гости увидят их на странице объекта — удобно для прямого бронирования или вопросов.",
+    "blockTitle": "Как связаться",
+    "phone": "Телефон",
+    "website": "Сайт",
+    "telegram": "Telegram",
+    "whatsapp": "WhatsApp",
+    "max": "MAX",
+    "vk": "ВКонтакте",
+    "instagram": "Instagram",
+    "phonePlaceholder": "+7 900 000-00-00",
+    "websitePlaceholder": "example.ru",
+    "telegramPlaceholder": "{'@'}username",
+    "whatsappPlaceholder": "+7 900 000-00-00",
+    "maxPlaceholder": "{'@'}username",
+    "vkPlaceholder": "vk.com/group",
+    "instagramPlaceholder": "{'@'}username"
+  },
   "form": {
     "selectPlaceholder": "Выберите…",
     "datesPlaceholder": "Заезд — выезд",

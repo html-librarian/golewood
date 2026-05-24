@@ -6,6 +6,11 @@ import {
 import { CANCELLATION_POLICIES, CANCELLATION_POLICY_LABELS } from '#shared/types/listing'
 import type { AmenityCatalogItem } from '#shared/types/catalog'
 import type { ListingDocument, ListingPhoto } from '#shared/types/listing'
+import { listingContactsFromForm, listingContactsToForm } from '#shared/utils/listing-contacts'
+import {
+  buildListingMetaDescription,
+  buildListingMetaTitle,
+} from '#shared/utils/listing-seo'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
@@ -61,6 +66,9 @@ const form = reactive({
   extraGuestsOffered: false,
   maxGuestsWithExtra: '',
   extraGuestPricePerNight: '',
+  contacts: listingContactsToForm(null),
+  metaTitle: '',
+  metaDescription: '',
 })
 
 const amenityLabel = (item: AmenityCatalogItem) =>
@@ -88,6 +96,9 @@ const applyListing = (listing: Awaited<ReturnType<typeof fetchHostListingById>>)
   form.extraGuestPricePerNight = listing.extraGuestPricePerNight
     ? String(listing.extraGuestPricePerNight)
     : ''
+  form.contacts = listingContactsToForm(listing.contacts)
+  form.metaTitle = listing.metaTitle ?? ''
+  form.metaDescription = listing.metaDescription ?? ''
   photos.value = listing.photos
   documents.value = listing.documents ?? []
 }
@@ -219,6 +230,8 @@ const saveBasic = async () => {
         checkInTime: form.checkInTime,
         checkOutTime: form.checkOutTime,
         propertyListingId: propertyListingId.value,
+        contacts: listingContactsFromForm(form.contacts),
+        ...metaPayload(),
         ...transferPayload(),
         ...extraGuestsPayload(),
       })
@@ -231,6 +244,8 @@ const saveBasic = async () => {
         city: form.city,
         address: form.address,
         description: form.description,
+        contacts: listingContactsFromForm(form.contacts),
+        ...metaPayload(),
       })
     }
 
@@ -293,6 +308,35 @@ const handleSubmit = async () => {
 }
 
 const photoCount = computed(() => photos.value.filter(item => item.mediaType === 'photo').length)
+
+const seoPreviewSource = computed(() => ({
+  title: form.title,
+  city: form.city,
+  description: form.description,
+  pricePerNight: Number(form.pricePerNight) || 0,
+  maxGuests: Number(form.maxGuests) || 1,
+  metaTitle: form.metaTitle,
+  metaDescription: form.metaDescription,
+}))
+
+const seoPreviewTitle = computed(() =>
+  buildListingMetaTitle(seoPreviewSource.value, locale.value === 'en' ? 'en' : 'ru'),
+)
+
+const seoPreviewDescription = computed(() =>
+  buildListingMetaDescription(seoPreviewSource.value, locale.value === 'en' ? 'en' : 'ru'),
+)
+
+const seoPreviewImageUrl = computed(() => {
+  const cover = photos.value.find(item => item.mediaType === 'photo') ?? photos.value[0]
+
+  return cover?.url ?? null
+})
+
+const metaPayload = () => ({
+  metaTitle: form.metaTitle.trim() || null,
+  metaDescription: form.metaDescription.trim() || null,
+})
 </script>
 
 <template>
@@ -347,6 +391,42 @@ const photoCount = computed(() => photos.value.filter(item => item.mediaType ===
         v-model="form.description"
         :label="t('descriptionLabel')"
       />
+      <ListingContactsFields
+        v-model="form.contacts"
+        :title="t('contactsTitle')"
+        :hint="t('contactsHint')"
+      />
+
+      <div class="space-y-3 rounded-xl border border-stone-200 p-4 dark:border-stone-700">
+        <div>
+          <p class="text-sm font-medium text-stone-800 dark:text-stone-200">
+            {{ t('seoTitle') }}
+          </p>
+          <p class="mt-1 text-xs text-stone-500 dark:text-stone-400">
+            {{ t('seoTitleHint') }}
+          </p>
+        </div>
+        <FormInput
+          v-model="form.metaTitle"
+          :label="t('seoTitle')"
+          :placeholder="t('seoTitlePlaceholder')"
+        />
+        <FormTextarea
+          v-model="form.metaDescription"
+          :label="t('seoDescription')"
+          :placeholder="t('seoDescriptionPlaceholder')"
+          :rows="3"
+        />
+        <p class="text-xs text-stone-500 dark:text-stone-400">
+          {{ t('seoDescriptionHint') }}
+        </p>
+        <ListingSharePreview
+          :title="seoPreviewTitle"
+          :description="seoPreviewDescription"
+          :image-url="seoPreviewImageUrl"
+        />
+      </div>
+
       <UiButton
         type="submit"
         :loading="loading"

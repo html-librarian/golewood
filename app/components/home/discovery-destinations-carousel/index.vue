@@ -83,7 +83,7 @@ watch(() => props.filters.length, () => nextTick(updateScrollState))
         v-for="filter in filters"
         :key="filter.id"
         :to="searchLink(filter)"
-        class="group relative aspect-[4/5] w-[7.25rem] shrink-0 snap-start rounded-2xl ring-1 ring-black/10 sm:w-32 md:w-36 dark:ring-white/10"
+        class="group relative aspect-[4/5] w-[7.25rem] shrink-0 snap-start overflow-hidden rounded-2xl ring-1 ring-black/10 sm:w-32 md:w-36 dark:ring-white/10"
         @click="onSelect(filter)"
       >
         <div
@@ -101,12 +101,11 @@ watch(() => props.filters.length, () => nextTick(updateScrollState))
             :name="filter.icon"
             class="absolute left-1/2 top-[38%] size-10 -translate-x-1/2 -translate-y-1/2 text-white/90 sm:size-11"
           />
+          <div
+            class="pointer-events-none absolute inset-0 bg-linear-to-t from-black/75 via-black/15 to-transparent"
+            aria-hidden="true"
+          />
         </div>
-
-        <div
-          class="pointer-events-none absolute inset-0 shadow-[inset_0_-72px_56px_-24px_rgba(0,0,0,0.72)]"
-          aria-hidden="true"
-        />
 
         <span class="absolute inset-x-0 bottom-0 z-10 p-3 text-left text-sm font-semibold leading-tight text-white">
           {{ labelFor(filter) }}

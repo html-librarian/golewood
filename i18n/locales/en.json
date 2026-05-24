@@ -83,6 +83,31 @@
     "like": "Like",
     "dislike": "Dislike"
   },
+  "listingSharePreview": {
+    "label": "Social preview",
+    "titlePlaceholder": "Listing title",
+    "descriptionPlaceholder": "Short description for VK, Telegram, and search",
+    "hint": "This is roughly how the link will look when shared. Add a photo on the next step — it will appear in the preview."
+  },
+  "listingContacts": {
+    "title": "Contacts and links",
+    "hint": "Optional. Guests will see them on the listing page — useful for direct questions or off-platform booking.",
+    "blockTitle": "How to reach us",
+    "phone": "Phone",
+    "website": "Website",
+    "telegram": "Telegram",
+    "whatsapp": "WhatsApp",
+    "max": "MAX",
+    "vk": "VK",
+    "instagram": "Instagram",
+    "phonePlaceholder": "+1 555 000-0000",
+    "websitePlaceholder": "example.com",
+    "telegramPlaceholder": "{'@'}username",
+    "whatsappPlaceholder": "+1 555 000-0000",
+    "maxPlaceholder": "{'@'}username",
+    "vkPlaceholder": "vk.com/group",
+    "instagramPlaceholder": "{'@'}username"
+  },
   "form": {
     "selectPlaceholder": "Select…",
     "datesPlaceholder": "Check-in — check-out",

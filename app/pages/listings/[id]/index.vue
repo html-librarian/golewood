@@ -7,6 +7,7 @@ import { getListingGuestCapacity } from '#shared/utils/listing-extra-guests'
 import { buildYandexMapsUrl, hasValidMapCoordinates } from '#shared/utils/map-coordinates'
 import { getReviewRatingLabel } from '#shared/utils/review-rating'
 import { parseBookingRouteQuery } from '#shared/utils/booking-route-query'
+import { buildListingMetaDescription, buildListingMetaTitle } from '#shared/utils/listing-seo'
 import { resolveSiteUrl } from '#shared/utils/seo'
 import ru from './i18n/ru'
 import en from './i18n/en'
@@ -202,6 +203,8 @@ const { data: listing, error, pending } = await useAsyncData(
   () => fetchPublishedById(listingId.value),
 )
 
+useListingPageSeo(listing)
+
 const guestCapacity = computed(() =>
   listing.value ? getListingGuestCapacity(listing.value) : 1,
 )
@@ -330,30 +333,17 @@ const shareImageUrl = computed(() => {
   return resolveSiteUrl(cover, siteUrl)
 })
 
-watchEffect(() => {
-  if (!listing.value) {
-    return
-  }
+const shareTitle = computed(() =>
+  listing.value
+    ? buildListingMetaTitle(listing.value, locale.value === 'en' ? 'en' : 'ru')
+    : '',
+)
 
-  const coverPhoto = listing.value.photos[0]?.url ?? null
-
-  useSiteSeo({
-    title: listing.value.title,
-    description: listing.value.description || t('description'),
-    image: coverPhoto,
-    jsonLd: buildListingJsonLd(
-      {
-        id: listing.value.id,
-        title: listing.value.title,
-        description: listing.value.description,
-        city: listing.value.city,
-        pricePerNight: listing.value.pricePerNight,
-        coverPhotoUrl: coverPhoto ? resolveSiteUrl(coverPhoto, siteUrl) : null,
-      },
-      siteUrl,
-    ),
-  })
-})
+const shareDescription = computed(() =>
+  listing.value
+    ? buildListingMetaDescription(listing.value, locale.value === 'en' ? 'en' : 'ru')
+    : '',
+)
 
 const { data: reviewsData, refresh: refreshReviews } = await useAsyncData(
   () => `listing-reviews-${listingId.value}`,
@@ -709,7 +699,7 @@ const headerPricePerNight = computed(() => {
         >
           <ListingShare
             :url="shareUrl"
-            :title="listing.title"
+            :title="shareTitle"
             :image-url="shareImageUrl"
           />
           <UiButton
@@ -736,7 +726,7 @@ const headerPricePerNight = computed(() => {
           <template #actions>
             <ListingShare
               :url="shareUrl"
-              :title="listing.title"
+              :title="shareTitle"
               :image-url="shareImageUrl"
             />
             <UiButton
@@ -982,6 +972,8 @@ const headerPricePerNight = computed(() => {
           </p>
         </section>
 
+        <ListingContactsBlock :contacts="listing.contacts" />
+
         <div
           class="scroll-mt-32 grid gap-4 sm:grid-cols-2"
         >
@@ -1007,12 +999,12 @@ const headerPricePerNight = computed(() => {
 
         <section
           v-if="listing.transferOffered"
-          class="scroll-mt-32 space-y-4 rounded-xl border border-stone-200 bg-stone-50 p-5 dark:border-stone-700 dark:bg-stone-900/50"
+          class="scroll-mt-32 rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900"
         >
-          <h2 class="font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
+          <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-50">
             {{ t('transferTitle') }}
           </h2>
-          <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
+          <p class="mt-2 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
             <template v-if="listing.transferPriceOnRequest">
               {{ t('transferOnRequest') }}
             </template>

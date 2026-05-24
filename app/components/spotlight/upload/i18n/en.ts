@@ -4,6 +4,7 @@ export default {
   loginHint: 'Sign in to submit a photo for the contest.',
   sourceListing: 'Golewood listing',
   sourceExternal: 'Not on the site yet',
+  sourceModeAria: 'Photo source type',
   listingUrl: 'Listing link',
   listingUrlPlaceholder: 'https://golewood.ru/listings/…',
   listingUrlHint: 'Copy the listing page URL from your browser.',

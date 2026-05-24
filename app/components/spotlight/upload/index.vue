@@ -37,6 +37,10 @@ const onFileChange = (event: Event) => {
   file.value = input.files?.[0] ?? null
 }
 
+const setSourceMode = (mode: SourceMode) => {
+  sourceMode.value = mode
+}
+
 const hasListingLink = computed(() => listingUrl.value.trim().length > 0)
 const hasExternalLink = computed(() =>
   externalSiteUrl.value.trim().length > 0 || externalInstagram.value.trim().length > 0,
@@ -121,27 +125,43 @@ const submit = async () => {
       {{ t('uploadSuccess') }}
     </p>
 
-    <template v-if="isAuthenticated">
-      <div class="flex flex-wrap gap-2">
+    <div
+      v-if="isAuthenticated"
+      class="space-y-4"
+      data-testid="spotlight-upload-form"
+    >
+      <div
+        class="flex flex-wrap gap-2"
+        role="tablist"
+        :aria-label="t('sourceModeAria')"
+      >
         <UiButton
           type="button"
           size="sm"
+          role="tab"
+          :aria-selected="sourceMode === 'listing'"
           :variant="sourceMode === 'listing' ? 'primary' : 'secondary'"
-          @click="sourceMode = 'listing'"
+          @click="setSourceMode('listing')"
         >
           {{ t('sourceListing') }}
         </UiButton>
         <UiButton
           type="button"
           size="sm"
+          role="tab"
+          :aria-selected="sourceMode === 'external'"
           :variant="sourceMode === 'external' ? 'primary' : 'secondary'"
-          @click="sourceMode = 'external'"
+          @click="setSourceMode('external')"
         >
           {{ t('sourceExternal') }}
         </UiButton>
       </div>
 
-      <template v-if="sourceMode === 'listing'">
+      <div
+        v-show="sourceMode === 'listing'"
+        class="space-y-4"
+        data-testid="spotlight-upload-listing-fields"
+      >
         <FormInput
           v-model="listingUrl"
           :label="t('listingUrl')"
@@ -152,9 +172,13 @@ const submit = async () => {
         <p class="text-xs text-stone-500 dark:text-stone-400">
           {{ t('listingUrlHint') }}
         </p>
-      </template>
+      </div>
 
-      <template v-else>
+      <div
+        v-show="sourceMode === 'external'"
+        class="space-y-4"
+        data-testid="spotlight-upload-external-fields"
+      >
         <FormInput
           v-model="placeName"
           :label="t('placeName')"
@@ -164,7 +188,6 @@ const submit = async () => {
           v-model="externalSiteUrl"
           :label="t('externalSite')"
           :placeholder="t('externalSitePlaceholder')"
-          type="url"
         />
         <FormInput
           v-model="externalInstagram"
@@ -174,7 +197,7 @@ const submit = async () => {
         <p class="text-xs text-stone-500 dark:text-stone-400">
           {{ t('externalHint') }}
         </p>
-      </template>
+      </div>
 
       <FormTextarea
         v-model="caption"
@@ -214,7 +237,7 @@ const submit = async () => {
       >
         {{ t('submit') }}
       </UiButton>
-    </template>
+    </div>
 
     <NuxtLink
       v-else

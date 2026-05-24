@@ -281,6 +281,8 @@ export const listingService = {
       kind: input.propertyListingId ? 'unit' : 'standalone',
       propertyListingId: input.propertyListingId ?? null,
       title: input.title,
+      metaTitle: input.metaTitle?.trim() || null,
+      metaDescription: input.metaDescription?.trim() || null,
       description: input.description,
       pricePerNight: input.pricePerNight,
       city,
@@ -302,6 +304,7 @@ export const listingService = {
         ? (input.transferPrice ?? null)
         : null,
       transferPriceOnRequest: input.transferOffered && input.transferPriceOnRequest,
+      contacts: input.contacts ?? {},
       status: 'draft',
     }).returning()
 

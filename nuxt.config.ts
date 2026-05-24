@@ -137,6 +137,8 @@ export default defineNuxtConfig({
     public: {
       siteUrl: 'http://localhost:3000',
       siteName: 'Golewood',
+      /** Fallback Open Graph image (absolute path on site). Use 1200×630 PNG in production. */
+      defaultOgImage: '/icon-512.png',
       smsAuthEnabled: false,
       emailAuthEnabled: true,
       maxBotUsername: '',

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { LISTING_TIME_PATTERN } from '../constants/listing-times'
+import { listingContactsSchema } from './listing-contacts'
 import { CANCELLATION_POLICIES, LISTING_STATUSES } from '../types/listing'
 import { getListingExtraGuestsValidationError } from '../utils/listing-extra-guests'
 
@@ -7,6 +8,8 @@ const listingTimeSchema = z.string().trim().regex(LISTING_TIME_PATTERN, 'Invalid
 
 const listingFieldsBaseSchema = z.object({
   title: z.string().trim().min(3).max(255),
+  metaTitle: z.string().trim().max(70).nullable().optional(),
+  metaDescription: z.string().trim().max(320).nullable().optional(),
   description: z.string().trim().max(5000).default(''),
   pricePerNight: z.number().int().min(1),
   city: z.string().trim().min(2).max(128),
@@ -26,6 +29,7 @@ const listingFieldsBaseSchema = z.object({
   maxGuestsWithExtra: z.number().int().min(1).max(50).nullable().optional(),
   extraGuestPricePerNight: z.number().int().min(0).max(100_000).nullable().optional(),
   cleaningFee: z.number().int().min(0).max(100_000).optional(),
+  contacts: listingContactsSchema.optional(),
 })
 
 const refineListingExtraGuests = (
