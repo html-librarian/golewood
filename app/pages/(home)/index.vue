@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { HOME_DISCOVERY_GROUPS } from '#shared/catalog/home-discovery'
+import type { HomeDiscoveryGroup } from '#shared/catalog/home-discovery'
 import { partitionPromotedForSearch } from '#shared/utils/promotion'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
 const { t } = usePageI18n({ ru, en })
-const { t: $t } = useI18n()
+const { t: $t, locale } = useI18n()
 const localePath = useLocalePath()
+const { fetchDiscoveryGroups } = useHomeDiscovery()
 const { fetchPublished } = useListings()
-const { fetchHero } = useSpotlight()
+const { fetchHomeHero } = useHomeHero()
 const { city: preferredCity, isGeoDefault, setCity, clearCity } = useUserCity()
 
 useSiteSeo({
@@ -59,7 +61,26 @@ const goSearch = async () => {
   })
 }
 
-const { data: hero } = await useAsyncData('spotlight-hero', () => fetchHero())
+const { data: hero } = await useAsyncData('home-hero', () => fetchHomeHero())
+
+const heroCredit = computed(() => {
+  if (!hero.value?.imageUrl) {
+    return null
+  }
+
+  if (hero.value.source === 'contest' && hero.value.listingTitle) {
+    return $t('spotlight.heroCredit', { listing: hero.value.listingTitle })
+  }
+
+  const credit = locale.value === 'en' ? hero.value.creditEn : hero.value.creditRu
+  return credit?.trim() || null
+})
+
+const { data: discoveryGroups } = await useAsyncData('home-discovery', () => fetchDiscoveryGroups())
+
+const discoveryGroupsResolved = computed<HomeDiscoveryGroup[]>(
+  () => discoveryGroups.value ?? HOME_DISCOVERY_GROUPS,
+)
 
 const { data: listings, pending } = await useAsyncData(
   () => `home-listings-${preferredCity.value ?? 'all'}`,
@@ -171,10 +192,10 @@ const trustItems = computed(() => [
             {{ t('subtitle') }}
           </p>
           <p
-            v-if="hero?.imageUrl && hero.listingTitle"
+            v-if="heroCredit"
             class="mx-auto mt-3 max-w-xl text-xs text-brand-200/90"
           >
-            {{ $t('spotlight.heroCredit', { listing: hero.listingTitle }) }}
+            {{ heroCredit }}
           </p>
           <NuxtLink
             :to="localePath('/spotlight')"
@@ -223,7 +244,7 @@ const trustItems = computed(() => [
             {{ t('discoverySubtitle') }}
           </p>
         </div>
-        <HomeDiscoveryFilters :groups="HOME_DISCOVERY_GROUPS" />
+        <HomeDiscoveryFilters :groups="discoveryGroupsResolved" />
       </div>
     </section>
 

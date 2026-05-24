@@ -247,6 +247,36 @@ export const amenityCatalog = pgTable('amenity_catalog', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
+export const homeDiscoveryGroups = pgTable('home_discovery_groups', {
+  id: varchar('id', { length: 32 }).primaryKey(),
+  titleRu: varchar('title_ru', { length: 128 }).notNull(),
+  titleEn: varchar('title_en', { length: 128 }).notNull(),
+  sortOrder: integer('sort_order').notNull().default(0),
+})
+
+export const homeHeroSettings = pgTable('home_hero_settings', {
+  id: varchar('id', { length: 32 }).primaryKey().default('default'),
+  mode: varchar('mode', { length: 16 }).notNull().default('auto'),
+  imageUrl: varchar('image_url', { length: 512 }),
+  creditRu: varchar('credit_ru', { length: 255 }),
+  creditEn: varchar('credit_en', { length: 255 }),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const homeDiscoveryItems = pgTable('home_discovery_items', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  itemKey: varchar('item_key', { length: 64 }).notNull().unique(),
+  groupId: varchar('group_id', { length: 32 }).notNull().references(() => homeDiscoveryGroups.id, { onDelete: 'cascade' }),
+  labelRu: varchar('label_ru', { length: 128 }).notNull(),
+  labelEn: varchar('label_en', { length: 128 }).notNull(),
+  icon: varchar('icon', { length: 128 }).notNull(),
+  tone: varchar('tone', { length: 160 }).notNull(),
+  params: jsonb('params').$type<Record<string, unknown>>().notNull().default({}),
+  active: boolean('active').notNull().default(true),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
 export const listingDocuments = pgTable('listing_documents', {
   id: uuid('id').primaryKey().defaultRandom(),
   listingId: uuid('listing_id').notNull().references(() => listings.id, { onDelete: 'cascade' }),

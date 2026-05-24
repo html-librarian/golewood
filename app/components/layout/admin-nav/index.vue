@@ -12,6 +12,7 @@ const links = [
   { to: '/admin/reports', label: 'admin.nav.reports', icon: 'ph:flag-duotone' },
   { to: '/admin/cities', label: 'admin.nav.cities', icon: 'ph:map-pin-duotone' },
   { to: '/admin/amenities', label: 'admin.nav.amenities', icon: 'ph:sparkle-duotone' },
+  { to: '/admin/home-discovery', label: 'admin.nav.homeDiscovery', icon: 'ph:circles-four-duotone' },
 ] as const
 
 const isActive = (path: string) => route.path === localePath(path)

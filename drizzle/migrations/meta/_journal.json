@@ -344,6 +344,20 @@
       "when": 1779402000000,
       "tag": "0048_booking_gift_certificate",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1779405600000,
+      "tag": "0049_home_discovery",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1779409200000,
+      "tag": "0050_home_hero_settings",
+      "breakpoints": true
     }
   ]
 }
