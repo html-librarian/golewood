@@ -175,10 +175,15 @@ const trustItems = computed(() => [
         <div
           class="absolute inset-0"
           :class="hero?.imageUrl
-            ? 'bg-linear-to-br from-brand-950/85 via-brand-900/70 to-brand-950/90'
+            ? 'bg-linear-to-br from-brand-950/45 via-brand-900/30 to-brand-950/55'
             : 'bg-linear-to-br from-brand-900 via-brand-800 to-brand-700'"
         />
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(251,191,36,0.15),transparent_35%)]" />
+        <div
+          class="absolute inset-0"
+          :class="hero?.imageUrl
+            ? 'bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.06),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(251,191,36,0.08),transparent_40%)]'
+            : 'bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(251,191,36,0.15),transparent_35%)]'"
+        />
       </div>
       <div class="page-container relative pb-20 pt-12 md:pb-24 md:pt-16">
         <div class="mx-auto max-w-5xl text-center text-white">

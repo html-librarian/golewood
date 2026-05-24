@@ -276,10 +276,32 @@ GitHub Actions on push/PR to `main`:
 | `DEPLOY_PATH` | `/var/opt/golewood` | Project dir on VPS (optional) |
 | `DEPLOY_SITE_URL` | `https://golewood.ru` | Post-deploy smoke (optional) |
 | `DEPLOY_PORT` | `22` | SSH port (optional) |
+| `GHCR_TOKEN` | PAT `read:packages` | `docker login` on VPS when the GHCR package is private |
 
 On the VPS, add the **public** deploy key to `~/.ssh/authorized_keys`. The server must have Docker, git clone, and `.env` (never committed).
 
 First deploy is manual (`docker compose up` + `.env`). Later pushes to `main` redeploy automatically when CI passes (pulls image from GHCR — no build on VPS).
+
+### Deploy not updating the site?
+
+Two different failures in Actions:
+
+| What you see | Meaning | What to do |
+|--------------|---------|------------|
+| **Deploy** skipped (grey, ~1 s) | **CI on `main` did not finish green** (lint/tests/e2e/docker-build). Deploy never starts. | Open the failed **CI** run → fix the red job (often **e2e**). Re-push or re-run CI. |
+| **Deploy** failed in **~5–10 s** | SSH or missing secrets before `remote-deploy.sh` runs. | Open Deploy logs. Run **Deploy → Run workflow** manually after fixing secrets. Check `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY` (and `GHCR_TOKEN` if the image is private). |
+| **Deploy** failed after **minutes** | VPS: `docker pull`, migrate, or smoke test. | SSH to the server, run `./scripts/remote-deploy.sh` and read the error. |
+
+Deploy runs only when the **whole** CI workflow succeeds (including E2E). A green `docker-build` alone is not enough if `e2e` failed.
+
+Manual deploy from GitHub: **Actions → Deploy → Run workflow** (after secrets are set and CI is green or you accept deploying the current `main`).
+
+```bash
+# On VPS (same as Actions)
+cd /var/opt/golewood
+export GOLEWOOD_USE_REGISTRY=1 GHCR_TOKEN=ghp_... GHCR_USER=html-librarian
+./scripts/remote-deploy.sh
+```
 
 ### Small VPS: OOM during `docker compose build`
 
