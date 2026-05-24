@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { CANCELLATION_POLICY_LABELS } from '#shared/types/listing'
+import { AMENITY_LABELS, CANCELLATION_POLICY_LABELS } from '#shared/types/listing'
 import type { ReviewRatings } from '#shared/types/review-ratings'
 import type { ListingSectionNavItem } from '~/components/listing/section-nav/types'
 import { formatPrice } from '#shared/utils/format'
 import { getListingGuestCapacity } from '#shared/utils/listing-extra-guests'
 import { buildYandexMapsUrl, hasValidMapCoordinates } from '#shared/utils/map-coordinates'
+import { getReviewRatingLabel } from '#shared/utils/review-rating'
 import { parseBookingRouteQuery } from '#shared/utils/booking-route-query'
 import { resolveSiteUrl } from '#shared/utils/seo'
 import ru from './i18n/ru'
@@ -33,6 +34,7 @@ const { fetchListingStories } = useStories()
 const { fetchListingNews } = useListingNews()
 const { fetchBonusAccount } = useBonus()
 const { fetchListingOffers } = useGiftCertificates()
+const { fetchAmenities } = useCatalog()
 
 const checkIn = ref('')
 const checkOut = ref('')
@@ -613,6 +615,68 @@ const listingMapLabel = computed(() => {
 
   return parts.join(', ')
 })
+
+const { data: amenityCatalog } = await useAsyncData(
+  () => `listing-amenity-catalog-${listingId.value}`,
+  () => fetchAmenities(),
+)
+
+const overviewReviewScore = computed(() => reviewsData.value?.ratingBreakdown?.overall ?? null)
+
+const overviewReviewLabel = computed(() => {
+  if (overviewReviewScore.value === null) {
+    return null
+  }
+
+  return getReviewRatingLabel(overviewReviewScore.value, locale.value)
+})
+
+const overviewReviewCount = computed(() => reviewsData.value?.totalCount ?? 0)
+
+const overviewAmenities = computed(() => {
+  if (!listing.value) {
+    return []
+  }
+
+  const catalog = amenityCatalog.value ?? []
+
+  return listing.value.amenities.slice(0, 6).map((slug) => {
+    const item = catalog.find(entry => entry.slug === slug)
+    const legacy = AMENITY_LABELS[slug as keyof typeof AMENITY_LABELS]
+
+    return {
+      slug,
+      icon: item?.icon ?? 'ph:check-circle-duotone',
+      label: item
+        ? (locale.value === 'en' ? item.labelEn : item.labelRu)
+        : (legacy?.[locale.value as 'ru' | 'en'] ?? slug),
+    }
+  })
+})
+
+const showDatesPrompt = computed(() =>
+  Boolean(
+    listing.value
+    && !isOwnListing.value
+    && !isTeamListing.value
+    && !isPropertyComplex.value
+    && (!checkIn.value || !checkOut.value),
+  ),
+)
+
+const showHeaderPriceCta = computed(() =>
+  Boolean(listing.value && !isTeamListing.value && !isPropertyComplex.value),
+)
+
+const headerPricePerNight = computed(() => {
+  if (!listing.value) {
+    return 0
+  }
+
+  return listing.value.kind === 'property'
+    ? (listing.value.priceFrom ?? listing.value.pricePerNight)
+    : listing.value.pricePerNight
+})
 </script>
 
 <template>
@@ -691,19 +755,28 @@ const listingMapLabel = computed(() => {
         </ListingSectionNav>
 
         <header class="space-y-4">
-          <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-            <div class="min-w-0 flex-1">
-              <h1 class="font-display text-3xl font-semibold text-stone-900 md:text-4xl dark:text-stone-50">
-                {{ listing.title }}
-              </h1>
-              <p class="mt-2 flex items-center gap-1.5 text-stone-600 dark:text-stone-400">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
+            <div class="min-w-0 flex-1 space-y-2">
+              <div class="flex flex-wrap items-start gap-3">
+                <h1 class="min-w-0 flex-1 font-display text-2xl font-semibold text-stone-900 sm:text-3xl md:text-4xl dark:text-stone-50">
+                  {{ listing.title }}
+                </h1>
+                <ListingTeamBadgeLink
+                  v-if="listing.teamBadge"
+                  :badge="listing.teamBadge"
+                  :to="teamBadgeHref"
+                  size="md"
+                  class="shrink-0"
+                />
+              </div>
+              <p class="flex items-center gap-1.5 text-stone-600 dark:text-stone-400">
                 <Icon
                   name="ph:map-pin-duotone"
                   class="size-4 shrink-0 text-brand-600 dark:text-brand-400"
                 />
                 {{ listing.city }}<span v-if="listing.address">, {{ listing.address }}</span>
               </p>
-              <p class="mt-1.5 flex items-center gap-1.5 text-sm text-stone-500 dark:text-stone-400">
+              <p class="flex items-center gap-1.5 text-sm text-stone-500 dark:text-stone-400">
                 <Icon
                   name="ph:users-duotone"
                   class="size-4 shrink-0"
@@ -713,12 +786,28 @@ const listingMapLabel = computed(() => {
               </p>
             </div>
 
-            <ListingTeamBadgeLink
-              v-if="listing.teamBadge"
-              :badge="listing.teamBadge"
-              :to="teamBadgeHref"
-              size="md"
-            />
+            <div
+              v-if="showHeaderPriceCta"
+              class="flex shrink-0 flex-col items-stretch gap-2 sm:items-end lg:min-w-[200px] lg:text-right"
+            >
+              <p class="text-sm text-stone-500 dark:text-stone-400">
+                <span
+                  v-if="listing.kind === 'property' && listing.priceFrom"
+                  class="mr-1"
+                >{{ t('priceFrom') }}</span>
+                <span class="text-2xl font-semibold tabular-nums text-stone-900 dark:text-stone-50">
+                  {{ formatPrice(headerPricePerNight) }}
+                </span>
+                <span class="ml-1 text-base font-normal">{{ t('pricePerNight') }}</span>
+              </p>
+              <UiButton
+                type="button"
+                class="w-full sm:w-auto lg:ml-auto"
+                @click="scrollToBookingPanel"
+              >
+                {{ t('showPrices') }}
+              </UiButton>
+            </div>
           </div>
 
           <StoryRing
@@ -756,6 +845,38 @@ const listingMapLabel = computed(() => {
           :labels="hostToolbarLabels"
         />
 
+        <section
+          id="listing-photos"
+          ref="photosSectionRef"
+          class="scroll-mt-32"
+        >
+          <ListingGallery
+            :photos="listing.photos"
+            :title="listing.title"
+            layout="mosaic"
+          />
+        </section>
+
+        <ListingOverviewStrip
+          v-if="!isTeamListing"
+          :review-score="overviewReviewScore"
+          :review-label="overviewReviewLabel"
+          :review-count="overviewReviewCount"
+          :amenities="overviewAmenities"
+          :city="listing.city"
+          :address="listing.address"
+          :has-map="showListingMap"
+          @scroll-to-reviews="scrollToSection('reviews')"
+          @scroll-to-amenities="scrollToSection('listing-amenities')"
+          @scroll-to-map="scrollToSection('listing-map')"
+        />
+
+        <ListingDatesPrompt
+          v-if="showDatesPrompt"
+          :price-per-night="listing.pricePerNight"
+          @select-dates="scrollToBookingPanel"
+        />
+
         <template v-if="isPropertyComplex">
           <ListingPropertyBookingFields
             v-model:check-in="checkIn"
@@ -774,17 +895,6 @@ const listingMapLabel = computed(() => {
             :labels="propertyUnitsLabels"
           />
         </template>
-
-        <section
-          id="listing-photos"
-          ref="photosSectionRef"
-          class="scroll-mt-32"
-        >
-          <ListingGallery
-            :photos="listing.photos"
-            :title="listing.title"
-          />
-        </section>
 
         <div class="space-y-12 md:space-y-14">
           <div
@@ -813,24 +923,6 @@ const listingMapLabel = computed(() => {
             :listing-id="listing.id"
           />
         </section>
-
-        <section
-          id="listing-description"
-          class="scroll-mt-32 space-y-4"
-        >
-          <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('description') }}
-          </h2>
-          <p class="whitespace-pre-wrap leading-relaxed text-stone-700 dark:text-stone-300">
-            {{ listing.description || $t('common.emDash') }}
-          </p>
-        </section>
-
-        <ListingCheckInOut
-          :check-in-time="listing.checkInTime"
-          :check-out-time="listing.checkOutTime"
-          :labels="checkInOutLabels"
-        />
 
         <section
           v-if="showListingMap"
@@ -874,9 +966,44 @@ const listingMapLabel = computed(() => {
             :latitude="listing.latitude"
             :longitude="listing.longitude"
             :label="listingMapLabel"
-            class="h-[min(280px,45vh)] w-full md:h-[320px]"
+            class="h-[min(280px,45vh)] w-full md:h-[380px]"
           />
         </section>
+
+        <section
+          id="listing-description"
+          class="scroll-mt-32 space-y-4"
+        >
+          <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
+            {{ t('aboutTitle') }}
+          </h2>
+          <p class="max-w-3xl whitespace-pre-wrap leading-relaxed text-stone-700 dark:text-stone-300">
+            {{ listing.description || $t('common.emDash') }}
+          </p>
+        </section>
+
+        <div
+          class="scroll-mt-32 grid gap-4 sm:grid-cols-2"
+        >
+          <ListingCheckInOut
+            :check-in-time="listing.checkInTime"
+            :check-out-time="listing.checkOutTime"
+            :labels="checkInOutLabels"
+          />
+
+          <section class="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
+            <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-50">
+              {{ t('cancellationPolicy') }}
+            </h2>
+            <p class="mt-2 flex items-start gap-2 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+              <Icon
+                name="ph:shield-check-duotone"
+                class="mt-0.5 size-5 shrink-0 text-brand-600 dark:text-brand-400"
+              />
+              {{ cancellationPolicyLabel }}
+            </p>
+          </section>
+        </div>
 
         <section
           v-if="listing.transferOffered"
@@ -898,12 +1025,12 @@ const listingMapLabel = computed(() => {
         <section
           v-if="listing.amenities.length"
           id="listing-amenities"
-          class="scroll-mt-32 space-y-4"
+          class="scroll-mt-32 space-y-5"
         >
           <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('amenities') }}
+            {{ t('servicesTitle') }}
           </h2>
-          <ListingAmenities :amenities="listing.amenities" />
+          <ListingAmenitiesGrouped :amenities="listing.amenities" />
         </section>
 
         <section
@@ -946,19 +1073,6 @@ const listingMapLabel = computed(() => {
               </a>
             </li>
           </ul>
-        </section>
-
-        <section class="scroll-mt-32 space-y-4">
-          <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('cancellationPolicy') }}
-          </h2>
-          <p class="flex items-start gap-2 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-            <Icon
-              name="ph:shield-check-duotone"
-              class="mt-0.5 size-5 shrink-0 text-brand-600 dark:text-brand-400"
-            />
-            {{ cancellationPolicyLabel }}
-          </p>
         </section>
 
         <section

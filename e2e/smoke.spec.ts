@@ -76,7 +76,7 @@ test.describe('smoke', () => {
     await gotoReady(page, '/auth/login')
     await expect(page.getByTestId('auth-email-form')).toBeVisible()
     await page.getByRole('link', { name: /яндекс|yandex/i }).click()
-    await expect(page).toHaveURL('/', { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/(|account)\/?$/, { timeout: 15_000 })
     await expect(page.getByRole('link', { name: /bookings|бронирован/i })).toBeVisible()
   })
 
@@ -84,7 +84,7 @@ test.describe('smoke', () => {
     await gotoReady(page, '/auth/login')
     await expect(page.getByTestId('auth-email-form')).toBeVisible()
     await page.getByRole('link', { name: /^vk$/i }).click()
-    await expect(page).toHaveURL('/', { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/(|account)\/?$/, { timeout: 15_000 })
     await expect(page.getByRole('link', { name: /bookings|бронирован/i })).toBeVisible()
   })
 })

@@ -31,6 +31,8 @@ describe('sortDiscoveryDestinations', () => {
 
     expect(sorted).toHaveLength(4)
     expect(sorted[0]?.params.city).toBe('Курск')
+    expect(sorted[0]?.labelRu).toBe('Курск')
+    expect(sorted[0]?.labelEn).toBe('Kursk')
     expect(sorted[0]?.id).toBe('priority-курск')
     expect(sorted[1]?.id).toBe('sochi')
   })

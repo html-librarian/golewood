@@ -49,7 +49,11 @@ const attemptLoginWithEmail = async (page: Page, email: string) => {
     throw new Error(`verify-email failed: ${verifyResponse.status()} ${await verifyResponse.text()}`)
   }
 
-  await expect(page).toHaveURL(/\/(account)?\/?$/)
+  if (page.url().includes('/auth/complete-profile')) {
+    throw new Error('redirected to complete-profile — re-run db:seed so demo users have firstName/lastName')
+  }
+
+  await expect(page).toHaveURL(/\/(|account)\/?$/)
   await expect(page.getByRole('link', { name: /bookings|бронирован/i }).first()).toBeVisible()
 }
 

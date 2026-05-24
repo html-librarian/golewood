@@ -245,7 +245,9 @@ export const oauthService = {
 
     const profile: OAuthProfile = {
       providerUserId: `mock-${provider}`,
-      name: `${provider} User (dev)`,
+      name: null,
+      firstName: provider === 'yandex' ? 'Yandex' : 'VK',
+      lastName: 'Dev',
       email: null,
     }
 

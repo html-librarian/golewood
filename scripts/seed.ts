@@ -23,6 +23,7 @@ import {
 } from '../server/db/schema/index.ts'
 import { calculateBookingPrice, splitBookingSettlement } from '../shared/utils/pricing.ts'
 import { isProductionRuntime } from '../shared/utils/runtime-mode.ts'
+import { buildFullName, userNamePartsFromWestern } from '../shared/utils/user-name.ts'
 
 const PLATFORM_FEE_PERCENT = 10
 
@@ -56,6 +57,13 @@ const meiliApiKey = process.env.NUXT_MEILI_API_KEY ?? ''
 
 const sql = postgres(databaseUrl)
 const db = drizzle(sql)
+
+const DEMO_USER_NAME_PARTS: Record<string, { firstName: string, lastName: string }> = {
+  '+79000000001': { firstName: 'Админ', lastName: 'Голевуд' },
+  '+79000000002': { firstName: 'Хост', lastName: 'Голевуд' },
+  '+79000000003': { firstName: 'Гость', lastName: 'Голевуд' },
+  '+79000000999': { firstName: 'Golewood', lastName: 'Bot' },
+}
 
 const DEMO_USERS = [
   { phone: '+79000000001', email: 'admin@golewood.local', name: 'Admin', role: 'admin' as const },
@@ -340,12 +348,21 @@ const upsertUser = async (
   email?: string,
   id?: string,
 ) => {
+  const nameParts = DEMO_USER_NAME_PARTS[phone]
+    ?? userNamePartsFromWestern(name, 'Demo')
+  const nameColumns = {
+    lastName: nameParts.lastName,
+    firstName: nameParts.firstName,
+    patronymic: nameParts.patronymic ?? null,
+    name: buildFullName(nameParts),
+  }
+
   const [existing] = await db.select().from(users).where(eq(users.phone, phone)).limit(1)
 
   if (existing) {
     const [updated] = await db.update(users)
       .set({
-        name,
+        ...nameColumns,
         role,
         email: email ?? existing.email,
         updatedAt: new Date(),
@@ -359,7 +376,7 @@ const upsertUser = async (
   const [created] = await db.insert(users).values({
     ...(id ? { id } : {}),
     phone,
-    name,
+    ...nameColumns,
     role,
     email,
   }).returning()
@@ -1090,6 +1107,20 @@ const seed = async () => {
     },
   })
   console.log('  oauth: host ↔ mock-yandex')
+
+  await db.insert(oauthAccounts).values({
+    userId: guest.id,
+    provider: 'vk',
+    providerUserId: 'mock-vk',
+    profileName: 'VK User (dev)',
+  }).onConflictDoUpdate({
+    target: [oauthAccounts.provider, oauthAccounts.providerUserId],
+    set: {
+      userId: guest.id,
+      profileName: 'VK User (dev)',
+    },
+  })
+  console.log('  oauth: guest ↔ mock-vk')
 
   await resetDemoTransactionalData(guest.id)
 

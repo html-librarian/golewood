@@ -3,8 +3,58 @@ import type { ListingGalleryProps } from './types'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
-const props = defineProps<ListingGalleryProps>()
+const props = withDefaults(defineProps<ListingGalleryProps>(), {
+  layout: 'mosaic',
+})
 const { t } = usePageI18n({ ru, en })
+
+const isMosaic = computed(() => props.layout === 'mosaic')
+const mosaicPhotos = computed(() => props.photos.slice(0, 5))
+const mosaicExtraCount = computed(() => Math.max(0, props.photos.length - 5))
+
+const mosaicGridClass = computed(() => {
+  const count = mosaicPhotos.value.length
+
+  if (count <= 1) {
+    return ''
+  }
+
+  if (count === 2) {
+    return 'grid h-[min(320px,45vh)] grid-cols-2 gap-2'
+  }
+
+  return 'grid h-[min(420px,55vh)] grid-cols-4 grid-rows-2 gap-2'
+})
+
+const mosaicTileClass = (index: number) => {
+  const count = mosaicPhotos.value.length
+
+  if (count <= 1) {
+    return ''
+  }
+
+  if (count === 2) {
+    return 'min-h-0'
+  }
+
+  if (index === 0) {
+    return 'col-span-2 row-span-2 min-h-0'
+  }
+
+  if (index === 1) {
+    return 'col-start-3 row-start-1 min-h-0'
+  }
+
+  if (index === 2) {
+    return count === 3 ? 'col-start-4 row-span-2 row-start-1 min-h-0' : 'col-start-4 row-start-1 min-h-0'
+  }
+
+  if (index === 3) {
+    return 'col-start-3 row-start-2 min-h-0'
+  }
+
+  return 'col-start-4 row-start-2 min-h-0'
+}
 
 const activeIndex = ref(0)
 const lightboxOpen = ref(false)
@@ -103,7 +153,84 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="space-y-3">
+  <div>
+    <div
+      v-if="isMosaic"
+    :class="mosaicPhotos.length <= 1 ? 'space-y-0' : mosaicGridClass"
+  >
+    <button
+      v-for="(item, index) in mosaicPhotos"
+      :key="item.id"
+      type="button"
+      class="group relative overflow-hidden rounded-2xl bg-stone-100 text-left dark:bg-stone-800"
+      :class="[
+        mosaicPhotos.length <= 1 ? 'aspect-16/10 w-full' : mosaicTileClass(index),
+      ]"
+      :aria-label="t('showPhoto', { current: index + 1, total: photos.length })"
+      @click="openLightbox(index)"
+    >
+      <iframe
+        v-if="item.mediaType === 'video' && item.embedUrl"
+        :src="item.embedUrl"
+        class="pointer-events-none h-full w-full border-0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        title=""
+      />
+      <ListingImage
+        v-else-if="item.url"
+        :src="item.url"
+        :alt="`${title} ${index + 1}`"
+        :eager="index === 0"
+        class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+      />
+      <ListingImagePlaceholder
+        v-else
+        show-label
+        class="h-full min-h-32"
+      />
+
+      <span
+        v-if="item.mediaType === 'video'"
+        class="absolute inset-0 z-10 flex items-center justify-center bg-stone-900/35"
+      >
+        <Icon
+          name="ph:play-circle-duotone"
+          class="size-12 text-white"
+        />
+      </span>
+
+      <span
+        v-if="index === mosaicPhotos.length - 1 && mosaicExtraCount > 0"
+        class="absolute inset-0 z-10 flex items-center justify-center bg-stone-900/55 text-lg font-semibold text-white"
+      >
+        +{{ mosaicExtraCount }}
+      </span>
+
+      <span
+        v-if="index === 0 && photos.length > 1"
+        class="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-stone-900/75 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm"
+      >
+        <Icon
+          name="ph:squares-four-duotone"
+          class="size-4"
+          aria-hidden="true"
+        />
+        {{ t('viewAllPhotos', { count: photos.length }) }}
+      </span>
+    </button>
+
+    <ListingImagePlaceholder
+      v-if="!mosaicPhotos.length"
+      show-label
+      class="aspect-16/10 w-full rounded-2xl"
+    />
+    </div>
+
+    <div
+      v-else
+      class="space-y-3"
+    >
     <button
       type="button"
       class="group relative aspect-16/10 w-full overflow-hidden rounded-2xl bg-stone-100 text-left dark:bg-stone-800"
@@ -172,6 +299,7 @@ onUnmounted(() => {
           :alt="`${title} ${index + 1}`"
         />
       </button>
+    </div>
     </div>
 
     <Teleport to="body">

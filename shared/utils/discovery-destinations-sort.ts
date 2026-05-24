@@ -1,4 +1,5 @@
 import type { HomeDiscoveryFilter } from '#shared/catalog/home-discovery'
+import { resolveCityDisplayLabels } from '#shared/utils/city-display-labels'
 
 export type DiscoveryDestinationsSortOptions = {
   /** City from confirmed geolocation (cookie source `geo`). */
@@ -41,15 +42,15 @@ const priorityDestinationId = (city: string) => {
 
 /** Card for a city that is not in the admin/home discovery list (profile or geo). */
 export const createPriorityDestinationFilter = (city: string): HomeDiscoveryFilter => {
-  const name = city.trim()
+  const labels = resolveCityDisplayLabels(city)
 
   return {
-    id: priorityDestinationId(name),
-    labelRu: name,
-    labelEn: name,
+    id: priorityDestinationId(labels.searchCity),
+    labelRu: labels.labelRu,
+    labelEn: labels.labelEn,
     icon: 'ph:map-pin-duotone',
     tone: 'from-brand-500 to-teal-700',
-    params: { city: name },
+    params: { city: labels.searchCity },
   }
 }
 

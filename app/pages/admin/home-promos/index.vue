@@ -152,7 +152,7 @@ const breakpoints: { id: HomePromoImageBreakpoint, labelKey: 'imageDesktop' | 'i
 </script>
 
 <template>
-  <div class="space-y-8">
+  <div class="page-container max-w-4xl space-y-8 pb-10">
     <header class="space-y-1">
       <h1 class="font-display text-2xl font-semibold text-stone-900 dark:text-stone-50">
         {{ t('title') }}
@@ -373,11 +373,13 @@ const breakpoints: { id: HomePromoImageBreakpoint, labelKey: 'imageDesktop' | 'i
           </UiButton>
         </article>
 
-        <div class="surface-card grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
-          <FormInput
-            v-model="newForms[section.slot].linkHref"
-            :label="t('link')"
-          />
+        <div class="surface-card grid gap-3 p-4 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <FormInput
+              v-model="newForms[section.slot].linkHref"
+              :label="t('link')"
+            />
+          </div>
           <FormInput
             v-model="newForms[section.slot].titleRu"
             :label="t('titleRu')"
@@ -386,11 +388,13 @@ const breakpoints: { id: HomePromoImageBreakpoint, labelKey: 'imageDesktop' | 'i
             v-model="newForms[section.slot].titleEn"
             :label="t('titleEn')"
           />
-          <FormInput
-            v-model="newForms[section.slot].ctaRu"
-            :label="t('ctaRu')"
-          />
-          <div class="flex items-end sm:col-span-2 lg:col-span-4">
+          <div class="sm:col-span-2">
+            <FormInput
+              v-model="newForms[section.slot].ctaRu"
+              :label="t('ctaRu')"
+            />
+          </div>
+          <div class="sm:col-span-2">
             <UiButton @click="addBanner(section.slot)">
               {{ t(section.addKey) }}
             </UiButton>
