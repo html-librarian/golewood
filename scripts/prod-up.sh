@@ -22,7 +22,9 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 if [[ "${1:-}" == "--migrate" ]] || [[ "${RUN_MIGRATE:-}" == "1" ]]; then
   echo "→ npm run db:migrate (in app container)"
-  docker compose -f docker-compose.prod.yml exec app npm run db:migrate
+  docker compose -f docker-compose.prod.yml exec -T app npm run db:migrate
+  echo "→ npm run db:seed:cities (in app container)"
+  docker compose -f docker-compose.prod.yml exec -T app npm run db:seed:cities
 fi
 
 echo ""

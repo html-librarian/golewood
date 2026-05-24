@@ -25,7 +25,7 @@ Run `NODE_ENV=production npm run check:prod` before deploy.
 1. [ ] DNS A/AAAA → server IP (`golewood.ru`, `www`)
 2. [ ] Copy `deploy/.env.production.example` → `.env`, fill all `CHANGE_ME_*` values
 3. [ ] `npm run preflight:prod` — no errors
-4. [ ] `npm run prod:up` (build, start, migrate)
+4. [ ] `npm run prod:up` (build, start, migrate + city catalog)
 5. [ ] Caddy (or nginx) → `127.0.0.1:3000`, TLS certificate
 6. [ ] YooKassa webhook: `https://<domain>/api/payments/yookassa/webhook`
 7. [ ] S3 for listing photos (`NUXT_S3_*`)
@@ -178,6 +178,27 @@ After first deploy and after each release with new SQL:
 ```bash
 docker compose -f docker-compose.prod.yml exec app npm run db:migrate
 ```
+
+### City catalog (Russia)
+
+The initial migration only inserts **4 demo cities**. The full catalog (**~324** names) lives in `shared/catalog/cities-ru.json` and is upserted with:
+
+```bash
+docker compose -f docker-compose.prod.yml exec -T app npm run db:seed:cities
+```
+
+Safe on production: idempotent upsert (insert missing, update `name_en` / `sort_order`, set `active = true`). Not demo listings — no `SEED_ALLOW_PRODUCTION` flag.
+
+`scripts/remote-deploy.sh` (GitHub Actions deploy) runs **`db:seed:cities` after every `db:migrate`**.
+
+**One-time on an already-running host** (before the next deploy with the updated script):
+
+```bash
+cd /path/to/golewood.ru
+docker compose -f docker-compose.prod.yml exec -T app npm run db:seed:cities
+```
+
+Verify: open account → «Ваш город» — search should list hundreds of cities, not only Москва / СПб / Казань / Сочи.
 
 ## 4. HTTPS reverse proxy (Caddy)
 

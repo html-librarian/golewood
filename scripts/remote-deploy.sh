@@ -69,6 +69,9 @@ fi
 echo "→ db:migrate"
 docker compose -f "${compose_file}" exec -T app npm run db:migrate
 
+echo "→ db:seed:cities"
+docker compose -f "${compose_file}" exec -T app npm run db:seed:cities
+
 wait_for_app_health
 
 if [[ -n "${SITE_URL:-}" ]]; then

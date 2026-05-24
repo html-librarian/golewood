@@ -19,6 +19,9 @@ npm ci
 echo "→ Migrations"
 npm run db:migrate
 
+echo "→ Russia cities catalog"
+npm run db:seed:cities
+
 echo "→ Seed demo data"
 npm run db:seed
 
