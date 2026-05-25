@@ -10,6 +10,10 @@ import { getDb } from '../utils/db'
 import { saveClaimAttachment } from '../utils/storage'
 import { normalizeEmail } from '#shared/utils/email'
 import { normalizePhone } from '#shared/utils/phone'
+import {
+  normalizeSourceAttribution,
+  teamListingSourceAttributionError,
+} from '#shared/utils/listing-source-attribution'
 import { emailService } from './email.service'
 
 export type ClaimUploadFile = { data: Buffer, filename?: string, type?: string }
@@ -385,7 +389,12 @@ export const listingClaimService = {
 
   updateListingOwnership: async (
     listingId: string,
-    input: { managedByTeam?: boolean, hostId?: string },
+    input: {
+      managedByTeam?: boolean
+      hostId?: string
+      sourceAttributionRu?: string | null
+      sourceAttributionEn?: string | null
+    },
   ) => {
     const db = getDb()
     const [listing] = await db.select().from(listings).where(eq(listings.id, listingId)).limit(1)
@@ -394,12 +403,30 @@ export const listingClaimService = {
       throw createError({ statusCode: 404, statusMessage: 'Listing not found' })
     }
 
+    const nextManagedByTeam = input.managedByTeam ?? listing.managedByTeam
+    const nextSourceRu = input.sourceAttributionRu !== undefined
+      ? input.sourceAttributionRu
+      : listing.sourceAttributionRu
+    const attributionError = teamListingSourceAttributionError(nextManagedByTeam, nextSourceRu)
+
+    if (attributionError) {
+      throw createError({ statusCode: 400, statusMessage: attributionError })
+    }
+
     const patch: Partial<typeof listings.$inferInsert> = {
       updatedAt: new Date(),
     }
 
     if (input.managedByTeam !== undefined) {
       patch.managedByTeam = input.managedByTeam
+    }
+
+    if (input.sourceAttributionRu !== undefined) {
+      patch.sourceAttributionRu = normalizeSourceAttribution(input.sourceAttributionRu)
+    }
+
+    if (input.sourceAttributionEn !== undefined) {
+      patch.sourceAttributionEn = normalizeSourceAttribution(input.sourceAttributionEn)
     }
 
     if (input.hostId) {

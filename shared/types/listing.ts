@@ -83,6 +83,9 @@ export interface Listing {
   transferPriceOnRequest: boolean
   contacts: ListingContacts
   managedByTeam: boolean
+  /** Источник текста и медиа для каталога команды (сноска на странице) */
+  sourceAttributionRu?: string | null
+  sourceAttributionEn?: string | null
   teamBadge?: TeamBadge | null
   teamBadgeBlogPost?: BlogPostCard | null
   hostNewsCount?: number

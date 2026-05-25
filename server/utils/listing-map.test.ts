@@ -41,6 +41,8 @@ describe('mapListing', () => {
       teamBadgeId: null,
       teamBadgeBlogPostId: null,
       managedByTeam: false,
+      sourceAttributionRu: null,
+      sourceAttributionEn: null,
       calendarExportToken: '770e8400-e29b-41d4-a716-446655440002',
       location: null,
       createdAt,

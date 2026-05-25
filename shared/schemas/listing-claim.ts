@@ -1,6 +1,9 @@
 import { z } from 'zod'
 import { phoneSchema } from './auth'
 
+const sourceAttributionRuSchema = z.string().trim().min(3).max(1000)
+const sourceAttributionEnSchema = z.string().trim().max(1000).nullable().optional()
+
 export const createListingClaimSchema = z.object({
   name: z.string().trim().min(2).max(100),
   phone: phoneSchema,
@@ -22,6 +25,16 @@ export const approveListingClaimSchema = z.object({
 export const updateListingOwnershipSchema = z.object({
   managedByTeam: z.boolean().optional(),
   hostId: z.string().uuid().optional(),
+  sourceAttributionRu: sourceAttributionRuSchema.nullable().optional(),
+  sourceAttributionEn: sourceAttributionEnSchema,
+}).superRefine((data, ctx) => {
+  if (data.managedByTeam === true && !data.sourceAttributionRu?.trim()) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['sourceAttributionRu'],
+      message: 'Source attribution (RU) is required for team catalog listings',
+    })
+  }
 })
 
 export type CreateListingClaimInput = z.infer<typeof createListingClaimSchema>

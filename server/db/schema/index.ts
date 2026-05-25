@@ -127,6 +127,8 @@ export const listings = pgTable('listings', {
   teamBadgeId: uuid('team_badge_id').references(() => teamBadgeCatalog.id, { onDelete: 'set null' }),
   teamBadgeBlogPostId: uuid('team_badge_blog_post_id'),
   managedByTeam: boolean('managed_by_team').notNull().default(false),
+  sourceAttributionRu: text('source_attribution_ru'),
+  sourceAttributionEn: text('source_attribution_en'),
   calendarExportToken: uuid('calendar_export_token').notNull().defaultRandom(),
   location: geographyPoint('location'),
   contacts: jsonb('contacts').$type<ListingContacts>().notNull().default({}),

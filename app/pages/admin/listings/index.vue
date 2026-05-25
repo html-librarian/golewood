@@ -39,6 +39,16 @@ const { data: claimRequests, refresh: refreshClaims, pending: claimsPending } = 
 )
 
 const publishAsTeamById = reactive<Record<string, boolean>>({})
+const teamSourceById = reactive<Record<string, { ru: string, en: string }>>({})
+const teamSourceErrorById = ref<string | null>(null)
+
+const ensureTeamSource = (id: string) => {
+  if (!teamSourceById[id]) {
+    teamSourceById[id] = { ru: '', en: '' }
+  }
+
+  return teamSourceById[id]
+}
 const claimHostIds = reactive<Record<string, string>>({})
 const claimHostMatches = reactive<Record<string, User | null>>({})
 const claimLookupPending = reactive<Record<string, boolean>>({})
@@ -77,6 +87,17 @@ const loading = computed(() =>
 )
 
 const updateStatus = async (id: string, status: 'published' | 'archived' | 'draft') => {
+  teamSourceErrorById.value = null
+
+  if (status === 'published' && publishAsTeamById[id]) {
+    const source = teamSourceById[id] ?? { ru: '', en: '' }
+
+    if (!source.ru.trim()) {
+      teamSourceErrorById.value = id
+      return
+    }
+  }
+
   await $fetch(`/api/admin/listings/${id}/status`, {
     method: 'PATCH',
     headers: authHeaders(),
@@ -84,10 +105,16 @@ const updateStatus = async (id: string, status: 'published' | 'archived' | 'draf
   })
 
   if (status === 'published' && publishAsTeamById[id]) {
+    const source = teamSourceById[id] ?? { ru: '', en: '' }
+
     await $fetch(`/api/admin/listings/${id}/ownership`, {
       method: 'PATCH',
       headers: authHeaders(),
-      body: { managedByTeam: true },
+      body: {
+        managedByTeam: true,
+        sourceAttributionRu: source.ru.trim(),
+        sourceAttributionEn: source.en.trim() || null,
+      },
     })
   }
 
@@ -130,11 +157,36 @@ const updateReviewStatus = async (id: string, status: 'approved' | 'rejected') =
   await refreshReviews()
 }
 
+const reindexPending = ref(false)
+const reindexFeedback = ref<{ kind: 'ok' | 'error', text: string } | null>(null)
+
 const reindex = async () => {
-  await $fetch('/api/admin/search/reindex', {
-    method: 'POST',
-    headers: authHeaders(),
-  })
+  reindexPending.value = true
+  reindexFeedback.value = null
+
+  try {
+    const result = await $fetch<{ indexed: number }>('/api/admin/search/reindex', {
+      method: 'POST',
+      headers: authHeaders(),
+    })
+    reindexFeedback.value = {
+      kind: 'ok',
+      text: t('reindexOk', { count: result.indexed }),
+    }
+  } catch (err: unknown) {
+    const body = err && typeof err === 'object' && 'data' in err
+      ? (err as { data?: { statusMessage?: string, data?: { hint?: string } } }).data
+      : undefined
+    const statusMessage = body?.statusMessage ?? t('reindexFail')
+    const hint = body?.data?.hint
+
+    reindexFeedback.value = {
+      kind: 'error',
+      text: [statusMessage, hint].filter(Boolean).join(' — '),
+    }
+  } finally {
+    reindexPending.value = false
+  }
 }
 
 const restoreArchived = async (id: string) => {
@@ -153,9 +205,24 @@ const restoreArchived = async (id: string) => {
       <h1 class="section-title">
         {{ t('title') }}
       </h1>
-      <UiButton @click="reindex()">
-        {{ t('reindex') }}
-      </UiButton>
+      <div class="flex flex-col items-end gap-2">
+        <UiButton
+          :disabled="reindexPending"
+          @click="reindex()"
+        >
+          {{ reindexPending ? t('reindexRunning') : t('reindex') }}
+        </UiButton>
+        <p
+          v-if="reindexFeedback"
+          class="max-w-md text-right text-sm"
+          :class="reindexFeedback.kind === 'ok'
+            ? 'text-brand-700 dark:text-brand-300'
+            : 'text-red-600 dark:text-red-400'"
+          role="status"
+        >
+          {{ reindexFeedback.text }}
+        </p>
+      </div>
     </div>
 
     <h2 class="mb-4 text-xl font-semibold text-stone-900 dark:text-stone-100">
@@ -200,11 +267,38 @@ const restoreArchived = async (id: string) => {
             {{ listing.city }}
           </p>
         </div>
-        <div class="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:min-w-56">
+        <div class="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:min-w-[20rem] lg:min-w-[24rem]">
           <FormCheckbox
             v-model="publishAsTeamById[listing.id]"
             :label="t('publishAsTeam')"
           />
+          <div
+            v-if="publishAsTeamById[listing.id]"
+            class="space-y-2 rounded-xl border border-brand-200/80 bg-brand-50/40 p-3 dark:border-brand-800/60 dark:bg-brand-950/30"
+          >
+            <FormTextarea
+              v-model="ensureTeamSource(listing.id).ru"
+              :label="t('teamSourceRu')"
+              :rows="3"
+            />
+            <p class="text-xs text-stone-500 dark:text-stone-400">
+              {{ t('teamSourceRuHint') }}
+            </p>
+            <FormTextarea
+              v-model="ensureTeamSource(listing.id).en"
+              :label="t('teamSourceEn')"
+              :rows="2"
+            />
+            <p class="text-xs text-stone-500 dark:text-stone-400">
+              {{ t('teamSourceEnHint') }}
+            </p>
+            <p
+              v-if="teamSourceErrorById === listing.id"
+              class="text-sm text-red-600 dark:text-red-400"
+            >
+              {{ t('teamSourceRequired') }}
+            </p>
+          </div>
           <div class="flex gap-2">
             <UiButton @click="updateStatus(listing.id, 'published')">
               {{ t('publish') }}

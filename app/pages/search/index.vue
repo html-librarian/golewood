@@ -162,7 +162,7 @@ const runSearch = async (page = 1) => {
 
   try {
     await pushSearchRoute(formToSearchParams(page))
-    if (!isLgUp.value) {
+    if (!isSearchDesktop.value) {
       mobileSearchExpanded.value = false
       filtersOpen.value = false
     }
@@ -297,7 +297,7 @@ const onMapSelect = (id: string) => {
     document.getElementById(`listing-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
-  if (!isLgUp.value) {
+  if (!isSearchDesktop.value) {
     mobileView.value = 'list'
     nextTick(() => scrollToListing())
     return
@@ -314,7 +314,8 @@ const mapFullscreen = ref(false)
 const mapPinsRef = ref<{ resize: () => void } | null>(null)
 const filtersOpen = ref(false)
 const mobileView = ref<'list' | 'map'>('list')
-const isLgUp = ref(false)
+/** Full layout: sidebar filters + list + map (only from xl). Below xl — tabs like mobile. */
+const isSearchDesktop = ref(false)
 const mobileSearchExpanded = ref(false)
 
 const activeFiltersCount = computed(() => {
@@ -368,8 +369,8 @@ const removeActiveFilter = async (tag: SearchActiveFilterTag) => {
   await runSearch(1)
 }
 
-const showListPanel = computed(() => isLgUp.value || mobileView.value === 'list')
-const showMapPanel = computed(() => isLgUp.value || mobileView.value === 'map')
+const showListPanel = computed(() => isSearchDesktop.value || mobileView.value === 'list')
+const showMapPanel = computed(() => isSearchDesktop.value || mobileView.value === 'map')
 
 const tabButtonClass = (active: boolean) => [
   'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-sm font-semibold transition',
@@ -383,9 +384,9 @@ const updateBreakpoint = () => {
     return
   }
 
-  isLgUp.value = window.matchMedia('(min-width: 1024px)').matches
+  isSearchDesktop.value = window.matchMedia('(min-width: 1280px)').matches
 
-  if (isLgUp.value) {
+  if (isSearchDesktop.value) {
     filtersOpen.value = false
     mobileSearchExpanded.value = false
   }
@@ -426,7 +427,7 @@ let breakpointMedia: MediaQueryList | undefined
 onMounted(() => {
   window.addEventListener('keydown', onMapFullscreenKeydown)
   updateBreakpoint()
-  breakpointMedia = window.matchMedia('(min-width: 1024px)')
+  breakpointMedia = window.matchMedia('(min-width: 1280px)')
   breakpointMedia.addEventListener('change', updateBreakpoint)
 })
 
@@ -443,7 +444,7 @@ watch(mobileView, (view) => {
 })
 
 watch(routeSearchKey, () => {
-  if (!isLgUp.value) {
+  if (!isSearchDesktop.value) {
     collapseMobileSearch()
   }
 })
@@ -456,8 +457,8 @@ watch(routeSearchKey, () => {
     </h1>
 
     <div class="sticky top-(--site-header-height) z-30 overflow-visible border-b border-stone-200 bg-stone-50/95 backdrop-blur-md dark:border-stone-800 dark:bg-stone-950/95">
-      <div class="layout-container space-y-2 py-2 lg:space-y-0 lg:py-4">
-        <template v-if="!isLgUp">
+      <div class="layout-container space-y-2 py-2 xl:space-y-0 xl:py-4">
+        <template v-if="!isSearchDesktop">
           <button
             v-if="!mobileSearchExpanded"
             type="button"
@@ -502,12 +503,12 @@ watch(routeSearchKey, () => {
             </button>
           </div>
 
-          <div class="flex flex-wrap items-center gap-2">
+          <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2">
             <UiButton
               type="button"
               variant="outline"
               size="sm"
-              class="shrink-0"
+              class="shrink-0 whitespace-nowrap"
               data-testid="search-filters-toggle"
               @click="filtersOpen = !filtersOpen"
             >
@@ -589,19 +590,22 @@ watch(routeSearchKey, () => {
       </div>
     </div>
 
-    <div class="layout-container grid flex-1 grid-cols-1 gap-6 py-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:grid-rows-[auto_auto] lg:items-start xl:grid-cols-[240px_minmax(0,1fr)_minmax(22rem,42%)] xl:grid-rows-none">
+    <div
+      class="layout-container grid flex-1 grid-cols-1 gap-6 py-6"
+      :class="isSearchDesktop ? 'xl:grid-cols-[240px_minmax(0,1fr)_minmax(22rem,42%)] xl:items-start' : 'min-h-0'"
+    >
       <SearchFilters
         v-model:min-price="form.minPrice"
         v-model:max-price="form.maxPrice"
         v-model:amenities="form.amenities"
         v-model:accommodation-types="form.accommodationTypes"
         v-model:team-badge-slugs="form.teamBadgeSlugs"
-        class="hidden lg:sticky lg:top-32 lg:block lg:self-start"
+        class="hidden xl:sticky xl:top-32 xl:block xl:self-start"
       />
 
       <div
         class="flex min-w-0 flex-col"
-        :class="{ 'max-lg:hidden': !showListPanel }"
+        :class="{ 'max-xl:hidden': !showListPanel }"
       >
         <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p
@@ -727,14 +731,14 @@ watch(routeSearchKey, () => {
           v-if="showMapPanel"
           :class="mapFullscreen
             ? 'fixed inset-0 z-300 flex flex-col bg-stone-50 p-3 dark:bg-stone-950 sm:p-4'
-            : 'max-lg:flex max-lg:min-h-0 max-lg:flex-1 lg:col-span-2 xl:sticky xl:top-32 xl:col-span-1 xl:z-10 xl:self-start'"
+            : 'max-xl:flex max-xl:min-h-0 max-xl:flex-1 xl:sticky xl:top-32 xl:col-span-1 xl:z-10 xl:self-start'"
         >
           <div
             v-if="mapItems.length"
-            class="relative"
+            class="relative min-h-0"
             :class="mapFullscreen
-              ? 'flex min-h-0 flex-1 flex-col'
-              : 'h-[min(420px,calc(100dvh-14rem))] max-lg:h-[calc(100dvh-14rem)] max-lg:max-h-none lg:max-h-[min(480px,55vh)] xl:h-[calc(100dvh-11rem)] xl:max-h-[calc(100dvh-11rem)]'"
+              ? 'flex flex-1 flex-col'
+              : 'h-[calc(100dvh-12rem)] max-xl:min-h-[280px] xl:h-[calc(100dvh-11rem)] xl:max-h-[calc(100dvh-11rem)]'"
           >
             <div
               class="absolute left-3 top-3 z-10 flex gap-2"
@@ -766,7 +770,7 @@ watch(routeSearchKey, () => {
 
           <div
             v-else
-            class="flex h-[min(420px,calc(100dvh-14rem))] items-center justify-center rounded-xl border border-dashed border-stone-300 p-6 text-center text-sm text-stone-500 max-lg:h-[calc(100dvh-14rem)] dark:border-stone-700 dark:text-stone-400 lg:max-h-[min(480px,55vh)] xl:h-[calc(100dvh-11rem)] xl:max-h-[calc(100dvh-11rem)]"
+            class="flex h-[calc(100dvh-12rem)] min-h-[280px] items-center justify-center rounded-xl border border-dashed border-stone-300 p-6 text-center text-sm text-stone-500 dark:border-stone-700 dark:text-stone-400 xl:h-[calc(100dvh-11rem)] xl:max-h-[calc(100dvh-11rem)]"
           >
             {{ t('mapEmpty') }}
           </div>

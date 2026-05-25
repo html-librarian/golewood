@@ -146,12 +146,14 @@ const toggleTeamBadge = (slug: string) => {
             :model-value="teamBadgeSlugs.includes(badge.slug)"
             @update:model-value="toggleTeamBadge(badge.slug)"
           >
-            <span class="inline-flex min-w-0 items-center gap-1.5">
-              <Icon
-                :name="badge.icon"
-                class="size-4 shrink-0 text-brand-700 dark:text-brand-400"
-              />
-              <span>{{ badgeLabel(badge.slug, badge.titleRu, badge.titleEn) }}</span>
+            <span class="flex min-w-0 items-center gap-2">
+              <span class="flex size-4 shrink-0 items-center justify-center">
+                <Icon
+                  :name="badge.icon"
+                  class="size-4 text-brand-700 dark:text-brand-400"
+                />
+              </span>
+              <span class="min-w-0">{{ badgeLabel(badge.slug, badge.titleRu, badge.titleEn) }}</span>
             </span>
           </FormCheckbox>
         </li>
@@ -189,12 +191,14 @@ const toggleTeamBadge = (slug: string) => {
             :model-value="accommodationTypes.includes(item.slug)"
             @update:model-value="toggleAccommodationType(item.slug)"
           >
-            <span class="inline-flex min-w-0 items-center gap-1.5">
-              <Icon
-                :name="item.icon"
-                class="size-4 shrink-0 text-brand-700 dark:text-brand-400"
-              />
-              <span>{{ accommodationLabel(item) }}</span>
+            <span class="flex min-w-0 items-center gap-2">
+              <span class="flex size-4 shrink-0 items-center justify-center">
+                <Icon
+                  :name="item.icon"
+                  class="size-4 text-brand-700 dark:text-brand-400"
+                />
+              </span>
+              <span class="min-w-0">{{ accommodationLabel(item) }}</span>
             </span>
           </FormCheckbox>
         </li>

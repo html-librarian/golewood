@@ -33,6 +33,7 @@ const { data: accommodationTypeCatalog } = await useAsyncData('wizard-accommodat
 
 const step = ref(1)
 const listingId = ref<string | null>(null)
+const isTeamManaged = ref(false)
 const propertyListingId = computed(() =>
   typeof route.query.propertyId === 'string' ? route.query.propertyId : undefined,
 )
@@ -69,6 +70,8 @@ const form = reactive({
   contacts: listingContactsToForm(null),
   metaTitle: '',
   metaDescription: '',
+  sourceAttributionRu: '',
+  sourceAttributionEn: '',
 })
 
 const amenityLabel = (item: AmenityCatalogItem) =>
@@ -99,6 +102,9 @@ const applyListing = (listing: Awaited<ReturnType<typeof fetchHostListingById>>)
   form.contacts = listingContactsToForm(listing.contacts)
   form.metaTitle = listing.metaTitle ?? ''
   form.metaDescription = listing.metaDescription ?? ''
+  form.sourceAttributionRu = listing.sourceAttributionRu ?? ''
+  form.sourceAttributionEn = listing.sourceAttributionEn ?? ''
+  isTeamManaged.value = listing.managedByTeam
   photos.value = listing.photos
   documents.value = listing.documents ?? []
 }
@@ -232,6 +238,7 @@ const saveBasic = async () => {
         propertyListingId: propertyListingId.value,
         contacts: listingContactsFromForm(form.contacts),
         ...metaPayload(),
+        ...sourcePayload(),
         ...transferPayload(),
         ...extraGuestsPayload(),
       })
@@ -246,6 +253,7 @@ const saveBasic = async () => {
         description: form.description,
         contacts: listingContactsFromForm(form.contacts),
         ...metaPayload(),
+        ...sourcePayload(),
       })
     }
 
@@ -337,6 +345,13 @@ const metaPayload = () => ({
   metaTitle: form.metaTitle.trim() || null,
   metaDescription: form.metaDescription.trim() || null,
 })
+
+const sourcePayload = () => (isTeamManaged.value
+  ? {
+      sourceAttributionRu: form.sourceAttributionRu.trim() || null,
+      sourceAttributionEn: form.sourceAttributionEn.trim() || null,
+    }
+  : {})
 </script>
 
 <template>
@@ -396,6 +411,31 @@ const metaPayload = () => ({
         :title="t('contactsTitle')"
         :hint="t('contactsHint')"
       />
+
+      <div
+        v-if="isTeamManaged"
+        class="space-y-3 rounded-xl border border-brand-200/80 bg-brand-50/40 p-4 dark:border-brand-800/60 dark:bg-brand-950/30"
+      >
+        <div>
+          <p class="text-sm font-medium text-brand-900 dark:text-brand-100">
+            {{ t('teamSourceTitle') }}
+          </p>
+          <p class="mt-1 text-xs text-brand-800/90 dark:text-brand-200/90">
+            {{ t('teamSourceHint') }}
+          </p>
+        </div>
+        <FormTextarea
+          v-model="form.sourceAttributionRu"
+          :label="t('teamSourceRu')"
+          :rows="3"
+          required
+        />
+        <FormTextarea
+          v-model="form.sourceAttributionEn"
+          :label="t('teamSourceEn')"
+          :rows="2"
+        />
+      </div>
 
       <div class="space-y-3 rounded-xl border border-stone-200 p-4 dark:border-stone-700">
         <div>

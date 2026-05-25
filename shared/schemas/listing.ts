@@ -30,6 +30,8 @@ const listingFieldsBaseSchema = z.object({
   extraGuestPricePerNight: z.number().int().min(0).max(100_000).nullable().optional(),
   cleaningFee: z.number().int().min(0).max(100_000).optional(),
   contacts: listingContactsSchema.optional(),
+  sourceAttributionRu: z.string().trim().max(1000).nullable().optional(),
+  sourceAttributionEn: z.string().trim().max(1000).nullable().optional(),
 })
 
 const refineListingExtraGuests = (

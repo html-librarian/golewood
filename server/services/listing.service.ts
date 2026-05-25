@@ -20,6 +20,7 @@ import {
   getListingExtraGuestsValidationError,
   normalizeListingExtraGuests,
 } from '#shared/utils/listing-extra-guests'
+import { normalizeSourceAttribution } from '#shared/utils/listing-source-attribution'
 import { getListingTransferValidationError, mergeTransferAmenity } from '#shared/utils/listing-transfer'
 import { parseVideoEmbedUrl } from '#shared/utils/video-embed'
 import { LISTING_DOCUMENT_MAX_BYTES, LISTING_DOCUMENT_MAX_COUNT, LISTING_PHOTO_MAX_COUNT } from '#shared/utils/media-limits'
@@ -305,6 +306,8 @@ export const listingService = {
         : null,
       transferPriceOnRequest: input.transferOffered && input.transferPriceOnRequest,
       contacts: input.contacts ?? {},
+      sourceAttributionRu: normalizeSourceAttribution(input.sourceAttributionRu),
+      sourceAttributionEn: normalizeSourceAttribution(input.sourceAttributionEn),
       status: 'draft',
     }).returning()
 
@@ -388,6 +391,12 @@ export const listingService = {
 
     const [row] = await db.update(listings).set({
       ...patch,
+      ...(patch.sourceAttributionRu !== undefined
+        ? { sourceAttributionRu: normalizeSourceAttribution(patch.sourceAttributionRu) }
+        : {}),
+      ...(patch.sourceAttributionEn !== undefined
+        ? { sourceAttributionEn: normalizeSourceAttribution(patch.sourceAttributionEn) }
+        : {}),
       ...(amenities ? { amenities } : {}),
       ...(extraGuests ?? {}),
       ...(patch.transferOffered !== undefined || patch.transferPrice !== undefined || patch.transferPriceOnRequest !== undefined

@@ -39,6 +39,8 @@ export const mapListing = (row: ListingRow): Listing => ({
   transferPriceOnRequest: row.transferPriceOnRequest,
   contacts: normalizeListingContacts(row.contacts ?? {}),
   managedByTeam: row.managedByTeam,
+  sourceAttributionRu: row.sourceAttributionRu,
+  sourceAttributionEn: row.sourceAttributionEn,
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),
 })

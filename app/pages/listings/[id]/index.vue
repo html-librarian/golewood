@@ -4,6 +4,7 @@ import type { ReviewRatings } from '#shared/types/review-ratings'
 import type { ListingSectionNavItem } from '~/components/listing/section-nav/types'
 import { formatPrice } from '#shared/utils/format'
 import { getListingGuestCapacity } from '#shared/utils/listing-extra-guests'
+import { getListingSourceAttributionText } from '#shared/utils/listing-source-attribution'
 import { buildYandexMapsUrl, hasValidMapCoordinates } from '#shared/utils/map-coordinates'
 import { getReviewRatingLabel } from '#shared/utils/review-rating'
 import { parseBookingRouteQuery } from '#shared/utils/booking-route-query'
@@ -224,6 +225,17 @@ const guestCapacity = computed(() =>
 )
 
 const isTeamListing = computed(() => Boolean(listing.value?.managedByTeam))
+
+const hasSourceFootnote = computed(() => {
+  if (!listing.value) {
+    return false
+  }
+
+  return Boolean(getListingSourceAttributionText(
+    listing.value,
+    locale.value === 'en' ? 'en' : 'ru',
+  ))
+})
 const isPropertyComplex = computed(() => listing.value?.kind === 'property')
 const propertyUnits = computed(() => listing.value?.units ?? [])
 
@@ -840,7 +852,11 @@ const headerPricePerNight = computed(() => {
           v-if="isTeamListing"
           class="rounded-xl border border-brand-200/80 bg-brand-50/60 px-4 py-3 text-sm text-brand-900 dark:border-brand-800/60 dark:bg-brand-950/40 dark:text-brand-100"
         >
-          {{ t('teamListingNotice') }}
+          {{ t('teamListingNotice') }}<span
+            v-if="hasSourceFootnote"
+            class="font-medium"
+            aria-hidden="true"
+          >*</span>
         </p>
 
         <ListingHostToolbar
@@ -1200,6 +1216,12 @@ const headerPricePerNight = computed(() => {
             />
           </div>
         </section>
+
+        <ListingSourceFootnote
+          v-if="hasSourceFootnote && listing"
+          :listing="listing"
+          class="border-t border-stone-200 pt-6 dark:border-stone-800"
+        />
 
         <section
           v-if="isAuthenticated && !isOwnListing"
