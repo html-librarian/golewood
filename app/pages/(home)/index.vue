@@ -87,21 +87,39 @@ const discoveryGroupsResolved = computed<HomeDiscoveryGroup[]>(
   () => discoveryGroups.value ?? HOME_DISCOVERY_GROUPS,
 )
 
+const emptyListingsResult = (city: string | null = null) => ({
+  items: [] as Awaited<ReturnType<typeof fetchPublished>>,
+  scope: 'all' as const,
+  city,
+})
+
 const { data: listings, pending } = await useAsyncData(
   () => `home-listings-${preferredCity.value ?? 'all'}`,
   async () => {
     const cityName = preferredCity.value
 
-    if (cityName) {
-      const inCity = await fetchPublished(cityName)
+    try {
+      if (cityName) {
+        const inCity = await fetchPublished(cityName)
 
-      if (inCity.length) {
-        return { items: inCity, scope: 'city' as const, city: cityName }
+        if (inCity.length) {
+          return { items: inCity, scope: 'city' as const, city: cityName }
+        }
       }
-    }
 
-    const all = await fetchPublished()
-    return { items: all, scope: 'all' as const, city: cityName ?? null }
+      const all = await fetchPublished()
+      return { items: all, scope: 'all' as const, city: cityName ?? null }
+    } catch (err: unknown) {
+      const status = err && typeof err === 'object' && 'statusCode' in err
+        ? Number((err as { statusCode: number }).statusCode)
+        : 0
+
+      if (status === 503) {
+        return emptyListingsResult(cityName ?? null)
+      }
+
+      throw err
+    }
   },
   { watch: [preferredCity] },
 )

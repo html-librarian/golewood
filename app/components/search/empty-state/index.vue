@@ -48,8 +48,8 @@ const localePath = useLocalePath()
         @click="emit('clearFilters')"
       >
         <Icon
-          name="ph:funnel-simple-x-duotone"
-          class="mr-1.5 size-4"
+          name="ph:funnel-simple-x"
+          class="mr-1.5 size-4 shrink-0"
         />
         {{ clearFiltersLabel }}
       </UiButton>

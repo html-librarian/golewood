@@ -110,7 +110,17 @@ const main = async () => {
 }
 
 main().catch(async (err) => {
-  console.error(err)
+  const cause = err && typeof err === 'object' && 'cause' in err
+    ? (err as { cause?: { message?: string } }).cause?.message
+    : undefined
+
+  if (cause?.includes('does not exist')) {
+    console.error('Database schema is out of date. Run: npm run db:migrate')
+    console.error(cause)
+  } else {
+    console.error(err)
+  }
+
   await sql.end()
   process.exit(1)
 })

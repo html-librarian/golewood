@@ -24,7 +24,11 @@ const variantClasses = computed(() => {
     return 'border border-stone-300 bg-white text-stone-900 hover:bg-stone-50 dark:border-stone-600 dark:bg-stone-900 dark:text-stone-100 dark:hover:bg-stone-800'
   }
 
-  return 'bg-brand-700 text-white shadow-sm hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-500'
+  return [
+    'bg-brand-700 text-white shadow-sm hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-500',
+    // Phosphor duotone: secondary layer reads as a light box on solid fills
+    '[&_[opacity="0.2"]]:opacity-0',
+  ].join(' ')
 })
 
 const sizeClasses = computed(() => {
