@@ -77,13 +77,13 @@ watch(() => props.filters.length, () => nextTick(updateScrollState))
   >
     <div
       ref="trackRef"
-      class="flex gap-3 overflow-x-auto scroll-smooth py-1 pb-2 pr-4 [-ms-overflow-style:none] [scrollbar-width:none] md:pr-6 lg:pr-8 [&::-webkit-scrollbar]:hidden snap-x snap-mandatory 2xl:pr-10"
+      class="flex gap-3 overflow-x-auto scroll-smooth py-1 pb-2 pr-4 [-ms-overflow-style:none] scrollbar-none md:pr-6 lg:pr-8 [&::-webkit-scrollbar]:hidden snap-x snap-mandatory 2xl:pr-10"
     >
       <NuxtLink
         v-for="filter in filters"
         :key="filter.id"
         :to="searchLink(filter)"
-        class="group relative aspect-[4/5] w-[7.25rem] shrink-0 snap-start overflow-hidden rounded-2xl ring-1 ring-black/10 sm:w-32 md:w-36 dark:ring-white/10"
+        class="group relative aspect-4/5 w-29 shrink-0 snap-start overflow-hidden rounded-2xl ring-1 ring-black/10 sm:w-32 md:w-36 dark:ring-white/10"
         @click="onSelect(filter)"
       >
         <div

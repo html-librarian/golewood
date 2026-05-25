@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { HOME_DISCOVERY_TONE_PRESETS } from '#shared/catalog/home-discovery-tones'
+import { homePromoHasPhoto } from '#shared/utils/home-promo-display'
 import type { HomePromoBanner, HomePromoImageBreakpoint, HomePromoSlot } from '#shared/types/home-promo'
 import ru from './i18n/ru'
 import en from './i18n/en'
@@ -52,8 +53,17 @@ const ensureDraft = (banner: HomePromoBanner) => {
   return drafts.value[banner.id]!
 }
 
+const syncDraftFromServer = (id: string) => {
+  const updated = (banners.value ?? []).find(item => item.id === id)
+
+  if (updated) {
+    drafts.value[id] = { ...updated }
+  }
+}
+
 const saveBanner = async (banner: HomePromoBanner) => {
   const draft = ensureDraft(banner)
+  const merged = { ...banner, ...draft }
   savingId.value = banner.id
   savedId.value = null
 
@@ -67,12 +77,13 @@ const saveBanner = async (banner: HomePromoBanner) => {
       ctaEn: draft.ctaEn ?? null,
       linkHref: draft.linkHref,
       linkExternal: draft.linkExternal,
-      backgroundMode: draft.backgroundMode,
+      backgroundMode: homePromoHasPhoto(merged) ? 'image' : draft.backgroundMode,
       tone: draft.tone,
       active: draft.active,
     })
     savedId.value = banner.id
     await refresh()
+    syncDraftFromServer(banner.id)
   } finally {
     savingId.value = null
   }
@@ -121,6 +132,7 @@ const onImagePick = async (banner: HomePromoBanner, breakpoint: HomePromoImageBr
   try {
     await uploadPromoImage(banner.id, breakpoint, file)
     await refresh()
+    syncDraftFromServer(banner.id)
   } finally {
     uploadingKey.value = null
     input.value = ''
@@ -133,6 +145,7 @@ const onClearImage = async (banner: HomePromoBanner, breakpoint: HomePromoImageB
   try {
     await clearPromoImage(banner.id, breakpoint)
     await refresh()
+    syncDraftFromServer(banner.id)
   } finally {
     uploadingKey.value = null
   }
@@ -326,7 +339,7 @@ const breakpoints: { id: HomePromoImageBreakpoint, labelKey: 'imageDesktop' | 'i
                   {{ t(bp.labelKey) }}
                 </p>
                 <div
-                  class="flex aspect-[16/10] items-center justify-center overflow-hidden rounded-xl bg-stone-100 ring-1 ring-stone-200 dark:bg-stone-900 dark:ring-stone-700"
+                  class="flex aspect-16/10 items-center justify-center overflow-hidden rounded-xl bg-stone-100 ring-1 ring-stone-200 dark:bg-stone-900 dark:ring-stone-700"
                 >
                   <img
                     v-if="imageUrlFor(banner, bp.id)"

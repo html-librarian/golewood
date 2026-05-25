@@ -333,6 +333,9 @@ Two different failures in Actions:
 | **Deploy** skipped (grey, ~1 s) | **CI on `main` did not finish green** (lint/tests/e2e/docker-build). Deploy never starts. | Open the failed **CI** run → fix the red job (often **e2e**). Re-push or re-run CI. |
 | **Deploy** failed in **~5–10 s** | SSH or missing secrets before `remote-deploy.sh` runs. | Open Deploy logs. Run **Deploy → Run workflow** manually after fixing secrets. Check `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY` (and `GHCR_TOKEN` if the image is private). |
 | **Deploy** failed after **minutes** | VPS: `docker pull`, migrate, or smoke test. | SSH to the server, run `./scripts/remote-deploy.sh` and read the error. |
+| **Search shows a listing, page says “not found”** | Meilisearch index out of sync with PostgreSQL (stale hit). | On VPS: `docker compose exec -T app npm run search:reindex`. Or Admin → reindex search. Ensure listing status is **published** (not draft/moderation). |
+
+`remote-deploy.sh` runs `search:reindex` after migrations so search and listing pages stay aligned.
 
 Deploy runs only when the **whole** CI workflow succeeds (including E2E). A green `docker-build` alone is not enough if `e2e` failed.
 

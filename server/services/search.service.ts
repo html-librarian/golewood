@@ -1,7 +1,7 @@
 import type { ListingCard } from '#shared/types/listing'
 import type { SearchParams, SearchResult, SearchResultItem } from '#shared/types/search'
 import { partitionPromotedForSearch } from '#shared/utils/promotion'
-import { and, eq, inArray, lt, gt, sql } from 'drizzle-orm'
+import { and, eq, inArray, lt, gt, ne, sql } from 'drizzle-orm'
 import { bookings, listings } from '../db/schema'
 import { getDb } from '../utils/db'
 import { ensureListingsIndex, getListingsIndex } from '../utils/meili'
@@ -108,6 +108,7 @@ const filterHitsToPublished = async (hits: Record<string, unknown>[]) => {
   const rows = await db.select({ id: listings.id }).from(listings).where(and(
     inArray(listings.id, ids),
     eq(listings.status, 'published'),
+    ne(listings.kind, 'unit'),
   ))
   const allowed = new Set(rows.map(row => row.id))
 

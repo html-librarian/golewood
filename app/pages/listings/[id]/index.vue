@@ -205,6 +205,20 @@ const { data: listing, error, pending } = await useAsyncData(
 
 useListingPageSeo(listing)
 
+const listingFetchStatus = computed(() => {
+  const err = error.value as { statusCode?: number, status?: number } | null
+
+  return err?.statusCode ?? err?.status ?? null
+})
+
+const listingErrorHint = computed(() => {
+  if (listingFetchStatus.value === 404) {
+    return t('notFoundHint')
+  }
+
+  return t('loadErrorHint')
+})
+
 const guestCapacity = computed(() =>
   listing.value ? getListingGuestCapacity(listing.value) : 1,
 )
@@ -679,8 +693,8 @@ const headerPricePerNight = computed(() => {
     <UiEmpty
       v-else-if="error"
       icon="ph:house-line-duotone"
-      :title="t('notFound')"
-      :description="t('notFoundHint')"
+      :title="listingFetchStatus === 404 ? t('notFound') : t('loadError')"
+      :description="listingErrorHint"
     >
       <NuxtLink :to="localePath('/search')">
         <UiButton>{{ t('explore') }}</UiButton>

@@ -58,7 +58,7 @@ const onSelect = (filter: HomeDiscoveryFilter) => {
             <Icon
               v-else
               :name="filter.icon"
-              class="absolute left-1/2 top-1/2 z-[1] size-8 -translate-x-1/2 -translate-y-1/2 sm:size-9"
+              class="absolute left-1/2 top-1/2 z-1 size-8 -translate-x-1/2 -translate-y-1/2 sm:size-9"
             />
           </span>
           <span

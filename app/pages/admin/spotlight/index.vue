@@ -229,7 +229,7 @@ const openFilePicker = () => {
           <p class="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">
             {{ t('bannerPreview') }}
           </p>
-          <div class="relative aspect-[4/3] overflow-hidden rounded-xl ring-1 ring-stone-200 dark:ring-stone-700">
+          <div class="relative aspect-4/3 overflow-hidden rounded-xl ring-1 ring-stone-200 dark:ring-stone-700">
             <img
               v-if="bannerSettings?.resolved.imageUrl"
               :src="bannerSettings.resolved.imageUrl"

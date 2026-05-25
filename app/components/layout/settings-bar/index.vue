@@ -188,7 +188,7 @@ onBeforeUnmount(() => {
           <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[10px] font-semibold text-brand-800 dark:bg-brand-900 dark:text-brand-200">
             {{ userInitials }}
           </span>
-          <span class="hidden max-w-[7.5rem] truncate 2xl:inline">{{ userDisplayName }}</span>
+          <span class="hidden max-w-30 truncate 2xl:inline">{{ userDisplayName }}</span>
         </NuxtLink>
 
         <button

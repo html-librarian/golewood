@@ -1,3 +1,4 @@
+import { homePromoHasPhoto } from '#shared/utils/home-promo-display'
 import type { HomePromoBanner, HomePromoImageBreakpoint, HomePromoSection } from '#shared/types/home-promo'
 import type { CreateHomePromoBannerInput, UpdateHomePromoBannerInput } from '#shared/schemas/home-promo'
 import { asc, eq } from 'drizzle-orm'
@@ -203,6 +204,17 @@ export const homePromoService = {
       throw createError({ statusCode: 404, statusMessage: 'Promo banner not found' })
     }
 
-    return mapRow(row)
+    const mapped = mapRow(row)
+
+    if (!homePromoHasPhoto(mapped)) {
+      const [withGradient] = await db.update(homePromoBanners)
+        .set({ backgroundMode: 'gradient', updatedAt: new Date() })
+        .where(eq(homePromoBanners.id, id))
+        .returning()
+
+      return mapRow(withGradient ?? row)
+    }
+
+    return mapped
   },
 }

@@ -37,6 +37,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "node --experimental-strip-types scripts/seed.ts",
     "db:seed:cities": "node --experimental-strip-types scripts/seed-cities.ts",
+    "search:reindex": "node --experimental-strip-types scripts/reindex-search.ts",
     "db:seed:reset": "SEED_RESET=1 node --experimental-strip-types scripts/seed.ts",
     "db:studio": "drizzle-kit studio",
     "icons:generate": "node --experimental-strip-types scripts/generate-pwa-icons.ts"

@@ -41,7 +41,7 @@ watch(() => props.banners.length, () => {
 
 <template>
   <div
-    class="relative size-full min-h-[11rem] sm:min-h-[12rem] lg:min-h-[15rem]"
+    class="relative size-full min-h-44 sm:min-h-48 lg:min-h-60"
     data-testid="home-promo-carousel"
   >
     <Transition
