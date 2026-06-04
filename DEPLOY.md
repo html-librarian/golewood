@@ -25,7 +25,7 @@ Run `NODE_ENV=production npm run check:prod` before deploy.
 1. [ ] DNS A/AAAA → server IP (`golewood.ru`, `www`)
 2. [ ] Copy `deploy/.env.production.example` → `.env`, fill all `CHANGE_ME_*` values
 3. [ ] `npm run preflight:prod` — no errors
-4. [ ] `npm run prod:up` (build, start, migrate + city catalog)
+4. [ ] `GOLEWOOD_USE_REGISTRY=1 ./scripts/prod-up.sh --migrate` (pull CI image; see § GHCR)
 5. [ ] Caddy (or nginx) → `127.0.0.1:3000`, TLS certificate
 6. [ ] YooKassa webhook: `https://<domain>/api/payments/yookassa/webhook`
 7. [ ] S3 for listing photos (`NUXT_S3_*`)
@@ -106,7 +106,7 @@ SMTP_PASS=<app-password>
 SMTP_FROM=golewood@internet.ru
 ```
 
-4. `docker compose -f docker-compose.prod.yml up -d --build` (builds `mail-relay` on first run).
+4. `GOLEWOOD_USE_REGISTRY=1 ./scripts/prod-up.sh --migrate` (pulls `app` from GHCR; `mail-relay` builds locally on first run if needed).
 5. Test from the VPS:
 
 ```bash
@@ -167,7 +167,9 @@ Optional: `RUN_DB_MIGRATE_ON_START=true` runs migrate on container start (otherw
 ## 2. Build and start
 
 ```bash
-docker compose -f docker-compose.prod.yml up -d --build
+export GOLEWOOD_USE_REGISTRY=1 GHCR_TOKEN=ghp_...
+./scripts/prod-up.sh --migrate
+# Local image build (large RAM): GOLEWOOD_BUILD_ON_VPS=1 ./scripts/prod-up.sh --migrate
 # Build context uses .dockerignore (excludes e2e, dev artifacts, docs except README)
 ```
 
@@ -295,8 +297,9 @@ Returns `200` when PostgreSQL, Redis and Meilisearch are reachable.
 
 ```bash
 git pull
-docker compose -f docker-compose.prod.yml up -d --build
-docker compose -f docker-compose.prod.yml exec app npm run db:migrate
+export GOLEWOOD_USE_REGISTRY=1 GHCR_TOKEN=ghp_...
+./scripts/remote-deploy.sh
+# or: ./scripts/prod-up.sh --migrate after pull
 # If release changed search index fields (amenities, accommodation types, property units) — reindex (§6)
 SITE_URL=https://golewood.ru ./scripts/post-deploy-smoke.sh
 ```
@@ -333,7 +336,7 @@ Two different failures in Actions:
 | **Deploy** skipped (grey, ~1 s) | **CI on `main` did not finish green** (lint/tests/e2e/docker-build). Deploy never starts. | Open the failed **CI** run → fix the red job (often **e2e**). Re-push or re-run CI. |
 | **Deploy** failed in **~5–10 s** | SSH or missing secrets before `remote-deploy.sh` runs. | Open Deploy logs. Run **Deploy → Run workflow** manually after fixing secrets. Check `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY` (and `GHCR_TOKEN` if the image is private). |
 | **Deploy** failed after **minutes** | VPS: `docker pull`, migrate, or smoke test. | SSH to the server, run `./scripts/remote-deploy.sh` and read the error. |
-| **Search shows a listing, page says “not found” / 500** | Meilisearch index stale **or** DB schema behind app code (`column "meta_title" does not exist`, etc.). | 1) `git pull` + `docker compose up -d --build` 2) `docker compose exec -T app npm run db:migrate` 3) `docker compose exec -T app npm run search:reindex`. Check listing is **published**. |
+| **Search shows a listing, page says “not found” / 500** | Meilisearch index stale **or** DB schema behind app code (`column "meta_title" does not exist`, etc.). | 1) `git pull` + `GOLEWOOD_USE_REGISTRY=1 ./scripts/prod-up.sh` (pull new image) 2) `db:migrate` 3) `search:reindex`. Check listing is **published**. |
 | **Reindex: `column … does not exist`** | Migrations `0057`–`0059` not applied (contacts, meta_title, source_attribution). Older images also skipped them if they were missing from `drizzle/migrations/meta/_journal.json` — `db:migrate` looked successful but did nothing. | Pull latest `main`, rebuild, `db:migrate`, then `search:reindex`. **Emergency** (psql in `postgres` service): run SQL from `0057`–`0059` in `drizzle/migrations/` (`ADD COLUMN IF NOT EXISTS …`). |
 | **`/api/hosts/:id/stories` → 500** | Migration `0061_host_profile_story_reposts` not applied (table missing). | `docker compose exec -T app npm run db:migrate` (through `0061`). Rebuild if journal was fixed in a newer release. |
 
@@ -352,12 +355,16 @@ export GOLEWOOD_USE_REGISTRY=1 GHCR_TOKEN=ghp_... GHCR_USER=html-librarian
 
 ### Small VPS: OOM during `docker compose build`
 
-Nuxt build (especially the Nitro step) needs **~4–6 GB** RAM or swap. Symptoms:
+**Do not build the app image on a small VPS** — use the image from GitHub Actions (see Option B below).
 
-- `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` during `[nitro] Building Nuxt Nitro server`
-- **SIGKILL** on `npm run build` = host ran out of RAM (not only Node heap)
+Nuxt build (especially Nitro) needs **~6 GB** RAM **or** swap. Symptoms:
 
-The Dockerfile sets `NODE_OPTIONS=--max-old-space-size=4096`. The **host** must still have enough memory + swap for that heap and the rest of the build.
+| Log | Meaning |
+|-----|---------|
+| `heap out of memory` | Node hit `--max-old-space-size` |
+| `signal SIGKILL` on `nuxt build` | Linux OOM killer (host RAM+swap exhausted) |
+
+`docker-compose.prod.yml` has **no** `build:` — only `docker-compose.build.yml` adds it. `./scripts/prod-up.sh` refuses to build unless `GOLEWOOD_BUILD_ON_VPS=1`.
 
 **Option A — swap (first manual deploy):**
 
@@ -365,7 +372,8 @@ The Dockerfile sets `NODE_OPTIONS=--max-old-space-size=4096`. The **host** must 
 sudo chmod +x deploy/add-swap.sh
 sudo ./deploy/add-swap.sh 4
 free -h
-docker compose -f docker-compose.prod.yml up -d --build
+GOLEWOOD_BUILD_ON_VPS=1 docker compose -f docker-compose.prod.yml -f docker-compose.build.yml build app
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 ### Meilisearch `unhealthy` on first `up`

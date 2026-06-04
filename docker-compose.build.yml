@@ -1,0 +1,8 @@
+# Optional: build app image locally (CI uses Dockerfile directly; VPS should pull from GHCR).
+# Usage: docker compose -f docker-compose.prod.yml -f docker-compose.build.yml build app
+services:
+  app:
+    build:
+      context: .
+      args:
+        NODE_MAX_OLD_SPACE_SIZE: ${NODE_MAX_OLD_SPACE_SIZE:-4096}

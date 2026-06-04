@@ -36,6 +36,9 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'node-server',
     sourceMap: false,
+    rollupConfig: {
+      maxParallelFileOps: 4,
+    },
     typescript: {
       tsConfig: {
         compilerOptions: {

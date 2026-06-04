@@ -60,9 +60,11 @@ if [[ "${GOLEWOOD_USE_REGISTRY:-0}" == "1" ]]; then
     "${compose[@]}" up -d
   fi
 else
-  echo "→ docker compose up -d --build"
-  if ! "${compose[@]}" up -d --build --wait 2>/dev/null; then
-    "${compose[@]}" up -d --build
+  echo "→ docker compose build (VPS — ensure swap; see DEPLOY.md)" >&2
+  docker compose -f "${compose_file}" -f docker-compose.build.yml build app
+  echo "→ docker compose up -d"
+  if ! "${compose[@]}" up -d --wait 2>/dev/null; then
+    "${compose[@]}" up -d
   fi
 fi
 

@@ -49,7 +49,7 @@ For E2E: stop the dev server first, or Playwright will reuse it locally (`reuseE
 | `npm run github:setup` | Create GitHub repo + push via `gh` CLI |
 | `npm run secrets:prod` | Print `openssl` secrets for production `.env` |
 | `npm run setup:prod-env` | Create `.env` from template + random secrets (`--domain`, `--force`) |
-| `npm run prod:up` | VPS: build & start prod compose + `db:migrate` |
+| `npm run prod:up` | VPS: start prod stack + `db:migrate` (pull GHCR image; see DEPLOY.md) |
 | `npm run smoke:prod` | POST-deploy HTTP smoke (`SITE_URL=https://…`) |
 | `npm run bootstrap` | Docker + `.env` + migrate + seed (first-time local setup) |
 | `npm run db:generate` | Generate Drizzle migration |
@@ -116,7 +116,7 @@ Full guide: **[DEPLOY.md](DEPLOY.md)**. Template env: **`deploy/.env.production.
 
 1. Copy `deploy/.env.production.example` → `.env` on the server; set secrets. **Unset** `NUXT_AUTH_DEV_CODE`; set `NUXT_YOOKASSA_MARKETPLACE_MOCK=false`.
 2. `NODE_ENV=production npm run check:prod` — fix errors before deploy.
-3. `docker compose -f docker-compose.prod.yml up -d --build`
+3. `GOLEWOOD_USE_REGISTRY=1 ./scripts/prod-up.sh --migrate` (or build on host: `GOLEWOOD_BUILD_ON_VPS=1`)
 4. `docker compose -f docker-compose.prod.yml exec app npm run db:migrate` (through `0061` if upgrading)
 5. Caddy/nginx → `127.0.0.1:3000` (see `deploy/Caddyfile.example`)
 6. **YooKassa** webhook: `{SITE_URL}/api/payments/yookassa/webhook`
@@ -140,7 +140,7 @@ See [DEPLOY.md](DEPLOY.md) for the full production guide.
 
 ```bash
 # Build & run with Docker
-docker compose -f docker-compose.prod.yml up -d --build
+GOLEWOOD_USE_REGISTRY=1 ./scripts/prod-up.sh --migrate
 
 # Run migrations inside app container
 docker compose -f docker-compose.prod.yml exec app npm run db:migrate
