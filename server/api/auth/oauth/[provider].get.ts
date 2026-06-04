@@ -9,11 +9,11 @@ const parseProvider = (value: string | undefined): OAuthProvider => {
   throw createError({ statusCode: 400, statusMessage: 'Unsupported OAuth provider' })
 }
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const provider = parseProvider(getRouterParam(event, 'provider'))
 
   if (provider === 'vk') {
-    const url = oauthService.prepareVkAuthorize(event)
+    const url = await oauthService.prepareVkAuthorize(event)
     return sendRedirect(event, url)
   }
 

@@ -18,6 +18,7 @@ import {
   generateVkOAuthState,
   parseVkIdCallbackQuery,
 } from '../utils/vk-id-oauth'
+import { consumeVkOAuthVerifier, storeVkOAuthVerifier } from '../utils/vk-oauth-state'
 
 const VK_OAUTH_STATE_COOKIE = 'vk-oauth-state'
 const VK_OAUTH_VERIFIER_COOKIE = 'vk-oauth-verifier'
@@ -112,6 +113,7 @@ const fetchVkIdProfile = async (
 
   if (config.vkClientSecret) {
     tokenBody.set('service_token', config.vkClientSecret)
+    tokenBody.set('client_secret', config.vkClientSecret)
   }
 
   const tokenResponse = await fetch('https://id.vk.ru/oauth2/auth', {
@@ -296,7 +298,7 @@ export const oauthService = {
     })
   },
 
-  prepareVkAuthorize: (event: H3Event) => {
+  prepareVkAuthorize: async (event: H3Event) => {
     if (!isProviderConfigured('vk')) {
       forbidInProduction()
       return `/api/auth/oauth/vk/mock`
@@ -311,6 +313,7 @@ export const oauthService = {
 
     setCookie(event, VK_OAUTH_VERIFIER_COOKIE, verifier, cookieOptions)
     setCookie(event, VK_OAUTH_STATE_COOKIE, state, cookieOptions)
+    await storeVkOAuthVerifier(state, verifier)
 
     const params = new URLSearchParams({
       response_type: 'code',
@@ -319,7 +322,7 @@ export const oauthService = {
       state,
       code_challenge: challenge,
       code_challenge_method: 'S256',
-      scope: 'email',
+      scope: 'vkid.personal_info email',
     })
 
     return `https://id.vk.ru/authorize?${params.toString()}`
@@ -336,9 +339,11 @@ export const oauthService = {
     }
 
     const savedState = getCookie(event, VK_OAUTH_STATE_COOKIE)
-    const verifier = getCookie(event, VK_OAUTH_VERIFIER_COOKIE)
+    const cookieVerifier = getCookie(event, VK_OAUTH_VERIFIER_COOKIE)
+    const redisVerifier = await consumeVkOAuthVerifier(parsed.state)
+    const verifier = redisVerifier ?? cookieVerifier
 
-    if (!savedState || !verifier || savedState !== parsed.state) {
+    if (!verifier || (savedState && savedState !== parsed.state)) {
       throw createError({ statusCode: 400, statusMessage: 'VK ID state mismatch' })
     }
 

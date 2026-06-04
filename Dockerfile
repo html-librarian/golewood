@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Nitro bundling can exceed 2 GB on a large Nuxt app; override on tiny VPS: --build-arg NODE_MAX_OLD_SPACE_SIZE=6144
 ARG NODE_MAX_OLD_SPACE_SIZE=4096
+ARG GIT_SHA=dev
 ENV NODE_OPTIONS=--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE}
 
 # Lockfile is generated with npm 11; stock node:22-alpine ships npm 10.
@@ -18,10 +19,12 @@ COPY . .
 RUN npm run build
 
 FROM node:22-alpine AS runner
+ARG GIT_SHA=dev
 
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV NUXT_BUILD_SHA=${GIT_SHA}
 ENV HOST=0.0.0.0
 ENV PORT=3000
 

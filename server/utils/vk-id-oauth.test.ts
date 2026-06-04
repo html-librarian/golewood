@@ -18,6 +18,21 @@ describe('vk-id-oauth', () => {
     expect(generateVkCodeVerifier().length).toBeGreaterThanOrEqual(32)
   })
 
+  it('parses URL-encoded payload JSON from VK redirect', () => {
+    const payload = encodeURIComponent(JSON.stringify({
+      code: 'abc',
+      state: 'xyz',
+      device_id: 'dev-1',
+      type: 'code_v2',
+    }))
+
+    expect(parseVkIdCallbackQuery({ payload })).toEqual({
+      code: 'abc',
+      state: 'xyz',
+      deviceId: 'dev-1',
+    })
+  })
+
   it('parses payload JSON from VK redirect', () => {
     const payload = JSON.stringify({
       code: 'abc',

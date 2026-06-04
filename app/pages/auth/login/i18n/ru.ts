@@ -19,6 +19,7 @@ export default {
   emailDivider: 'или по email',
   errorSendCode: 'Не удалось отправить код',
   errorInvalidCode: 'Неверный код',
+  oauthLoginFailed: 'Не удалось войти через {provider}. Попробуйте email или повторите позже.',
   errorEmailConflict: 'Этот email уже привязан к другому аккаунту',
   linkPhoneHint: 'Привязать номер телефона к аккаунту',
   mfaSubtitle: 'Дополнительный код отправлен на {email}',

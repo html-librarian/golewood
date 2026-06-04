@@ -33,26 +33,46 @@ const setSessionCookies = (
 }
 
 export default defineEventHandler(async (event) => {
+  const localePath = useLocalePath()
   const provider = parseProvider(getRouterParam(event, 'provider'))
   const meta = getSessionClientMeta(event)
 
-  const result = provider === 'vk'
-    ? await oauthService.handleVkCallback(event, meta)
-    : await (async () => {
-      const code = getQuery(event).code
+  try {
+    const result = provider === 'vk'
+      ? await oauthService.handleVkCallback(event, meta)
+      : await (async () => {
+        const code = getQuery(event).code
 
-      if (!code || typeof code !== 'string') {
-        throw createError({ statusCode: 400, statusMessage: 'Missing OAuth code' })
-      }
+        if (!code || typeof code !== 'string') {
+          throw createError({ statusCode: 400, statusMessage: 'Missing OAuth code' })
+        }
 
-      return oauthService.handleCallback(provider, code, meta)
-    })()
-  const resolved = resolveOAuthLoginResult(result)
+        return oauthService.handleCallback(provider, code, meta)
+      })()
+    const resolved = resolveOAuthLoginResult(result)
 
-  if (resolved.kind === 'mfa') {
+    if (resolved.kind === 'mfa') {
+      return sendRedirect(event, resolved.redirectPath)
+    }
+
+    setSessionCookies(event, resolved.session)
     return sendRedirect(event, resolved.redirectPath)
-  }
+  } catch (err: unknown) {
+    const status = err && typeof err === 'object' && 'statusCode' in err
+      ? Number((err as { statusCode: number }).statusCode)
+      : 500
 
-  setSessionCookies(event, resolved.session)
-  return sendRedirect(event, resolved.redirectPath)
+    if (status >= 400 && status < 500) {
+      const message = err && typeof err === 'object' && 'statusMessage' in err
+        ? String((err as { statusMessage: string }).statusMessage)
+        : 'oauth_failed'
+
+      return sendRedirect(event, localePath({
+        path: '/auth/login',
+        query: { oauth: provider, error: message },
+      }))
+    }
+
+    throw err
+  }
 })

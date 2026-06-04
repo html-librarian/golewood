@@ -4,7 +4,7 @@
 services:
   app:
     image: ghcr.io/html-librarian/golewood:${GOLEWOOD_IMAGE_TAG:-latest}
-    pull_policy: missing
+    pull_policy: always
     ports:
       - '127.0.0.1:3000:3000'
     env_file:

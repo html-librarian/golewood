@@ -46,5 +46,6 @@ export default defineEventHandler(async () => {
   return {
     ok: true,
     checks,
+    buildSha: process.env.NUXT_BUILD_SHA ?? 'unknown',
   }
 })

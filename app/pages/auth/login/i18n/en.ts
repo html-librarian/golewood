@@ -19,6 +19,7 @@ export default {
   emailDivider: 'or with email',
   errorSendCode: 'Failed to send code',
   errorInvalidCode: 'Invalid code',
+  oauthLoginFailed: 'Could not sign in with {provider}. Try email or try again later.',
   errorEmailConflict: 'This email is already linked to another account',
   linkPhoneHint: 'Link a phone number to your account',
   mfaSubtitle: 'An extra sign-in code was sent to {email}',

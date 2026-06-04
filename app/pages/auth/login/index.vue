@@ -12,6 +12,18 @@ const localePath = useLocalePath()
 const route = useRoute()
 const router = useRouter()
 
+const oauthLoginError = computed(() => {
+  const provider = route.query.oauth
+
+  if (provider !== 'vk' && provider !== 'yandex') {
+    return ''
+  }
+
+  return t('oauthLoginFailed', {
+    provider: provider === 'vk' ? t('oauthVk') : t('oauthYandex'),
+  })
+})
+
 const emailLabels = computed(() => ({
   emailLabel: t('emailLabel'),
   codeLabel: t('emailCodeLabel'),
@@ -174,6 +186,14 @@ const handleResendMfa = async () => {
           }}
         </p>
       </div>
+
+      <p
+        v-if="oauthLoginError"
+        class="mb-6 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300"
+        role="alert"
+      >
+        {{ oauthLoginError }}
+      </p>
 
       <div class="space-y-6">
         <div class="flex flex-col gap-2">

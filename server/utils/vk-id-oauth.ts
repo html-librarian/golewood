@@ -13,24 +13,34 @@ export const generateVkCodeVerifier = () => randomBytes(48).toString('base64url'
 export const buildVkCodeChallenge = (verifier: string) =>
   createHash('sha256').update(verifier).digest('base64url')
 
-export const parseVkIdCallbackQuery = (query: Record<string, unknown>): VkIdCallbackPayload | null => {
-  if (typeof query.payload === 'string') {
+const parsePayloadJson = (raw: string) => {
+  const attempts = [raw, decodeURIComponent(raw)]
+
+  for (const value of attempts) {
     try {
-      const payload = JSON.parse(query.payload) as {
+      return JSON.parse(value) as {
         code?: string
         state?: string
         device_id?: string
       }
-
-      if (payload.code && payload.state && payload.device_id) {
-        return {
-          code: payload.code,
-          state: payload.state,
-          deviceId: payload.device_id,
-        }
-      }
     } catch {
-      return null
+      continue
+    }
+  }
+
+  return null
+}
+
+export const parseVkIdCallbackQuery = (query: Record<string, unknown>): VkIdCallbackPayload | null => {
+  if (typeof query.payload === 'string') {
+    const payload = parsePayloadJson(query.payload)
+
+    if (payload?.code && payload.state && payload.device_id) {
+      return {
+        code: payload.code,
+        state: payload.state,
+        deviceId: payload.device_id,
+      }
     }
   }
 

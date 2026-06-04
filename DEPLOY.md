@@ -391,7 +391,27 @@ Common causes:
 
 **Option B — pull pre-built image from GitHub (recommended):**
 
-CI pushes `ghcr.io/html-librarian/golewood:latest` on every green `main` build. On VPS:
+CI pushes `ghcr.io/html-librarian/golewood:latest` and `:sha` on every green `main` build. On VPS:
+
+**Verify the running image matches `main`:**
+
+```bash
+curl -fsS http://127.0.0.1:3000/api/health | jq .buildSha
+# must match: git rev-parse origin/main  (after CI docker-build is green)
+
+curl -sI http://127.0.0.1:3000/api/auth/oauth/vk | grep -i location
+# must contain id.vk.ru (not oauth.vk.com)
+```
+
+Pin a specific CI build:
+
+```bash
+export GOLEWOOD_IMAGE_TAG=$(git rev-parse origin/main)
+docker compose -f docker-compose.prod.yml pull app
+docker compose -f docker-compose.prod.yml up -d --force-recreate app
+```
+
+On VPS:
 
 ```bash
 # GitHub → Settings → Developer settings → PAT (read:packages)
