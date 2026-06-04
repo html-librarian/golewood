@@ -12,6 +12,7 @@ const link = ref<MaxLinkStart | null>(null)
 const loading = ref(false)
 const error = ref('')
 const showDevMock = import.meta.dev
+const showDisabledDevHint = computed(() => import.meta.dev && !status.value?.enabled)
 
 const load = async () => {
   loading.value = true
@@ -99,7 +100,7 @@ onMounted(() => {
     </div>
 
     <p
-      v-if="import.meta.dev && !status?.enabled"
+      v-if="showDisabledDevHint"
       class="rounded-lg bg-stone-100 px-3 py-2 text-sm text-stone-600 dark:bg-stone-800 dark:text-stone-300"
     >
       {{ labels.disabledHint }}
