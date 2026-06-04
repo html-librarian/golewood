@@ -180,6 +180,7 @@ const formatSignedAmount = (amount: number) => {
         </h2>
         <UiEmpty
           v-if="!account.transactions.length"
+          embedded
           icon="ph:coins-duotone"
           :title="t('emptyTransactions')"
         />

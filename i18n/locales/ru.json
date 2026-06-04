@@ -32,12 +32,19 @@
     "patronymic": "Отчество",
     "patronymicOptional": "Необязательно",
     "carouselPrev": "Назад",
-    "carouselNext": "Вперёд"
+    "carouselNext": "Вперёд",
+    "close": "Закрыть",
+    "navMain": "Основная навигация",
+    "navMobile": "Мобильная навигация",
+    "pagination": "Пагинация",
+    "discoveryQuickSearch": "Быстрый поиск",
+    "backToTop": "Наверх"
   },
   "story": {
     "anonymous": "Гость",
     "guestOnlyPage": "Сторис доступны только гостям. Раздел «Мои сторис» — для аккаунтов с ролью guest.",
-    "myStories": "Мои сторис"
+    "myStories": "Мои сторис",
+    "close": "Закрыть"
   },
   "spotlight": {
     "yourVote": "Ваш голос",
@@ -54,7 +61,26 @@
     "back": "К блогу",
     "relatedListing": "Объявление",
     "viewListing": "Смотреть на Golewood",
-    "teamReview": "Обзор команды"
+    "teamReview": "Обзор команды",
+    "followAuthor": "Подписаться",
+    "unfollowAuthor": "Отписаться",
+    "anonymousAuthor": "Автор",
+    "writePost": "Написать статью",
+    "myPosts": "Мои статьи",
+    "authorMeta": "{posts} статей · {followers} подписчиков",
+    "filters": {
+      "search": "Поиск",
+      "searchPlaceholder": "Заголовок или текст",
+      "author": "Автор",
+      "authorPlaceholder": "Имя автора",
+      "clearAuthor": "Сбросить",
+      "city": "Город",
+      "allCities": "Все города",
+      "listing": "Место",
+      "followingOnly": "Только от подписок",
+      "apply": "Найти",
+      "reset": "Сбросить фильтры"
+    }
   },
   "listing": {
     "noPhoto": "Нет фото",
@@ -116,11 +142,19 @@
     "nextMonth": "Следующий месяц",
     "decrease": "Уменьшить",
     "increase": "Увеличить",
+    "rangeMin": "Минимум",
+    "rangeMax": "Максимум",
     "citySearch": "Поиск города…",
     "cityEmpty": "Город не найден",
     "cityClear": "Сбросить город",
     "cityOpen": "Открыть список городов",
     "cityClose": "Закрыть список городов",
+    "listingSelectSearch": "Поиск по названию или адресу…",
+    "listingSelectEmpty": "Объявления не найдены",
+    "listingSelectPlaceholder": "Выберите объявление…",
+    "listingSelectClear": "Сбросить выбор",
+    "listingSelectOpen": "Открыть список объявлений",
+    "listingSelectClose": "Закрыть список объявлений",
     "cityDefaultHint": "«{city}» подставлен автоматически по вашему местоположению",
     "filePickerPick": "Прикрепить файлы",
     "filePickerRemove": "Удалить файл",
@@ -415,7 +449,8 @@
   "cookieConsent": {
     "message": "Мы используем файлы cookie и аналогичные технологии для входа, языка, темы оформления и безопасности сайта. Подробнее — в ",
     "privacyLink": "Политике конфиденциальности",
-    "accept": "Принять"
+    "accept": "Принять",
+    "ariaLabel": "Уведомление о cookie"
   },
   "legalConsent": {
     "prefix": "Регистрируясь или продолжая пользоваться сайтом, вы принимаете ",
@@ -424,6 +459,7 @@
   },
   "legal": {
     "nav": {
+      "ariaLabel": "Правовые документы",
       "overview": "Правовая информация",
       "requisites": "Реквизиты",
       "offer": "Договор оферты",
@@ -441,6 +477,7 @@
   },
   "help": {
     "nav": {
+      "ariaLabel": "Справка",
       "overview": "Обзор",
       "faq": "Вопросы и ответы",
       "becomeHost": "Как сдать жильё",

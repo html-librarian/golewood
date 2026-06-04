@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatPrice } from '#shared/utils/format'
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
@@ -89,6 +89,61 @@ const bookingChartSegments = computed(() => {
 })
 
 const analytics = computed(() => stats.value?.analytics)
+
+const quickLinks = computed(() => {
+  const links = [
+    {
+      to: localePath('/host/guide'),
+      icon: 'ph:graduation-cap-duotone',
+      title: t('guideLink'),
+      description: t('guideDesc'),
+      testId: undefined as string | undefined,
+    },
+    {
+      to: localePath('/host/listings'),
+      icon: 'ph:house-line-duotone',
+      title: t('listingsLink'),
+      description: t('listingsDesc'),
+      testId: undefined as string | undefined,
+    },
+  ]
+
+  if (!isHostUser.value) {
+    return links
+  }
+
+  return [
+    ...links,
+    {
+      to: localePath('/host/bookings'),
+      icon: 'ph:calendar-check-duotone',
+      title: t('bookingsLink'),
+      description: t('bookingsDesc'),
+      testId: undefined as string | undefined,
+    },
+    {
+      to: localePath('/host/gift-certificates'),
+      icon: 'ph:gift-duotone',
+      title: t('giftCertificatesLink'),
+      description: t('giftCertificatesDesc'),
+      testId: undefined as string | undefined,
+    },
+    {
+      to: localePath('/host/promo'),
+      icon: 'ph:megaphone-duotone',
+      title: t('promoLink'),
+      description: t('promoDesc'),
+      testId: undefined as string | undefined,
+    },
+    {
+      to: localePath('/host/listings'),
+      icon: 'ph:film-strip-duotone',
+      title: t('storiesLink'),
+      description: t('storiesDesc'),
+      testId: 'host-dashboard-stories',
+    },
+  ]
+})
 </script>
 
 <template>
@@ -150,24 +205,27 @@ const analytics = computed(() => stats.value?.analytics)
             <p class="text-xs font-medium text-stone-600 dark:text-stone-400">
               {{ t('earnings30') }}
             </p>
-            <p class="mt-1 font-display text-2xl font-semibold tabular-nums text-stone-900 dark:text-stone-50">
-              {{ formatPrice(analytics?.earningsLast30DaysRub ?? 0) }}
+            <p class="mt-1 font-display text-2xl font-semibold text-stone-900 dark:text-stone-50">
+              <UiCountUp
+                :value="analytics?.earningsLast30DaysRub ?? 0"
+                format="price"
+              />
             </p>
           </article>
           <article class="surface-card p-4">
             <p class="text-xs font-medium text-stone-600 dark:text-stone-400">
               {{ t('paidBookings30') }}
             </p>
-            <p class="mt-1 font-display text-2xl font-semibold tabular-nums text-stone-900 dark:text-stone-50">
-              {{ analytics?.paidBookingsLast30Days ?? 0 }}
+            <p class="mt-1 font-display text-2xl font-semibold text-stone-900 dark:text-stone-50">
+              <UiCountUp :value="analytics?.paidBookingsLast30Days ?? 0" />
             </p>
           </article>
           <article class="surface-card p-4">
             <p class="text-xs font-medium text-stone-600 dark:text-stone-400">
               {{ t('portalBookings30') }}
             </p>
-            <p class="mt-1 font-display text-2xl font-semibold tabular-nums text-stone-900 dark:text-stone-50">
-              {{ analytics?.bookingsCreatedLast30Days ?? 0 }}
+            <p class="mt-1 font-display text-2xl font-semibold text-stone-900 dark:text-stone-50">
+              <UiCountUp :value="analytics?.bookingsCreatedLast30Days ?? 0" />
             </p>
           </article>
           <article class="surface-card p-4">
@@ -218,31 +276,31 @@ const analytics = computed(() => stats.value?.analytics)
       </div>
     </div>
 
-    <div
-      v-else-if="isHostUser"
-      class="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-    >
-      <NuxtLink
-        v-for="card in statCards"
-        :key="card.label"
-        :to="card.to"
-        class="surface-card group p-5 transition hover:shadow-(--shadow-card)"
-      >
-        <div class="flex items-start justify-between">
-          <Icon
-            :name="card.icon"
-            class="size-6"
-            :class="card.color"
-          />
-          <span class="text-3xl font-bold text-stone-900 dark:text-stone-50">
-            {{ card.value }}
-          </span>
-        </div>
-        <p class="mt-3 text-sm font-medium text-stone-600 dark:text-stone-400">
-          {{ card.label }}
-        </p>
-      </NuxtLink>
-    </div>
+    <UiReveal v-else-if="isHostUser">
+      <div class="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <NuxtLink
+          v-for="(card, index) in statCards"
+          :key="card.label"
+          :to="card.to"
+          class="reveal-stagger-item surface-card group p-5 transition hover:-translate-y-0.5 hover:shadow-(--shadow-card)"
+          :style="{ transitionDelay: `${staggerDelayMs(index, 45, 270)}ms` }"
+        >
+          <div class="flex items-start justify-between">
+            <Icon
+              :name="card.icon"
+              class="size-6"
+              :class="card.color"
+            />
+            <span class="text-3xl font-bold text-stone-900 dark:text-stone-50">
+              <UiCountUp :value="card.value" />
+            </span>
+          </div>
+          <p class="mt-3 text-sm font-medium text-stone-600 dark:text-stone-400">
+            {{ card.label }}
+          </p>
+        </NuxtLink>
+      </div>
+    </UiReveal>
 
     <div
       v-if="isHostUser && pending"
@@ -274,91 +332,31 @@ const analytics = computed(() => stats.value?.analytics)
       />
     </div>
 
-    <div
-      class="grid gap-4 sm:grid-cols-2"
-      :class="isHostUser ? 'lg:grid-cols-3' : 'lg:grid-cols-2'"
-    >
-      <NuxtLink
-        :to="localePath('/host/guide')"
-        class="surface-card group p-6 transition hover:shadow-(--shadow-card)"
+    <UiReveal :delay="60">
+      <div
+        class="grid gap-4 sm:grid-cols-2"
+        :class="isHostUser ? 'lg:grid-cols-3' : 'lg:grid-cols-2'"
       >
-        <Icon
-          name="ph:graduation-cap-duotone"
-          class="mb-3 size-8 text-brand-600 dark:text-brand-400"
-        />
-        <h2 class="font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
-          {{ t('guideLink') }}
-        </h2>
-        <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
-          {{ t('guideDesc') }}
-        </p>
-      </NuxtLink>
-
-      <NuxtLink
-        :to="localePath('/host/listings')"
-        class="surface-card group p-6 transition hover:shadow-(--shadow-card)"
-      >
-        <Icon
-          name="ph:house-line-duotone"
-          class="mb-3 size-8 text-brand-600 dark:text-brand-400"
-        />
-        <h2 class="font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
-          {{ t('listingsLink') }}
-        </h2>
-        <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
-          {{ t('listingsDesc') }}
-        </p>
-      </NuxtLink>
-
-      <template v-if="isHostUser">
         <NuxtLink
-          :to="localePath('/host/bookings')"
-          class="surface-card group p-6 transition hover:shadow-(--shadow-card)"
+          v-for="(link, index) in quickLinks"
+          :key="link.title"
+          :to="link.to"
+          class="reveal-stagger-item surface-card group p-6 transition hover:-translate-y-0.5 hover:shadow-(--shadow-card)"
+          :style="{ transitionDelay: `${staggerDelayMs(index, 50, 300)}ms` }"
+          :data-testid="link.testId"
         >
           <Icon
-            name="ph:calendar-check-duotone"
-            class="mb-3 size-8 text-brand-600 dark:text-brand-400"
+            :name="link.icon"
+            class="mb-3 size-8 text-brand-600 transition group-hover:scale-105 dark:text-brand-400"
           />
           <h2 class="font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('bookingsLink') }}
+            {{ link.title }}
           </h2>
           <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
-            {{ t('bookingsDesc') }}
+            {{ link.description }}
           </p>
         </NuxtLink>
-
-        <NuxtLink
-          :to="localePath('/host/gift-certificates')"
-          class="surface-card group p-6 transition hover:shadow-(--shadow-card)"
-        >
-          <Icon
-            name="ph:gift-duotone"
-            class="mb-3 size-8 text-brand-600 dark:text-brand-400"
-          />
-          <h2 class="font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('giftCertificatesLink') }}
-          </h2>
-          <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
-            {{ t('giftCertificatesDesc') }}
-          </p>
-        </NuxtLink>
-
-        <NuxtLink
-          :to="localePath('/host/promo')"
-          class="surface-card group p-6 transition hover:shadow-(--shadow-card)"
-        >
-          <Icon
-            name="ph:megaphone-duotone"
-            class="mb-3 size-8 text-brand-600 dark:text-brand-400"
-          />
-          <h2 class="font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('promoLink') }}
-          </h2>
-          <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
-            {{ t('promoDesc') }}
-          </p>
-        </NuxtLink>
-      </template>
-    </div>
+      </div>
+    </UiReveal>
   </div>
 </template>

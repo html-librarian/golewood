@@ -3,6 +3,7 @@ export default {
   subtitle: 'Vote for the best shot — the winner becomes the homepage background.',
   monthLabel: 'Contest',
   empty: 'No approved photos for this month yet.',
+  myPendingTitle: 'Your photos pending moderation',
   loginToVote: 'Sign in to vote',
   votingClosed: 'Voting for this month is closed',
   voteSaved: 'Your vote has been counted',

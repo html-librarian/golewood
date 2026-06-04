@@ -7,6 +7,7 @@ import type { ReviewCardProps } from './types'
 const props = withDefaults(defineProps<ReviewCardProps>(), {
   canReplyToReview: false,
   showPendingBadge: false,
+  pending: false,
 })
 
 const emit = defineEmits<{
@@ -80,6 +81,7 @@ const authorName = computed(() => props.review.authorName ?? t('review.anonymous
   <article
     data-testid="review-card"
     class="surface-card overflow-hidden p-5 sm:p-6"
+    :class="{ 'opacity-75 saturate-50': pending }"
   >
     <div class="flex flex-col gap-5 sm:flex-row sm:gap-6">
       <aside class="flex shrink-0 gap-3 sm:w-44 sm:flex-col sm:gap-3">
@@ -131,7 +133,7 @@ const authorName = computed(() => props.review.authorName ?? t('review.anonymous
               size="sm"
             />
             <UiBadge
-              v-if="showPendingBadge"
+              v-if="showPendingBadge || pending"
               variant="muted"
             >
               {{ $t('review.pendingModeration') }}
@@ -177,7 +179,7 @@ const authorName = computed(() => props.review.authorName ?? t('review.anonymous
         </p>
 
         <ReviewReplyThread
-          v-if="replyLabels"
+          v-if="replyLabels && !pending"
           :review-id="review.id"
           :replies="review.replies"
           :labels="replyLabels"

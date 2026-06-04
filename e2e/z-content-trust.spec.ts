@@ -13,7 +13,9 @@ test.describe('content & trust (v38–v40)', () => {
 
     const photos = await request.get('/api/spotlight/photos')
     expect(photos.ok()).toBeTruthy()
-    expect(Array.isArray(await photos.json())).toBe(true)
+    const photosBody = await photos.json() as { photos: unknown[], myPending: unknown[] }
+    expect(Array.isArray(photosBody.photos)).toBe(true)
+    expect(Array.isArray(photosBody.myPending)).toBe(true)
 
     const badges = await request.get('/api/team-badges')
     expect(badges.ok()).toBeTruthy()
@@ -37,7 +39,7 @@ test.describe('content & trust (v38–v40)', () => {
 
   test('home hero links to spotlight', async ({ page }) => {
     await gotoReady(page, '/')
-    await expect(page.getByRole('link', { name: /фото месяца →|photo of the month →/i })).toBeVisible({ timeout: 15_000 })
+    await expect(page.getByTestId('home-spotlight-cta')).toBeVisible({ timeout: 15_000 })
   })
 
   test('admin spotlight page loads', async ({ page }) => {
@@ -75,5 +77,52 @@ test.describe('content & trust (v38–v40)', () => {
 
     await gotoReady(page, '/stories')
     await expect(page.getByRole('heading', { level: 1 })).toContainText(/мои сторис|my stories/i, { timeout: 15_000 })
+    await expect(page.getByRole('heading', { level: 2, name: /архив|archive/i })).toBeVisible()
+  })
+
+  test('host profile stories API returns reposted demo story', async ({ request }) => {
+    const search = await request.get(`/api/search?city=${encodeURIComponent('Москва')}`)
+    expect(search.ok()).toBeTruthy()
+    const { items } = await search.json() as { items: Array<{ id: string }> }
+    expect(items.length).toBeGreaterThan(0)
+
+    const listingRes = await request.get(`/api/listings/${items[0]!.id}`)
+    expect(listingRes.ok()).toBeTruthy()
+    const listing = await listingRes.json() as { hostId: string }
+
+    const res = await request.get(`/api/hosts/${listing.hostId}/stories`)
+    expect(res.ok(), await res.text()).toBeTruthy()
+
+    const stories = await res.json() as Array<{ id: string, reposted?: boolean }>
+    expect(Array.isArray(stories)).toBe(true)
+    expect(stories.length).toBeGreaterThan(0)
+    expect(stories.some(story => story.reposted)).toBe(true)
+  })
+
+  test('guest stories API returns seeded active and archive', async ({ request }) => {
+    const guestToken = await getApiToken(request)
+    const headers = { Authorization: `Bearer ${guestToken}` }
+
+    const res = await request.get('/api/stories/me', { headers })
+    expect(res.ok(), await res.text()).toBeTruthy()
+
+    const body = await res.json() as { active: unknown[], archive: unknown[] }
+    expect(body.active.length).toBeGreaterThan(0)
+    expect(body.archive.length).toBeGreaterThan(0)
+  })
+
+  test('host profile page shows reposted guest stories', async ({ page, request }) => {
+    const search = await request.get(`/api/search?city=${encodeURIComponent('Москва')}`)
+    expect(search.ok()).toBeTruthy()
+    const { items } = await search.json() as { items: Array<{ id: string }> }
+    expect(items.length).toBeGreaterThan(0)
+
+    const listingRes = await request.get(`/api/listings/${items[0]!.id}`)
+    expect(listingRes.ok()).toBeTruthy()
+    const listing = await listingRes.json() as { hostId: string }
+
+    await gotoReady(page, `/hosts/${listing.hostId}`)
+    await expect(page.getByTestId('host-profile-stories')).toBeVisible({ timeout: 15_000 })
+    await expect(page.getByTestId('host-profile-stories').getByRole('button')).toHaveCount(1)
   })
 })

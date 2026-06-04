@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ListingCard } from '#shared/types/listing'
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import type { ListingFeaturedCarouselProps } from './types'
 
 const props = withDefaults(defineProps<ListingFeaturedCarouselProps>(), {
@@ -18,6 +19,7 @@ const pages = computed(() => {
 })
 
 const activePage = ref(0)
+const pageEnterKey = ref(0)
 const paused = ref(false)
 const prefersReducedMotion = ref(false)
 
@@ -32,6 +34,11 @@ const goToPage = (index: number) => {
   }
 
   const normalized = ((index % pageCount.value) + pageCount.value) % pageCount.value
+
+  if (normalized !== activePage.value) {
+    pageEnterKey.value += 1
+  }
+
   activePage.value = normalized
 }
 
@@ -92,7 +99,7 @@ onBeforeUnmount(() => {
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeave"
   >
-    <div class="overflow-hidden px-4 py-6 -my-6 sm:px-3">
+    <div class="overflow-hidden px-1 py-6 -mx-1 -my-6 md:py-7 md:-my-7">
       <div
         class="flex transition-transform duration-500 ease-out motion-reduce:transition-none"
         :style="{ transform: `translateX(-${activePage * 100}%)` }"
@@ -102,11 +109,15 @@ onBeforeUnmount(() => {
           :key="pageIndex"
           class="w-full shrink-0"
         >
-          <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
+          <div
+            class="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6"
+            :class="pageIndex === activePage && pageEnterKey > 0 ? 'carousel-page-enter' : ''"
+          >
             <div
-              v-for="listing in page"
+              v-for="(listing, listingIndex) in page"
               :key="listing.id"
-              class="min-w-0 overflow-visible p-2"
+              class="reveal-stagger-item min-w-0"
+              :style="{ transitionDelay: `${staggerDelayMs(listingIndex)}ms` }"
             >
               <ListingCard :listing="listing" />
             </div>
@@ -118,7 +129,7 @@ onBeforeUnmount(() => {
     <template v-if="pageCount > 1">
       <button
         type="button"
-        class="absolute left-0 top-[calc(50%-2.5rem)] z-20 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 shadow-md transition hover:bg-stone-50 md:flex lg:-left-3 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:bg-stone-800"
+        class="absolute left-0 top-1/2 z-20 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 shadow-md transition hover:bg-stone-50 md:flex lg:-left-5 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:bg-stone-800"
         :aria-label="labels.prev"
         @click="prevPage()"
       >
@@ -129,7 +140,7 @@ onBeforeUnmount(() => {
       </button>
       <button
         type="button"
-        class="absolute right-0 top-[calc(50%-2.5rem)] z-20 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 shadow-md transition hover:bg-stone-50 md:flex lg:-right-3 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:bg-stone-800"
+        class="absolute right-0 top-1/2 z-20 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 shadow-md transition hover:bg-stone-50 md:flex lg:-right-5 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:bg-stone-800"
         :aria-label="labels.next"
         @click="nextPage()"
       >

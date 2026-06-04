@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ConversationSummary } from '#shared/types/conversation'
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
@@ -23,14 +24,10 @@ const otherParty = (conversation: ConversationSummary) => {
 
 <template>
   <div class="page-container">
-    <div class="mb-8">
-      <h1 class="section-title">
-        {{ t('title') }}
-      </h1>
-      <p class="section-subtitle mt-2">
-        {{ t('subtitle') }}
-      </p>
-    </div>
+    <UiPageHeader
+      :title="t('title')"
+      :subtitle="t('subtitle')"
+    />
 
     <div
       v-if="pending"
@@ -57,19 +54,20 @@ const otherParty = (conversation: ConversationSummary) => {
       </NuxtLink>
     </UiEmpty>
 
-    <ul
-      v-else
-      class="space-y-2"
-    >
-      <li
-        v-for="conversation in conversations"
-        :key="conversation.id"
-      >
-        <NuxtLink
-          :to="localePath(`/messages/${conversation.id}`)"
-          class="surface-card block p-4 transition hover:border-brand-200 dark:hover:border-brand-800"
-          :class="conversation.unreadCount > 0 ? 'border-brand-200 dark:border-brand-800' : ''"
+    <UiReveal v-else>
+      <ul class="space-y-2">
+        <li
+          v-for="(conversation, index) in conversations"
+          :key="conversation.id"
+          class="reveal-stagger-item"
+          :style="{ transitionDelay: `${staggerDelayMs(index, 45, 315)}ms` }"
         >
+          <NuxtLink
+            :to="localePath(`/messages/${conversation.id}`)"
+            class="surface-card-interactive block p-4"
+            :class="conversation.unreadCount > 0 ? 'border-brand-200 dark:border-brand-800' : ''"
+            data-testid="conversation-item"
+          >
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
               <p
@@ -101,8 +99,9 @@ const otherParty = (conversation: ConversationSummary) => {
               />
             </div>
           </div>
-        </NuxtLink>
-      </li>
-    </ul>
+          </NuxtLink>
+        </li>
+      </ul>
+    </UiReveal>
   </div>
 </template>

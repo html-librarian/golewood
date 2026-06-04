@@ -46,7 +46,7 @@ const handleReaction = async (reaction: ListingNewsReaction) => {
 const buttonClass = (active: boolean) => [
   'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition',
   active
-    ? 'border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-500 dark:bg-brand-950/50 dark:text-brand-200'
+    ? 'border-brand-600 bg-brand-100 text-brand-950 dark:border-brand-500 dark:bg-brand-900/80 dark:text-brand-50'
     : 'border-stone-200 bg-white text-stone-700 hover:border-stone-300 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300',
 ]
 </script>

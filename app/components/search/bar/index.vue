@@ -11,7 +11,7 @@ const isToolbar = computed(() => props.variant === 'toolbar')
 
 const formClass = computed(() => {
   if (props.variant === 'hero') {
-    return 'grid gap-4 rounded-2xl bg-white/95 p-4 shadow-(--shadow-float) backdrop-blur-md md:grid-cols-[1.2fr_1.2fr_0.7fr_auto] md:gap-3 md:p-4 dark:bg-stone-900/95'
+    return 'search-shell search-shell-hero flex flex-col md:flex-row md:items-stretch'
   }
 
   if (isToolbar.value) {
@@ -39,11 +39,25 @@ const cityFieldClass = computed(() =>
   isToolbar.value ? 'max-md:col-span-3 max-md:border-b max-md:border-stone-200 dark:max-md:border-stone-700' : '',
 )
 
-const submitWrapClass = computed(() =>
-  isToolbar.value
-    ? 'max-md:col-start-3 max-md:row-start-2 max-md:border-0 md:border-t-0 md:border-l md:border-stone-200 dark:md:border-stone-700'
-    : 'items-end md:px-1',
+const heroFieldsClass = computed(() =>
+  'grid min-w-0 flex-1 gap-0 md:grid-cols-[1.25fr_1.25fr_0.75fr] md:items-stretch',
 )
+
+const heroFieldWrapClass = computed(() =>
+  'border-b border-stone-200/80 px-4 py-3 last:border-b-0 md:border-b-0 md:border-r md:px-5 md:py-4 dark:border-stone-700/80',
+)
+
+const submitWrapClass = computed(() => {
+  if (props.variant === 'hero') {
+    return 'shrink-0 p-2 md:p-2'
+  }
+
+  if (isToolbar.value) {
+    return 'max-md:col-start-3 max-md:row-start-2 max-md:border-0 md:border-t-0 md:border-l md:border-stone-200 dark:md:border-stone-700'
+  }
+
+  return 'items-end md:px-1'
+})
 </script>
 
 <template>
@@ -52,6 +66,56 @@ const submitWrapClass = computed(() =>
       :class="formClass"
       @submit.prevent="emit('submit')"
     >
+      <template v-if="variant === 'hero'">
+        <div :class="heroFieldsClass">
+          <div :class="heroFieldWrapClass">
+            <FormCitySelect
+              :model-value="city"
+              :label="$t('search.city')"
+              :placeholder="$t('search.cityPlaceholder')"
+              variant="plain"
+              @update:model-value="emit('update:city', $event)"
+            />
+          </div>
+          <div :class="heroFieldWrapClass">
+            <FormDateRange
+              :start="checkIn"
+              :end="checkOut"
+              :label="$t('search.dates')"
+              variant="plain"
+              @update:start="emit('update:checkIn', $event)"
+              @update:end="emit('update:checkOut', $event)"
+            />
+          </div>
+          <div :class="heroFieldWrapClass">
+            <FormNumberStepper
+              :model-value="guests"
+              :label="$t('search.guests')"
+              :min="1"
+              :max="16"
+              variant="plain"
+              @update:model-value="emit('update:guests', $event)"
+            />
+          </div>
+        </div>
+
+        <div :class="submitWrapClass">
+          <UiButton
+            type="submit"
+            class="h-full w-full min-h-12 md:min-h-15 md:min-w-[140px] md:rounded-[calc(var(--radius-search)-0.375rem)]"
+            size="lg"
+            :loading="loading"
+          >
+            <Icon
+              name="ph:magnifying-glass-duotone"
+              class="size-5 md:mr-2"
+            />
+            <span>{{ $t('search.submit') }}</span>
+          </UiButton>
+        </div>
+      </template>
+
+      <template v-else>
       <div :class="fieldsClass">
         <div :class="[cityFieldClass, isToolbar ? 'max-md:[&_label]:sr-only' : '']">
           <FormCitySelect
@@ -112,6 +176,7 @@ const submitWrapClass = computed(() =>
           <span class="max-md:sr-only">{{ $t('search.submit') }}</span>
         </UiButton>
       </div>
+      </template>
     </form>
 
     <p

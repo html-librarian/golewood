@@ -5,6 +5,7 @@ export interface SpotlightCardProps {
   voted?: boolean
   voteDisabled?: boolean
   loading?: boolean
+  pending?: boolean
 }
 
 export interface SpotlightCardEmits {

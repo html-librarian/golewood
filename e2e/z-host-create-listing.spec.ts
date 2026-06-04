@@ -18,8 +18,8 @@ test.describe('host create listing', () => {
 
     await fillListingWizard(page)
 
-    await expect(page.getByRole('link', { name: E2E_LISTING_TITLE })).toBeVisible({ timeout: 15_000 })
-    const card = page.locator('.space-y-2').filter({ has: page.getByRole('link', { name: E2E_LISTING_TITLE }) })
+    await expect(page.getByRole('heading', { name: E2E_LISTING_TITLE })).toBeVisible({ timeout: 15_000 })
+    const card = page.locator('.space-y-2').filter({ has: page.getByRole('heading', { name: E2E_LISTING_TITLE }) })
     await expect(card.getByText(/модерац|moderation/i)).toBeVisible()
   })
 })

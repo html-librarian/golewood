@@ -1,8 +1,14 @@
-import type { UserStory } from '#shared/types/story'
+import type { MyStoriesResponse, UserStory } from '#shared/types/story'
 import type { User } from '#shared/types/user'
 import { and, asc, desc, eq, gt, sql } from 'drizzle-orm'
 import { randomUUID } from 'node:crypto'
-import { listingStoryPins, listings, userStories, users } from '../db/schema'
+import {
+  hostProfileStoryReposts,
+  listingStoryPins,
+  listings,
+  userStories,
+  users,
+} from '../db/schema'
 import { getDb } from '../utils/db'
 import { STORY_IMAGE_MAX_BYTES, STORY_VIDEO_MAX_BYTES } from '#shared/utils/media-limits'
 import { resolveStoryMediaType } from '#shared/utils/story-media'
@@ -22,6 +28,8 @@ const getExpiresAt = () => {
 
 const notExpired = () => gt(userStories.expiresAt, new Date())
 
+const isStoryExpired = (expiresAt: Date) => expiresAt <= new Date()
+
 const mapStory = (
   row: typeof userStories.$inferSelect,
   extra?: Partial<UserStory>,
@@ -33,6 +41,7 @@ const mapStory = (
   mediaType: row.mediaType,
   expiresAt: row.expiresAt.toISOString(),
   createdAt: row.createdAt.toISOString(),
+  isExpired: isStoryExpired(row.expiresAt),
   ...extra,
 })
 
@@ -79,7 +88,7 @@ const assertHostCanManage = async (listingId: string, user: Pick<User, 'id' | 'r
   return listing
 }
 
-const assertStoryForListing = async (storyId: string, listingId: string) => {
+const assertActiveStoryForListing = async (storyId: string, listingId: string) => {
   const db = getDb()
   const [story] = await db.select()
     .from(userStories)
@@ -96,6 +105,7 @@ const assertStoryForListing = async (storyId: string, listingId: string) => {
 
   return story
 }
+
 
 export const storyService = {
   create: async (
@@ -151,10 +161,11 @@ export const storyService = {
     return mapStory(row, {
       listingTitle: listing.title,
       listingCity: listing.city,
+      isExpired: false,
     })
   },
 
-  listMine: async (userId: string): Promise<UserStory[]> => {
+  listMine: async (userId: string): Promise<MyStoriesResponse> => {
     const db = getDb()
     const rows = await db.select({
       story: userStories,
@@ -163,13 +174,18 @@ export const storyService = {
     })
       .from(userStories)
       .innerJoin(listings, eq(userStories.listingId, listings.id))
-      .where(and(eq(userStories.userId, userId), notExpired()))
+      .where(eq(userStories.userId, userId))
       .orderBy(desc(userStories.createdAt))
 
-    return rows.map(row => mapStory(row.story, {
+    const mapped = rows.map(row => mapStory(row.story, {
       listingTitle: row.listingTitle,
       listingCity: row.listingCity,
     }))
+
+    return {
+      active: mapped.filter(story => !story.isExpired),
+      archive: mapped.filter(story => story.isExpired),
+    }
   },
 
   listPinnedForListing: async (listingId: string): Promise<UserStory[]> => {
@@ -196,17 +212,20 @@ export const storyService = {
       listingCity: row.listingCity,
       authorName: row.authorName,
       pinned: true,
+      isExpired: false,
     }))
   },
 
   listForHost: async (listingId: string, user: Pick<User, 'id' | 'role'>): Promise<UserStory[]> => {
-    await assertHostCanManage(listingId, user)
+    const listing = await assertHostCanManage(listingId, user)
+    const hostId = listing.hostId
     const db = getDb()
 
     const rows = await db.select({
       story: userStories,
       authorName: users.name,
       pinSort: listingStoryPins.sortOrder,
+      repostSort: hostProfileStoryReposts.sortOrder,
     })
       .from(userStories)
       .innerJoin(users, eq(userStories.userId, users.id))
@@ -217,18 +236,49 @@ export const storyService = {
           eq(listingStoryPins.listingId, listingId),
         ),
       )
-      .where(and(eq(userStories.listingId, listingId), notExpired()))
+      .leftJoin(
+        hostProfileStoryReposts,
+        and(
+          eq(hostProfileStoryReposts.storyId, userStories.id),
+          eq(hostProfileStoryReposts.hostId, hostId),
+        ),
+      )
+      .where(eq(userStories.listingId, listingId))
       .orderBy(desc(userStories.createdAt))
 
     return rows.map(row => mapStory(row.story, {
       authorName: row.authorName,
       pinned: row.pinSort !== null && row.pinSort !== undefined,
+      reposted: row.repostSort !== null && row.repostSort !== undefined,
+    }))
+  },
+
+  listRepostedForHostProfile: async (hostId: string): Promise<UserStory[]> => {
+    const db = getDb()
+    const rows = await db.select({
+      story: userStories,
+      listingTitle: listings.title,
+      listingCity: listings.city,
+      authorName: users.name,
+    })
+      .from(hostProfileStoryReposts)
+      .innerJoin(userStories, eq(hostProfileStoryReposts.storyId, userStories.id))
+      .innerJoin(listings, eq(userStories.listingId, listings.id))
+      .innerJoin(users, eq(userStories.userId, users.id))
+      .where(eq(hostProfileStoryReposts.hostId, hostId))
+      .orderBy(asc(hostProfileStoryReposts.sortOrder), desc(hostProfileStoryReposts.createdAt))
+
+    return rows.map(row => mapStory(row.story, {
+      listingTitle: row.listingTitle,
+      listingCity: row.listingCity,
+      authorName: row.authorName,
+      reposted: true,
     }))
   },
 
   pin: async (listingId: string, user: Pick<User, 'id' | 'role'>, storyId: string) => {
     await assertHostCanManage(listingId, user)
-    await assertStoryForListing(storyId, listingId)
+    await assertActiveStoryForListing(storyId, listingId)
 
     const db = getDb()
     const [maxRow] = await db.select({
@@ -257,5 +307,57 @@ export const storyService = {
       ))
 
     return { listingId, storyId, pinned: false }
+  },
+
+  repostToProfile: async (user: Pick<User, 'id' | 'role'>, storyId: string) => {
+    const db = getDb()
+    const [story] = await db.select()
+      .from(userStories)
+      .where(eq(userStories.id, storyId))
+      .limit(1)
+
+    if (!story) {
+      throw createError({ statusCode: 404, statusMessage: 'Story not found' })
+    }
+
+    const listing = await assertHostCanManage(story.listingId, user)
+    const hostId = listing.hostId
+
+    const [maxRow] = await db.select({
+      max: sql<number>`coalesce(max(${hostProfileStoryReposts.sortOrder}), -1)`,
+    })
+      .from(hostProfileStoryReposts)
+      .where(eq(hostProfileStoryReposts.hostId, hostId))
+
+    const sortOrder = Number(maxRow?.max ?? -1) + 1
+
+    await db.insert(hostProfileStoryReposts)
+      .values({ hostId, storyId, sortOrder })
+      .onConflictDoNothing()
+
+    return { hostId, storyId, reposted: true }
+  },
+
+  unrepostFromProfile: async (user: Pick<User, 'id' | 'role'>, storyId: string) => {
+    const db = getDb()
+    const [story] = await db.select()
+      .from(userStories)
+      .where(eq(userStories.id, storyId))
+      .limit(1)
+
+    if (!story) {
+      throw createError({ statusCode: 404, statusMessage: 'Story not found' })
+    }
+
+    const listing = await assertHostCanManage(story.listingId, user)
+    const hostId = listing.hostId
+
+    await db.delete(hostProfileStoryReposts)
+      .where(and(
+        eq(hostProfileStoryReposts.hostId, hostId),
+        eq(hostProfileStoryReposts.storyId, storyId),
+      ))
+
+    return { hostId, storyId, reposted: false }
   },
 }

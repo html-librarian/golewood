@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { listings } from '../db/schema'
+import { blogPosts, listings } from '../db/schema'
 import { getDb } from '../utils/db'
 
 const escapeXml = (value: string) =>
@@ -15,16 +15,25 @@ export default defineEventHandler(async (event) => {
   const siteUrl = config.public.siteUrl.replace(/\/$/, '')
   const db = getDb()
 
-  const rows = await db.select({
-    id: listings.id,
-    updatedAt: listings.updatedAt,
-  })
-    .from(listings)
-    .where(eq(listings.status, 'published'))
+  const [listingRows, blogRows] = await Promise.all([
+    db.select({
+      id: listings.id,
+      updatedAt: listings.updatedAt,
+    })
+      .from(listings)
+      .where(eq(listings.status, 'published')),
+    db.select({
+      slug: blogPosts.slug,
+      updatedAt: blogPosts.updatedAt,
+    })
+      .from(blogPosts)
+      .where(eq(blogPosts.status, 'published')),
+  ])
 
   const staticPaths = [
     '',
     '/search',
+    '/blog',
     '/auth/login',
     '/auth/register',
     '/legal',
@@ -40,12 +49,17 @@ export default defineEventHandler(async (event) => {
     lastmod: new Date().toISOString().slice(0, 10),
   }))
 
-  const listingUrls = rows.map(row => ({
+  const listingUrls = listingRows.map(row => ({
     loc: `${siteUrl}/listings/${row.id}`,
     lastmod: row.updatedAt.toISOString().slice(0, 10),
   }))
 
-  const urls = [...staticUrls, ...listingUrls]
+  const blogUrls = blogRows.map(row => ({
+    loc: `${siteUrl}/blog/${row.slug}`,
+    lastmod: row.updatedAt.toISOString().slice(0, 10),
+  }))
+
+  const urls = [...staticUrls, ...listingUrls, ...blogUrls]
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(url => `  <url>

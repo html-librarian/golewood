@@ -34,3 +34,8 @@ export interface SpotlightVoteState {
   photoId: string | null
   closed: boolean
 }
+
+export interface SpotlightPhotosResponse {
+  photos: SpotlightPhoto[]
+  myPending: SpotlightPhoto[]
+}

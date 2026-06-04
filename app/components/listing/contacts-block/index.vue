@@ -69,14 +69,13 @@ const displayValue = (key: keyof ListingContacts, href: string) => {
 </script>
 
 <template>
-  <section
+  <UiSection
     v-if="visible"
-    class="scroll-mt-32 space-y-4"
+    id="listing-contacts"
+    :title="title ?? t('listingContacts.blockTitle')"
+    icon="ph:address-book-duotone"
     data-testid="listing-contacts"
   >
-    <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-      {{ title ?? t('listingContacts.blockTitle') }}
-    </h2>
     <ul class="grid gap-2 sm:grid-cols-2">
       <li
         v-for="row in rows"
@@ -84,7 +83,7 @@ const displayValue = (key: keyof ListingContacts, href: string) => {
       >
         <a
           :href="row.href"
-          class="flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm transition hover:border-brand-300 hover:bg-brand-50/50 dark:border-stone-800 dark:bg-stone-900 dark:hover:border-brand-700 dark:hover:bg-brand-950/30"
+          class="flex items-center gap-3 rounded-xl bg-stone-50/80 px-4 py-3 text-sm ring-1 ring-stone-200/70 transition hover:bg-brand-50/60 hover:ring-brand-200 dark:bg-stone-800/40 dark:ring-stone-700/50 dark:hover:bg-brand-950/30 dark:hover:ring-brand-800/50"
           :target="row.external ? '_blank' : undefined"
           :rel="row.external ? 'noopener noreferrer' : undefined"
         >
@@ -103,5 +102,5 @@ const displayValue = (key: keyof ListingContacts, href: string) => {
         </a>
       </li>
     </ul>
-  </section>
+  </UiSection>
 </template>

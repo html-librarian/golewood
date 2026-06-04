@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { loginWithOtp } from './helpers/auth'
+import { acceptCookiesIfVisible } from './helpers/listing'
 import { resetE2eSeed } from './helpers/seed'
 
 const STUDIO_TITLE = 'Уютная студия у метро'
@@ -18,12 +19,14 @@ test.describe('favorites', () => {
     expect(listing).toBeTruthy()
 
     await page.goto(`/listings/${listing!.id}`)
+    await acceptCookiesIfVisible(page)
     await page.getByRole('button', { name: /избран|favorite/i }).click()
     await expect(page.getByRole('button', { name: /убрать|remove from favorites/i })).toBeVisible()
 
     await page.goto('/favorites')
+    await acceptCookiesIfVisible(page)
     await expect(page.getByRole('heading', { level: 1 })).toContainText(/избран|favorites/i)
-    await expect(page.getByRole('link', { name: STUDIO_TITLE })).toBeVisible()
+    await expect(page.getByTestId('favorite-card').getByRole('heading', { name: STUDIO_TITLE })).toBeVisible()
   })
 
   test('guest can remove listing from favorites page', async ({ page, request }) => {
@@ -39,9 +42,10 @@ test.describe('favorites', () => {
     })
 
     await page.goto('/favorites')
-    const card = page.locator('.space-y-2').filter({ has: page.getByRole('link', { name: STUDIO_TITLE }) })
+    await acceptCookiesIfVisible(page)
+    const card = page.getByTestId('favorite-card').filter({ has: page.getByRole('heading', { name: STUDIO_TITLE }) })
     await expect(card).toBeVisible()
     await card.getByRole('button', { name: /убрать|remove from favorites/i }).click()
-    await expect(page.getByText(/нет избран|no favorite/i)).toBeVisible()
+    await expect(page.getByTestId('favorite-card').getByRole('heading', { name: STUDIO_TITLE })).toBeHidden()
   })
 })

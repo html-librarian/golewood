@@ -1,4 +1,4 @@
-import type { SpotlightHero, SpotlightPhoto, SpotlightVoteState } from '#shared/types/spotlight'
+import type { SpotlightHero, SpotlightPhoto, SpotlightPhotosResponse, SpotlightVoteState } from '#shared/types/spotlight'
 import { authorizationHeaders } from '#shared/utils/auth-headers'
 import type { SpotlightVoteInput } from '#shared/schemas/spotlight'
 
@@ -10,7 +10,7 @@ export const useSpotlight = () => {
   const fetchHero = () => $fetch<SpotlightHero>('/api/spotlight/hero')
 
   const fetchPhotos = (month?: string) =>
-    $fetch<SpotlightPhoto[]>('/api/spotlight/photos', {
+    $fetch<SpotlightPhotosResponse>('/api/spotlight/photos', {
       query: month ? { month } : undefined,
     })
 

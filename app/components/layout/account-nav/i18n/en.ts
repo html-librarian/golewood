@@ -1,11 +1,13 @@
 export default {
   navTitle: 'Sections',
+  navAriaLabel: 'Account navigation',
   profile: 'Profile',
   balance: 'Bonus balance',
   giftCertificates: 'Gift certificates',
   bookings: 'My bookings',
   favorites: 'Favorites',
   messages: 'Messages',
+  blogPosts: 'My posts',
   stories: 'My stories',
   rentOut: 'List your place',
   host: 'Host dashboard',

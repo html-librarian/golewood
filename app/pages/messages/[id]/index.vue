@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import { GOLEWOOD_BOT_USER_ID } from '#shared/constants/golewood-bot'
 import ru from './i18n/ru'
 import en from './i18n/en'
@@ -105,6 +106,17 @@ const handleSend = async () => {
         <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">
           {{ otherParty }}
         </p>
+        <NuxtLink
+          v-if="conversation.listingId"
+          :to="localePath(`/listings/${conversation.listingId}`)"
+          class="mt-2 inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400"
+        >
+          {{ t('viewListing') }}
+          <Icon
+            name="ph:arrow-square-out-duotone"
+            class="size-4"
+          />
+        </NuxtLink>
       </header>
 
       <div
@@ -119,12 +131,13 @@ const handleSend = async () => {
         </p>
 
         <template
-          v-for="message in conversation.messages"
+          v-for="(message, index) in conversation.messages"
           :key="message.id"
         >
           <div
             v-if="message.isSystem || message.senderId === GOLEWOOD_BOT_USER_ID"
-            class="flex justify-center"
+            class="message-bubble-enter flex justify-center"
+            :style="{ animationDelay: `${staggerDelayMs(index, 25, 400)}ms` }"
             data-testid="message-bot"
           >
             <div
@@ -140,8 +153,9 @@ const handleSend = async () => {
 
           <div
             v-else
-            class="flex"
+            class="message-bubble-enter flex"
             :class="message.senderId === user?.id ? 'justify-end' : 'justify-start'"
+            :style="{ animationDelay: `${staggerDelayMs(index, 25, 400)}ms` }"
           >
             <div
               class="max-w-[85%] rounded-2xl px-4 py-2 text-sm"

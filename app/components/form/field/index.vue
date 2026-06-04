@@ -7,6 +7,7 @@ const props = withDefaults(defineProps<FormFieldProps>(), {
 })
 
 const fieldId = computed(() => props.id ?? `field-${useId()}`)
+const labelId = computed(() => `${fieldId.value}-label`)
 </script>
 
 <template>
@@ -16,6 +17,7 @@ const fieldId = computed(() => props.id ?? `field-${useId()}`)
   >
     <label
       v-if="label"
+      :id="labelId"
       :for="fieldId"
       class="form-label"
       :class="variant === 'plain' ? 'px-3 pt-2.5 text-xs text-stone-500 dark:text-stone-400' : ''"
@@ -31,7 +33,10 @@ const fieldId = computed(() => props.id ?? `field-${useId()}`)
       class="w-full"
       :class="variant === 'plain' ? 'flex flex-1 items-center' : ''"
     >
-      <slot :field-id="fieldId" />
+      <slot
+        :field-id="fieldId"
+        :label-id="labelId"
+      />
     </div>
 
     <p

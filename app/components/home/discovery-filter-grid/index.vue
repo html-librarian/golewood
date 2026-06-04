@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { HomeDiscoveryFilter } from '#shared/catalog/home-discovery'
 import { buildSearchRouteQuery } from '#shared/utils/search-query'
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import type { HomeDiscoveryFilterGridEmits, HomeDiscoveryFilterGridProps } from './types'
 
-const { filters } = defineProps<HomeDiscoveryFilterGridProps>()
+const { filters, variant = 'tiles' } = defineProps<HomeDiscoveryFilterGridProps>()
+
 const emit = defineEmits<HomeDiscoveryFilterGridEmits>()
 
 const { locale } = useI18n()
@@ -30,21 +32,47 @@ const onSelect = (filter: HomeDiscoveryFilter) => {
 
 <template>
   <ul
-    class="grid grid-cols-2 gap-x-3 gap-y-5 md:grid-cols-4 md:gap-x-4 md:gap-y-6 lg:grid-cols-8"
+    v-if="variant === 'chips'"
+    class="flex flex-wrap justify-center gap-2 sm:gap-2.5"
+    data-testid="discovery-filter-chips"
+  >
+    <li
+      v-for="(filter, index) in filters"
+      :key="filter.id"
+      class="reveal-stagger-item"
+      :style="{ transitionDelay: `${staggerDelayMs(index, 45, 360)}ms` }"
+    >
+      <NuxtLink
+        :to="searchLink(filter)"
+        class="chip chip-inactive inline-flex items-center gap-1.5 px-3.5 py-2 sm:px-4"
+        @click="onSelect(filter)"
+      >
+        <Icon
+          :name="filter.icon"
+          class="chip-icon"
+        />
+        {{ labelFor(filter) }}
+      </NuxtLink>
+    </li>
+  </ul>
+
+  <ul
+    v-else
+    class="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 md:grid-cols-4 md:gap-x-4 md:gap-y-6"
     data-testid="discovery-filter-grid"
   >
     <li
-      v-for="filter in filters"
+      v-for="(filter, index) in filters"
       :key="filter.id"
+      class="reveal-stagger-item"
+      :style="{ transitionDelay: `${staggerDelayMs(index, 45, 360)}ms` }"
     >
       <NuxtLink
         :to="searchLink(filter)"
         class="group flex flex-col gap-2"
         @click="onSelect(filter)"
       >
-        <span
-          class="relative aspect-square w-full rounded-2xl shadow-sm ring-1 ring-black/10 transition group-hover:shadow-md dark:ring-white/10"
-        >
+        <span class="discovery-tile">
           <span
             class="absolute inset-0 overflow-hidden rounded-2xl"
             :class="filter.imageUrl ? 'bg-stone-200 dark:bg-stone-800' : `bg-linear-to-br text-white ${filter.tone}`"

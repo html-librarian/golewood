@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/postgres-js'
 import { and, eq, inArray, like, notInArray } from 'drizzle-orm'
 import { Meilisearch } from 'meilisearch'
 import {
+  blogAuthorFollows,
   blogPosts,
   bookings,
   conversations,
@@ -10,15 +11,18 @@ import {
   giftCertificatePurchases,
   hostLegalProfiles,
   hostPromoTransactions,
+  hostProfileStoryReposts,
   listingNews,
   listingPhotos,
   listingPromotions,
+  listingStoryPins,
   listings,
   payments,
   reports,
   reviews,
   teamBadgeCatalog,
   oauthAccounts,
+  userStories,
   users,
 } from '../server/db/schema/index.ts'
 import { calculateBookingPrice, splitBookingSettlement } from '../shared/utils/pricing.ts'
@@ -661,6 +665,181 @@ const seedReports = async (
   console.log('  open report on moderation listing')
 }
 
+const DEMO_STORY_IDS = {
+  studioActive: '00000000-0000-4000-8000-000000000101',
+  studioExpired: '00000000-0000-4000-8000-000000000102',
+  nevaActive: '00000000-0000-4000-8000-000000000103',
+  nevaExpiredReposted: '00000000-0000-4000-8000-000000000104',
+} as const
+
+const seedDemoStories = async (
+  host: typeof users.$inferSelect,
+  guest: typeof users.$inferSelect,
+  listingByTitle: Record<string, typeof listings.$inferSelect>,
+) => {
+  const studio = listingByTitle['Уютная студия у метро']
+  const neva = listingByTitle['Двухкомнатная у Невы']
+
+  if (!studio || !neva) {
+    return
+  }
+
+  console.log('Seeding demo stories…')
+
+  const listingIds = [studio.id, neva.id]
+
+  await db.delete(hostProfileStoryReposts).where(eq(hostProfileStoryReposts.hostId, host.id))
+  await db.delete(listingStoryPins).where(inArray(listingStoryPins.listingId, listingIds))
+  await db.delete(userStories).where(inArray(userStories.listingId, listingIds))
+
+  const activeExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
+  const expiredAt = new Date(Date.now() - 48 * 60 * 60 * 1000)
+
+  const storyRows = [
+    {
+      id: DEMO_STORY_IDS.studioActive,
+      listingId: studio.id,
+      mediaUrl: '/seed/studio.svg',
+      expiresAt: activeExpiresAt,
+    },
+    {
+      id: DEMO_STORY_IDS.studioExpired,
+      listingId: studio.id,
+      mediaUrl: '/seed/studio.svg',
+      expiresAt: expiredAt,
+    },
+    {
+      id: DEMO_STORY_IDS.nevaActive,
+      listingId: neva.id,
+      mediaUrl: '/seed/neva.svg',
+      expiresAt: activeExpiresAt,
+    },
+    {
+      id: DEMO_STORY_IDS.nevaExpiredReposted,
+      listingId: neva.id,
+      mediaUrl: '/seed/neva.svg',
+      expiresAt: expiredAt,
+    },
+  ] as const
+
+  for (const story of storyRows) {
+    await db.insert(userStories).values({
+      id: story.id,
+      userId: guest.id,
+      listingId: story.listingId,
+      mediaUrl: story.mediaUrl,
+      mediaType: 'image',
+      expiresAt: story.expiresAt,
+    }).onConflictDoUpdate({
+      target: userStories.id,
+      set: {
+        userId: guest.id,
+        listingId: story.listingId,
+        mediaUrl: story.mediaUrl,
+        mediaType: 'image',
+        expiresAt: story.expiresAt,
+      },
+    })
+  }
+
+  await db.insert(listingStoryPins).values({
+    listingId: studio.id,
+    storyId: DEMO_STORY_IDS.studioActive,
+    sortOrder: 0,
+  }).onConflictDoNothing()
+
+  await db.insert(hostProfileStoryReposts).values({
+    hostId: host.id,
+    storyId: DEMO_STORY_IDS.nevaExpiredReposted,
+    sortOrder: 0,
+  }).onConflictDoNothing()
+
+  console.log('  guest stories: 2 active + 2 archive (studio + neva)')
+  console.log('  pinned on studio listing; expired neva story reposted to host profile')
+}
+
+const seedDemoUserBlogPosts = async (
+  guest: typeof users.$inferSelect,
+  host: typeof users.$inferSelect,
+  listingByTitle: Record<string, typeof listings.$inferSelect>,
+) => {
+  const studio = listingByTitle['Уютная студия у метро']
+  const neva = listingByTitle['Двухкомнатная у Невы']
+
+  if (!studio) {
+    return
+  }
+
+  console.log('Seeding demo user blog posts…')
+
+  const posts = [
+    {
+      slug: 'demo-guest-weekend-in-moscow',
+      titleRu: 'Выходные в Москве: студия у метро',
+      titleEn: 'Weekend in Moscow: studio near the metro',
+      excerptRu: 'Короткая поездка, удобная локация и впечатления от района.',
+      excerptEn: 'A short trip, great location, and neighborhood notes.',
+      bodyRu: '<p>Остановились в студии на пару ночей — удобно добираться до центра, рядом кафе и парк.</p>',
+      bodyEn: '<p>Stayed in the studio for two nights — easy access to the center, cafés and a park nearby.</p>',
+      listingId: studio.id,
+      city: studio.city,
+      authorId: guest.id,
+    },
+    {
+      slug: 'demo-guest-petersburg-notes',
+      titleRu: 'Заметки о Петербурге',
+      titleEn: 'Notes on Saint Petersburg',
+      excerptRu: 'Прогулки у воды, дворы и любимые маршруты без спешки.',
+      excerptEn: 'Walks by the water, courtyards, and unhurried favorite routes.',
+      bodyRu: '<p>Делюсь маршрутом на один день: набережная, кофе и закат у мостов.</p>',
+      bodyEn: '<p>Sharing a one-day route: embankment, coffee, and sunset by the bridges.</p>',
+      listingId: neva?.id ?? null,
+      city: neva?.city ?? 'Санкт-Петербург',
+      authorId: guest.id,
+    },
+  ] as const
+
+  for (const post of posts) {
+    await db.insert(blogPosts).values({
+      slug: post.slug,
+      titleRu: post.titleRu,
+      titleEn: post.titleEn,
+      excerptRu: post.excerptRu,
+      excerptEn: post.excerptEn,
+      bodyRu: post.bodyRu,
+      bodyEn: post.bodyEn,
+      listingId: post.listingId,
+      city: post.city,
+      authorId: post.authorId,
+      status: 'published',
+      publishedAt: new Date(),
+    }).onConflictDoUpdate({
+      target: blogPosts.slug,
+      set: {
+        titleRu: post.titleRu,
+        titleEn: post.titleEn,
+        excerptRu: post.excerptRu,
+        excerptEn: post.excerptEn,
+        bodyRu: post.bodyRu,
+        bodyEn: post.bodyEn,
+        listingId: post.listingId,
+        city: post.city,
+        authorId: post.authorId,
+        status: 'published',
+        publishedAt: new Date(),
+        updatedAt: new Date(),
+      },
+    })
+  }
+
+  await db.insert(blogAuthorFollows).values({
+    followerId: host.id,
+    authorId: guest.id,
+  }).onConflictDoNothing()
+
+  console.log('  guest blog: 2 published posts; host follows guest author')
+}
+
 const resetNonDemoData = async () => {
   const demoPhones = DEMO_USERS.map(user => user.phone)
   const demoTitles = DEMO_LISTINGS.map(listing => listing.title)
@@ -1163,6 +1342,8 @@ const seed = async () => {
   }
   await seedPendingReview(userByPhone, listingByTitle)
   await seedReports(guest, listingByTitle['Лофт на модерации'])
+  await seedDemoStories(host, guest, listingByTitle)
+  await seedDemoUserBlogPosts(guest, host, listingByTitle)
 
   const indexed = await reindexPublished()
   console.log(`Meilisearch: indexed ${indexed} published listings`)
@@ -1188,6 +1369,7 @@ const seed = async () => {
   }
   console.log('  1 pending review')
   console.log('  1 open report')
+  console.log('  demo stories: pin on studio + host profile repost (expired neva)')
   console.log('\nDemo accounts (email OTP code: 0000 with NUXT_AUTH_DEV_CODE):')
   console.log('  Admin  admin@golewood.local')
   console.log('  Host   host@golewood.local')

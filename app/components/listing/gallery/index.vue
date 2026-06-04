@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import type { ListingGalleryProps } from './types'
 import ru from './i18n/ru'
 import en from './i18n/en'
@@ -20,40 +21,48 @@ const mosaicGridClass = computed(() => {
   }
 
   if (count === 2) {
-    return 'grid h-[min(320px,45vh)] grid-cols-2 gap-2'
+    return 'grid grid-cols-2 gap-2 md:h-[min(320px,45vh)]'
   }
 
-  return 'grid h-[min(420px,55vh)] grid-cols-4 grid-rows-2 gap-2'
+  return 'grid grid-cols-2 gap-2 md:h-[min(420px,55vh)] md:grid-cols-4 md:grid-rows-2'
 })
 
 const mosaicTileClass = (index: number) => {
   const count = mosaicPhotos.value.length
 
   if (count <= 1) {
-    return ''
+    return 'aspect-16/10 w-full'
   }
 
   if (count === 2) {
-    return 'min-h-0'
+    return 'aspect-4/3 min-h-0 md:aspect-auto md:h-full'
   }
 
+  const mobileClass = index === 0
+    ? 'col-span-2 aspect-16/10'
+    : 'aspect-square'
+
   if (index === 0) {
-    return 'col-span-2 row-span-2 min-h-0'
+    return `${mobileClass} md:col-span-2 md:row-span-2 md:aspect-auto md:h-full min-h-0`
   }
 
   if (index === 1) {
-    return 'col-start-3 row-start-1 min-h-0'
+    return `${mobileClass} md:col-start-3 md:row-start-1 md:aspect-auto md:h-full min-h-0`
   }
 
   if (index === 2) {
-    return count === 3 ? 'col-start-4 row-span-2 row-start-1 min-h-0' : 'col-start-4 row-start-1 min-h-0'
+    const desktopClass = count === 3
+      ? 'md:col-start-4 md:row-span-2 md:row-start-1 md:aspect-auto md:h-full min-h-0'
+      : 'md:col-start-4 md:row-start-1 md:aspect-auto md:h-full min-h-0'
+
+    return `${mobileClass} ${desktopClass}`
   }
 
   if (index === 3) {
-    return 'col-start-3 row-start-2 min-h-0'
+    return `${mobileClass} md:col-start-3 md:row-start-2 md:aspect-auto md:h-full min-h-0`
   }
 
-  return 'col-start-4 row-start-2 min-h-0'
+  return `${mobileClass} md:col-start-4 md:row-start-2 md:aspect-auto md:h-full min-h-0`
 }
 
 const activeIndex = ref(0)
@@ -76,7 +85,11 @@ const openLightbox = (index: number) => {
     return
   }
 
-  lightboxIndex.value = index
+  const isMoreTile = isMosaic.value
+    && index === mosaicPhotos.value.length - 1
+    && mosaicExtraCount.value > 0
+
+  lightboxIndex.value = isMoreTile ? index + 1 : index
   lightboxOpen.value = true
 }
 
@@ -162,10 +175,9 @@ onUnmounted(() => {
       v-for="(item, index) in mosaicPhotos"
       :key="item.id"
       type="button"
-      class="group relative overflow-hidden rounded-2xl bg-stone-100 text-left dark:bg-stone-800"
-      :class="[
-        mosaicPhotos.length <= 1 ? 'aspect-16/10 w-full' : mosaicTileClass(index),
-      ]"
+      class="gallery-tile-enter group relative overflow-hidden rounded-2xl bg-stone-100 text-left motion-reduce:animate-none dark:bg-stone-800"
+      :style="{ animationDelay: `${staggerDelayMs(index, 70, 350)}ms` }"
+      :class="mosaicTileClass(index)"
       :aria-label="t('showPhoto', { current: index + 1, total: photos.length })"
       @click="openLightbox(index)"
     >
@@ -231,12 +243,17 @@ onUnmounted(() => {
       v-else
       class="space-y-3"
     >
-    <button
-      type="button"
-      class="group relative aspect-16/10 w-full overflow-hidden rounded-2xl bg-stone-100 text-left dark:bg-stone-800"
-      :aria-label="t('openGallery')"
-      @click="openLightbox(activeIndex)"
+    <Transition
+      name="gallery-slide"
+      mode="out-in"
     >
+      <button
+        :key="activeIndex"
+        type="button"
+        class="group relative aspect-16/10 w-full overflow-hidden rounded-2xl bg-stone-100 text-left dark:bg-stone-800"
+        :aria-label="t('openGallery')"
+        @click="openLightbox(activeIndex)"
+      >
       <iframe
         v-if="activeItem?.mediaType === 'video' && activeItem.embedUrl"
         :src="activeItem.embedUrl"
@@ -268,7 +285,8 @@ onUnmounted(() => {
         />
         {{ t('viewAllPhotos', { count: photos.length }) }}
       </span>
-    </button>
+      </button>
+    </Transition>
 
     <div
       v-if="photos.length > 1"
@@ -305,17 +323,17 @@ onUnmounted(() => {
     <Teleport to="body">
       <div
         v-if="lightboxOpen && lightboxItem"
-        class="fixed inset-0 z-100 flex flex-col bg-black/95"
+        class="gallery-lightbox fixed inset-0 z-100 flex flex-col"
         role="dialog"
         aria-modal="true"
       >
-        <div class="flex items-center justify-between gap-3 px-4 py-3 text-white">
-          <p class="text-sm font-medium tabular-nums">
+        <div class="gallery-lightbox-bar flex items-center justify-between gap-3 px-4 py-3">
+          <p class="text-sm font-medium tabular-nums text-white/90">
             {{ t('counter', { current: lightboxIndex + 1, total: photos.length }) }}
           </p>
           <button
             type="button"
-            class="rounded-full p-2 hover:bg-white/10"
+            class="rounded-full p-2 text-white/90 transition hover:bg-white/10 hover:text-white"
             :aria-label="t('close')"
             @click="closeLightbox"
           >
@@ -379,7 +397,7 @@ onUnmounted(() => {
 
         <div
           v-if="photos.length > 1"
-          class="flex gap-2 overflow-x-auto px-4 pb-4 pt-2"
+          class="gallery-lightbox-strip flex gap-2 overflow-x-auto px-4 pb-4 pt-2"
         >
           <button
             v-for="(item, index) in photos"

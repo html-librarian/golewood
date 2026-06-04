@@ -1,9 +1,16 @@
 export default {
   back: 'Back to listings',
   title: 'Listing stories',
-  empty: 'No active stories for this listing',
+  empty: 'No stories tagged at this listing yet',
+  activeSection: 'Active (24h)',
+  archiveSection: 'Archive',
   pin: 'Show on listing',
   unpin: 'Hide from listing',
   pinned: 'On listing',
+  repost: 'Add to my profile',
+  unrepost: 'Remove from profile',
+  reposted: 'On profile',
+  expired: 'Expired',
   author: 'Guest',
+  pinExpiredHint: 'Only active stories can be shown on the listing page',
 } as const

@@ -175,91 +175,35 @@ const handleResendMfa = async () => {
         </p>
       </div>
 
-      <div class="flex flex-col gap-2">
-        <a
-          href="/api/auth/oauth/yandex"
-          class="oauth-button"
-        >
-          {{ t('oauthYandex') }}
-        </a>
-        <a
-          href="/api/auth/oauth/vk"
-          class="oauth-button"
-        >
-          {{ t('oauthVk') }}
-        </a>
-      </div>
-
-      <form
-        v-if="step === 'mfa'"
-        data-testid="auth-mfa-form"
-        class="flex flex-col gap-4"
-        @submit.prevent="handleVerifyMfa()"
-      >
-        <p class="text-sm text-stone-600 dark:text-stone-400">
-          {{ mfaSubtitle }}
-        </p>
-
-        <FormInput
-          v-model="mfaCode"
-          :label="t('mfaCodeLabel')"
-          maxlength="4"
-          autocomplete="one-time-code"
-          :error="error"
-          required
-        />
-
-        <p
-          v-if="devCode"
-          class="rounded-lg bg-brand-50 px-3 py-2 text-sm text-brand-800 dark:bg-brand-950 dark:text-brand-200"
-        >
-          {{ t('devCode') }}: <strong>{{ devCode }}</strong>
-        </p>
-
-        <UiButton
-          type="submit"
-          size="lg"
-          class="w-full"
-          :loading="loading"
-        >
-          {{ t('mfaSubmit') }}
-        </UiButton>
-
-        <UiButton
-          type="button"
-          variant="ghost"
-          class="w-full"
-          :disabled="loading"
-          @click="handleResendMfa()"
-        >
-          {{ t('mfaResend') }}
-        </UiButton>
-      </form>
-
-      <template v-else-if="phoneAuthEnabled">
-        <div class="my-6 flex items-center gap-3">
-          <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
-          <span class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">{{ t('oauthDivider') }}</span>
-          <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+      <div class="space-y-6">
+        <div class="flex flex-col gap-2">
+          <a
+            href="/api/auth/oauth/yandex"
+            class="oauth-button"
+          >
+            {{ t('oauthYandex') }}
+          </a>
+          <a
+            href="/api/auth/oauth/vk"
+            class="oauth-button"
+          >
+            {{ t('oauthVk') }}
+          </a>
         </div>
 
         <form
-          data-testid="auth-phone-form"
+          v-if="step === 'mfa'"
+          data-testid="auth-mfa-form"
           class="flex flex-col gap-4"
-          @submit.prevent="step === 'phone' ? handleSendCode() : handleVerify()"
+          @submit.prevent="handleVerifyMfa()"
         >
-          <FormPhoneInput
-            v-model="phone"
-            :label="t('phoneLabel')"
-            :disabled="step === 'code' || loading"
-            :error="step === 'phone' ? error : undefined"
-            required
-          />
+          <p class="text-sm text-stone-600 dark:text-stone-400">
+            {{ mfaSubtitle }}
+          </p>
 
           <FormInput
-            v-if="step === 'code'"
-            v-model="code"
-            :label="t('codeLabel')"
+            v-model="mfaCode"
+            :label="t('mfaCodeLabel')"
             maxlength="4"
             autocomplete="one-time-code"
             :error="error"
@@ -279,27 +223,82 @@ const handleResendMfa = async () => {
             class="w-full"
             :loading="loading"
           >
-            {{ step === 'phone' ? t('sendCode') : t('submit') }}
+            {{ t('mfaSubmit') }}
+          </UiButton>
+
+          <UiButton
+            type="button"
+            variant="ghost"
+            class="w-full"
+            :disabled="loading"
+            @click="handleResendMfa()"
+          >
+            {{ t('mfaResend') }}
           </UiButton>
         </form>
-      </template>
 
-      <template v-if="emailSignInEnabled">
-        <div
-          v-if="phoneAuthEnabled"
-          class="my-6 flex items-center gap-3"
-        >
-          <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
-          <span class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">{{ t('emailDivider') }}</span>
-          <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
-        </div>
+        <template v-else-if="phoneAuthEnabled">
+          <div class="flex items-center gap-3">
+            <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+            <span class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">{{ t('oauthDivider') }}</span>
+            <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+          </div>
 
-        <AuthEmailSignIn
-          :labels="emailLabels"
-          :allow-phone-link="phoneAuthEnabled"
-          @success="onEmailSuccess"
-        />
-      </template>
+          <form
+            data-testid="auth-phone-form"
+            class="flex flex-col gap-4"
+            @submit.prevent="step === 'phone' ? handleSendCode() : handleVerify()"
+          >
+            <FormPhoneInput
+              v-model="phone"
+              :label="t('phoneLabel')"
+              :disabled="step === 'code' || loading"
+              :error="step === 'phone' ? error : undefined"
+              required
+            />
+
+            <FormInput
+              v-if="step === 'code'"
+              v-model="code"
+              :label="t('codeLabel')"
+              maxlength="4"
+              autocomplete="one-time-code"
+              :error="error"
+              required
+            />
+
+            <p
+              v-if="devCode"
+              class="rounded-lg bg-brand-50 px-3 py-2 text-sm text-brand-800 dark:bg-brand-950 dark:text-brand-200"
+            >
+              {{ t('devCode') }}: <strong>{{ devCode }}</strong>
+            </p>
+
+            <UiButton
+              type="submit"
+              size="lg"
+              class="w-full"
+              :loading="loading"
+            >
+              {{ step === 'phone' ? t('sendCode') : t('submit') }}
+            </UiButton>
+          </form>
+        </template>
+
+        <template v-if="emailSignInEnabled && step !== 'mfa'">
+          <div class="flex items-center gap-3">
+            <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+            <span class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">{{ t('emailDivider') }}</span>
+            <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+          </div>
+
+          <AuthEmailSignIn
+            :labels="emailLabels"
+            :allow-phone-link="phoneAuthEnabled"
+            @success="onEmailSuccess"
+          />
+        </template>
+      </div>
 
       <LegalConsentNotice class="mt-6" />
 

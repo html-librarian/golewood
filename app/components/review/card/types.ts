@@ -7,6 +7,7 @@ export interface ReviewCardProps {
   canReplyToReview?: boolean
   canReplyToReply?: (reply: import('#shared/types/review').ReviewReply) => boolean
   showPendingBadge?: boolean
+  pending?: boolean
 }
 
 export interface ReviewCardEmits {

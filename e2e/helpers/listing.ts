@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { expect, type APIRequestContext, type Page } from '@playwright/test'
+import type { APIRequestContext, Page } from '@playwright/test'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -43,7 +43,7 @@ export const fillListingWizard = async (page: Page, title = E2E_LISTING_TITLE) =
   await page.getByLabel(/адрес|address/i).fill('ул. E2E, 1')
   await page.getByRole('button', { name: /далее|next/i }).click()
 
-  await page.getByLabel(/цена за ночь|price per night/i).fill('5000')
+  await page.getByTestId('host-listing-price-input').locator('input[type="number"]').fill('5000')
   await page.getByLabel(/гостей в цене|guests/i).fill('2')
   await page.getByLabel(/спален|bedrooms/i).fill('1')
 
@@ -54,8 +54,14 @@ export const fillListingWizard = async (page: Page, title = E2E_LISTING_TITLE) =
 
   await page.getByRole('button', { name: /далее|next/i }).click()
 
-  await page.locator('input[type="file"][multiple]').setInputFiles(PHOTO_FIXTURE)
-  await expect(page.locator('img[src*="/uploads/listings/"]')).toBeVisible({ timeout: 15_000 })
+  await Promise.all([
+    page.waitForResponse(response =>
+      response.request().method() === 'POST'
+      && response.url().includes('/photos')
+      && response.ok(),
+    ),
+    page.locator('input[type="file"][multiple]').setInputFiles(PHOTO_FIXTURE),
+  ])
   await page.getByRole('button', { name: /далее|next/i }).click()
 
   await Promise.all([

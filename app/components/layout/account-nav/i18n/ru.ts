@@ -1,11 +1,13 @@
 export default {
   navTitle: 'Разделы',
+  navAriaLabel: 'Навигация личного кабинета',
   profile: 'Профиль',
   balance: 'Баланс бонусов',
   giftCertificates: 'Подарочные сертификаты',
   bookings: 'Мои бронирования',
   favorites: 'Избранное',
   messages: 'Сообщения',
+  blogPosts: 'Мои статьи',
   stories: 'Мои сторис',
   rentOut: 'Сдать жильё',
   host: 'Кабинет хозяина',

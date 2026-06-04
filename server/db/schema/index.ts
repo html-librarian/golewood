@@ -1,5 +1,5 @@
 import type { ListingContacts } from '#shared/types/listing-contacts'
-import { type AnyPgColumn, pgEnum, pgTable, uuid, varchar, timestamp, integer, bigint, text, doublePrecision, jsonb, customType, unique, boolean } from 'drizzle-orm/pg-core'
+import { type AnyPgColumn, pgEnum, pgTable, uuid, varchar, timestamp, integer, bigint, text, doublePrecision, jsonb, customType, unique, boolean, primaryKey } from 'drizzle-orm/pg-core'
 
 const geographyPoint = customType<{ data: unknown, driverData: unknown }>({
   dataType: () => 'geography(Point,4326)',
@@ -147,11 +147,21 @@ export const blogPosts = pgTable('blog_posts', {
   bodyEn: text('body_en').notNull().default(''),
   coverImageUrl: varchar('cover_image_url', { length: 512 }),
   listingId: uuid('listing_id').references(() => listings.id, { onDelete: 'set null' }),
+  authorId: uuid('author_id').references(() => users.id, { onDelete: 'set null' }),
+  city: varchar('city', { length: 128 }),
   status: blogPostStatusEnum('status').notNull().default('draft'),
   publishedAt: timestamp('published_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 })
+
+export const blogAuthorFollows = pgTable('blog_author_follows', {
+  followerId: uuid('follower_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  authorId: uuid('author_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, table => ({
+  pk: primaryKey({ columns: [table.followerId, table.authorId] }),
+}))
 
 export const listingNews = pgTable('listing_news', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -639,4 +649,13 @@ export const listingStoryPins = pgTable('listing_story_pins', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, table => ({
   listingStoryUnique: unique().on(table.listingId, table.storyId),
+}))
+
+export const hostProfileStoryReposts = pgTable('host_profile_story_reposts', {
+  hostId: uuid('host_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  storyId: uuid('story_id').notNull().references(() => userStories.id, { onDelete: 'cascade' }),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, table => ({
+  hostStoryUnique: unique().on(table.hostId, table.storyId),
 }))

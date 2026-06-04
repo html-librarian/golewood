@@ -10,12 +10,12 @@ defineProps<LegalDocumentProps>()
       <h1 class="section-title">
         {{ title }}
       </h1>
-      <p class="text-sm text-stone-500 dark:text-stone-400">
+      <p class="legal-meta">
         {{ updated }}
       </p>
       <p
         v-if="intro"
-        class="max-w-2xl text-stone-600 dark:text-stone-400"
+        class="legal-body max-w-2xl"
       >
         {{ intro }}
       </p>
@@ -32,7 +32,7 @@ defineProps<LegalDocumentProps>()
       <p
         v-for="(paragraph, pIndex) in section.paragraphs"
         :key="pIndex"
-        class="text-sm leading-relaxed text-stone-600 dark:text-stone-400"
+        class="legal-body"
       >
         {{ paragraph }}
       </p>

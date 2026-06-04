@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
@@ -28,14 +29,10 @@ const handleRemove = async (listingId: string) => {
 
 <template>
   <div class="page-container">
-    <div class="mb-8">
-      <h1 class="section-title">
-        {{ t('title') }}
-      </h1>
-      <p class="section-subtitle mt-2">
-        {{ t('subtitle') }}
-      </p>
-    </div>
+    <UiPageHeader
+      :title="t('title')"
+      :subtitle="t('subtitle')"
+    />
 
     <div
       v-if="pending"
@@ -55,6 +52,7 @@ const handleRemove = async (listingId: string) => {
     <UiEmpty
       v-else-if="!favorites?.length"
       icon="ph:heart-duotone"
+      brand
       :title="t('empty')"
       :description="t('emptyDescription')"
     >
@@ -63,25 +61,28 @@ const handleRemove = async (listingId: string) => {
       </NuxtLink>
     </UiEmpty>
 
-    <div
-      v-else
-      class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
-    >
+    <UiReveal v-else>
       <div
-        v-for="listing in favorites"
-        :key="listing.id"
-        class="space-y-2"
+        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
       >
-        <ListingCard :listing="listing" />
-        <button
-          type="button"
-          class="px-1 text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-50 dark:text-red-400"
-          :disabled="removingId === listing.id"
-          @click="handleRemove(listing.id)"
+        <div
+          v-for="(listing, index) in favorites"
+          :key="listing.id"
+          class="reveal-stagger-item space-y-2"
+          data-testid="favorite-card"
+          :style="{ transitionDelay: `${staggerDelayMs(index)}ms` }"
         >
-          {{ t('remove') }}
-        </button>
+          <ListingCard :listing="listing" />
+          <button
+            type="button"
+            class="px-1 text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-50 dark:text-red-400"
+            :disabled="removingId === listing.id"
+            @click="handleRemove(listing.id)"
+          >
+            {{ t('remove') }}
+          </button>
+        </div>
       </div>
-    </div>
+    </UiReveal>
   </div>
 </template>

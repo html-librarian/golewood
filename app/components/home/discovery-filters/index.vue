@@ -30,22 +30,24 @@ const onSelect = (filter: HomeDiscoveryFilter) => {
 
 <template>
   <section
-    class="space-y-8"
-    aria-label="Quick search"
+    class="discovery-panel surface-card divide-y divide-stone-100 dark:divide-stone-800"
+    :aria-label="$t('common.discoveryQuickSearch')"
   >
     <div
-      v-for="(group, groupIndex) in groups"
+      v-for="group in groups"
       :key="group.id"
-      class="space-y-4"
-      :class="groupIndex > 0 ? 'border-t border-stone-200 pt-8 dark:border-stone-800' : ''"
+      class="px-4 py-6 md:px-6 md:py-7"
     >
-      <h2 class="text-center text-sm font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">
+      <h3
+        class="editorial-kicker editorial-kicker-leaf mb-4 md:mb-5"
+        :class="group.id === 'destinations' ? 'text-left' : 'text-center'"
+      >
         {{ titleFor(group) }}
-      </h2>
+      </h3>
 
       <div
         v-if="group.id === 'destinations'"
-        class="bleed-viewport-right pt-1"
+        class="-mr-4 bleed-viewport-right md:-mr-6"
       >
         <HomeDiscoveryDestinationsCarousel
           :filters="sortedDestinations(group.filters)"
@@ -55,6 +57,7 @@ const onSelect = (filter: HomeDiscoveryFilter) => {
 
       <HomeDiscoveryFilterGrid
         v-else
+        variant="chips"
         :filters="group.filters"
         @select="onSelect"
       />

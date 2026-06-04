@@ -20,7 +20,7 @@ const sections = computed(() => (locale.value === 'en' ? en.sections : ru.sectio
       <h1 class="section-title">
         {{ t('title') }}
       </h1>
-      <p class="text-sm text-stone-600 dark:text-stone-400">
+      <p class="legal-meta">
         {{ t('updated') }}
       </p>
     </header>
@@ -36,7 +36,7 @@ const sections = computed(() => (locale.value === 'en' ? en.sections : ru.sectio
       <p
         v-for="(paragraph, pIndex) in section.paragraphs"
         :key="pIndex"
-        class="text-sm leading-relaxed text-stone-600 dark:text-stone-400"
+        class="legal-body"
       >
         {{ paragraph }}
       </p>
@@ -44,7 +44,7 @@ const sections = computed(() => (locale.value === 'en' ? en.sections : ru.sectio
 
     <NuxtLink
       :to="localePath('/host/payout')"
-      class="inline-block text-sm font-medium text-brand-700 hover:underline dark:text-brand-400"
+      class="legal-link inline-block"
     >
       {{ t('payoutLink') }}
     </NuxtLink>

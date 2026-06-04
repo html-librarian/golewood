@@ -16,7 +16,7 @@ const { city: preferredCity, isGeoDefault, setCity, clearCity } = useUserCity()
 
 useSiteSeo({
   title: t('title'),
-  description: t('subtitle'),
+  description: t('title'),
 })
 
 const searchForm = reactive({
@@ -80,6 +80,10 @@ const heroCredit = computed(() => {
 const { data: homePromos } = await useAsyncData('home-promos', () => fetchHomePromos())
 
 const homePromosResolved = computed(() => homePromos.value ?? { featured: null, carousel: [] })
+
+const hasHomePromos = computed(() =>
+  Boolean(homePromosResolved.value.featured) || homePromosResolved.value.carousel.length > 0,
+)
 
 const { data: discoveryGroups } = await useAsyncData('home-discovery', () => fetchDiscoveryGroups())
 
@@ -183,55 +187,73 @@ const trustItems = computed(() => [
   { icon: 'ph:credit-card-duotone', label: t('trustPayment') },
   { icon: 'ph:headset-duotone', label: t('trustSupport') },
 ])
+
+const heroSectionRef = ref<HTMLElement | null>(null)
+const { meshStyle, orbStyle, orbStyleSlow } = useHeroParallax(heroSectionRef)
 </script>
 
 <template>
   <div>
-    <section class="relative">
-      <div class="pointer-events-none absolute inset-0 overflow-hidden">
+    <section
+      ref="heroSectionRef"
+      class="relative isolate"
+    >
+      <div class="pointer-events-none absolute inset-0 overflow-clip">
         <img
           v-if="hero?.imageUrl"
           :src="hero.imageUrl"
           alt=""
-          class="absolute inset-0 size-full object-cover"
+          class="hero-photo-zoom absolute inset-0 size-full object-cover"
         >
         <div
           class="absolute inset-0"
           :class="hero?.imageUrl
-            ? 'bg-linear-to-br from-brand-950/25 via-brand-900/15 to-brand-950/35'
-            : 'bg-linear-to-br from-brand-900 via-brand-800 to-brand-700'"
+            ? 'bg-linear-to-b from-brand-950/50 via-brand-900/35 to-brand-950/75'
+            : 'bg-linear-to-br from-brand-950 via-brand-900 to-brand-800'"
         />
         <div
-          v-if="!hero?.imageUrl"
-          class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(251,191,36,0.15),transparent_35%)]"
+          class="hero-mesh absolute inset-0"
+          :style="meshStyle"
+        />
+        <div
+          class="absolute -left-24 top-1/4 size-72 rounded-full bg-brand-400/20 blur-3xl"
+          :style="orbStyleSlow"
+          aria-hidden="true"
+        />
+        <div
+          class="absolute -right-16 bottom-0 size-96 rounded-full bg-accent-400/15 blur-3xl"
+          :style="orbStyle"
+          aria-hidden="true"
         />
       </div>
-      <div class="page-container relative pb-20 pt-12 md:pb-24 md:pt-16">
-        <div class="mx-auto max-w-5xl text-center text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]">
-          <p class="mb-3 text-sm font-medium uppercase tracking-widest text-brand-200">
+      <div class="page-container relative pb-24 pt-14 md:pb-28 md:pt-20">
+        <div class="mx-auto max-w-4xl text-center text-white">
+          <p class="editorial-kicker editorial-kicker-leaf mb-4 text-brand-200/90">
             Golewood
           </p>
-          <h1 class="font-display text-[clamp(1.375rem,4.5vw,3.5rem)] font-semibold leading-tight tracking-tight whitespace-nowrap max-[360px]:whitespace-normal max-[360px]:text-[1.625rem]">
+          <h1 class="hero-title-display font-display text-[clamp(2rem,5vw,3.75rem)] font-semibold leading-[1.08] tracking-tight">
             {{ t('title') }}
           </h1>
-          <p class="mx-auto mt-4 max-w-xl text-base text-brand-100 md:text-lg">
-            {{ t('subtitle') }}
-          </p>
           <p
             v-if="heroCredit"
-            class="mx-auto mt-3 max-w-xl text-xs text-brand-200/90"
+            class="mx-auto mt-5 max-w-xl text-xs text-brand-200/80 md:mt-6"
           >
             {{ heroCredit }}
           </p>
           <NuxtLink
             :to="localePath('/spotlight')"
-            class="mt-4 inline-flex text-sm font-medium text-accent-300 underline-offset-4 hover:text-accent-200 hover:underline"
+            class="spotlight-cta mt-5"
+            data-testid="home-spotlight-cta"
           >
-            {{ $t('spotlight.link') }} →
+            {{ $t('spotlight.link') }}
+            <Icon
+              name="ph:camera-duotone"
+              class="size-4"
+            />
           </NuxtLink>
         </div>
 
-        <div class="mx-auto mt-12 w-full max-w-6xl md:mt-16 xl:max-w-7xl">
+        <div class="search-canopy mx-auto mt-12 w-full max-w-5xl md:mt-14">
           <SearchBar
             v-model:city="searchForm.city"
             v-model:check-in="searchForm.checkIn"
@@ -244,43 +266,58 @@ const trustItems = computed(() => [
           />
         </div>
 
-        <ul class="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-4 md:mt-12 md:gap-8">
+        <ul class="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-3 md:mt-12">
           <li
             v-for="item in trustItems"
             :key="item.label"
-            class="flex items-center gap-2 text-sm text-brand-100"
+            class="trust-pill-enter trust-pill-glass flex items-center gap-2 rounded-full px-4 py-2 text-sm text-brand-50 ring-1"
           >
             <Icon
               :name="item.icon"
-              class="size-5 text-accent-400"
+              class="size-4 text-accent-300"
             />
             {{ item.label }}
           </li>
         </ul>
       </div>
+      <UiForestDivider />
     </section>
 
-    <HomePromoBanners :section="homePromosResolved" />
+    <div
+      v-if="hasHomePromos"
+      class="bg-white dark:bg-stone-950"
+    >
+      <HomePromoBanners :section="homePromosResolved" />
+      <UiForestDivider tone="sand" />
+    </div>
 
-    <section class="overflow-x-clip border-t border-stone-200 bg-white py-10 dark:border-stone-800 dark:bg-stone-950 md:py-12">
-      <div class="page-container space-y-6">
-        <div class="text-center">
-          <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50 md:text-2xl">
-            {{ t('discoveryTitle') }}
-          </h2>
-          <p class="mx-auto mt-2 max-w-xl text-sm text-stone-600 dark:text-stone-400">
-            {{ t('discoverySubtitle') }}
-          </p>
+    <UiReveal>
+      <section class="overflow-x-clip py-10 md:py-12">
+        <div class="page-container space-y-6">
+          <div class="mx-auto max-w-2xl text-center">
+            <h2 class="section-title section-title-accent section-title-accent-center mx-auto text-center">
+              {{ t('discoveryTitle') }}
+            </h2>
+            <p class="section-subtitle mx-auto mt-3">
+              {{ t('discoverySubtitle') }}
+            </p>
+          </div>
+          <HomeDiscoveryFilters :groups="discoveryGroupsResolved" />
         </div>
-        <HomeDiscoveryFilters :groups="discoveryGroupsResolved" />
-      </div>
-    </section>
+      </section>
+    </UiReveal>
 
-    <section class="page-container">
-      <div
-        v-if="pending"
-        class="space-y-6"
-      >
+    <UiForestDivider
+      flip
+      class="opacity-80"
+    />
+
+    <UiReveal :delay="80">
+      <section class="page-container">
+        <div
+          v-if="pending"
+          class="space-y-6"
+        >
         <div class="space-y-2">
           <UiSkeleton variant="title" class="w-48" />
           <UiSkeleton class="w-64" />
@@ -296,18 +333,21 @@ const trustItems = computed(() => [
             <UiSkeleton class="w-2/3" />
           </div>
         </div>
-      </div>
+        </div>
 
-      <div
-        v-else-if="displayListings.length || heroListing"
-        class="space-y-6"
-      >
+        <div
+          v-else-if="displayListings.length || heroListing"
+          class="space-y-6"
+        >
         <div class="flex items-end justify-between gap-4">
           <div>
-            <h2 class="section-title">
+            <p class="editorial-kicker editorial-kicker-leaf">
+              {{ listings?.scope === 'city' && listings.city ? listings.city : 'Golewood' }}
+            </p>
+            <h2 class="section-title mt-2 section-title-accent">
               {{ featuredTitle }}
             </h2>
-            <p class="section-subtitle mt-1">
+            <p class="section-subtitle mt-2 max-w-2xl">
               {{ featuredDesc }}
             </p>
           </div>
@@ -315,7 +355,7 @@ const trustItems = computed(() => [
             :to="localePath(listings?.scope === 'city' && listings.city
               ? { path: '/search', query: { city: listings.city } }
               : '/search')"
-            class="hidden text-sm font-semibold text-brand-700 hover:text-brand-800 md:inline dark:text-brand-300"
+            class="link-forest hidden text-sm md:inline"
           >
             {{ t('viewAll') }} →
           </NuxtLink>
@@ -331,12 +371,12 @@ const trustItems = computed(() => [
           :listings="displayListings"
           :labels="carouselLabels"
         />
-      </div>
+        </div>
 
-      <div
-        v-else
-        class="surface-card mx-auto max-w-lg p-10 text-center"
-      >
+        <div
+          v-else
+          class="surface-card mx-auto max-w-lg p-10 text-center"
+        >
         <Icon
           name="ph:house-line-duotone"
           class="mx-auto size-12 text-stone-400"
@@ -345,6 +385,7 @@ const trustItems = computed(() => [
           {{ t('empty') }}
         </p>
       </div>
-    </section>
+      </section>
+    </UiReveal>
   </div>
 </template>

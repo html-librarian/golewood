@@ -15,8 +15,14 @@ const containerClass = computed(() =>
 
 const verifiedClass = computed(() =>
   props.overlay
-    ? 'inline-flex max-w-full items-center gap-1 rounded-md bg-white/95 px-2 py-0.5 text-xs font-medium text-emerald-800 shadow-sm ring-1 ring-emerald-200/80 backdrop-blur-sm dark:bg-stone-900/95 dark:text-emerald-300 dark:ring-emerald-800/50'
-    : 'inline-flex max-w-full items-center gap-1 rounded-full bg-emerald-500 px-2.5 py-0.5 text-xs font-semibold text-white dark:bg-emerald-400 dark:text-emerald-950',
+    ? 'inline-flex max-w-full items-center gap-1 rounded-md bg-white px-2 py-0.5 text-xs font-semibold text-emerald-950 shadow-sm ring-1 ring-emerald-300/80 dark:bg-emerald-950 dark:text-emerald-50 dark:ring-emerald-700/60'
+    : 'inline-flex max-w-full items-center gap-1 rounded-full bg-emerald-800 px-2.5 py-0.5 text-xs font-semibold text-white dark:bg-emerald-900 dark:text-white',
+)
+
+const verifiedIconClass = computed(() =>
+  props.overlay
+    ? 'size-3.5 shrink-0 text-emerald-900 dark:text-emerald-200'
+    : 'size-3.5 shrink-0 text-current',
 )
 
 const pinClass = computed(() =>
@@ -66,7 +72,7 @@ const boostClass = computed(() =>
     >
       <Icon
         name="ph:seal-check-duotone"
-        class="size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400"
+        :class="verifiedIconClass"
       />
       {{ t('hostVerification.verifiedShort') }}
     </span>

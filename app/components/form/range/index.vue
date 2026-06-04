@@ -10,6 +10,8 @@ const props = withDefaults(defineProps<FormRangeProps>(), {
 
 const emit = defineEmits<FormRangeEmits>()
 
+const { t } = useI18n()
+
 const formatLabel = (value: number) =>
   props.formatValue ? props.formatValue(value) : formatPrice(value)
 
@@ -85,7 +87,7 @@ const updateMax = (raw: number) => {
             :max="ceiling"
             :step="step"
             :value="normalizedMin"
-            aria-label="Min"
+            :aria-label="t('form.rangeMin')"
             @input="updateMin(Number(($event.target as HTMLInputElement).value))"
           >
           <input
@@ -95,7 +97,7 @@ const updateMax = (raw: number) => {
             :max="ceiling"
             :step="step"
             :value="normalizedMax"
-            aria-label="Max"
+            :aria-label="t('form.rangeMax')"
             @input="updateMax(Number(($event.target as HTMLInputElement).value))"
           >
         </div>

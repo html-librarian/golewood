@@ -107,6 +107,7 @@ const handlePurchase = async (slug: PromotionProductSlug, price: number) => {
         </h2>
         <UiEmpty
           v-if="!data.active.length"
+          embedded
           icon="ph:megaphone-duotone"
           :title="t('emptyActive')"
         />

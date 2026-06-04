@@ -13,5 +13,6 @@ definePageMeta({
     </main>
     <LayoutAppFooter />
     <LegalCookieConsent />
+    <UiBackToTop />
   </div>
 </template>

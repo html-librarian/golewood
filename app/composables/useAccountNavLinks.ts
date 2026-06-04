@@ -1,7 +1,7 @@
 export type AccountNavLink = {
   to: string
   icon: string
-  labelKey: 'profile' | 'balance' | 'giftCertificates' | 'bookings' | 'favorites' | 'messages' | 'stories' | 'rentOut' | 'host' | 'admin'
+  labelKey: 'profile' | 'balance' | 'giftCertificates' | 'bookings' | 'favorites' | 'messages' | 'stories' | 'blogPosts' | 'rentOut' | 'host' | 'admin'
 }
 
 export const useAccountNavLinks = () => {
@@ -15,6 +15,7 @@ export const useAccountNavLinks = () => {
       { to: '/bookings', icon: 'ph:calendar-check-duotone', labelKey: 'bookings' },
       { to: '/favorites', icon: 'ph:heart-duotone', labelKey: 'favorites' },
       { to: '/messages', icon: 'ph:chat-circle-dots-duotone', labelKey: 'messages' },
+      { to: '/blog/my', icon: 'ph:article-duotone', labelKey: 'blogPosts' },
     ]
 
     if (user.value?.role === 'guest') {

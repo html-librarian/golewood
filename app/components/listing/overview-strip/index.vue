@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { formatReviewScore } from '#shared/utils/review-rating'
 import type { ListingOverviewStripEmits, ListingOverviewStripProps } from './types'
 import ru from './i18n/ru'
 import en from './i18n/en'
@@ -8,10 +7,7 @@ const props = defineProps<ListingOverviewStripProps>()
 const emit = defineEmits<ListingOverviewStripEmits>()
 
 const { t, locale } = usePageI18n({ ru, en })
-
-const formattedScore = computed(() =>
-  props.reviewScore !== null ? formatReviewScore(props.reviewScore, locale.value) : null,
-)
+const { t: $t } = useI18n()
 
 const locationLine = computed(() => {
   const parts = [props.city, props.address].filter(Boolean)
@@ -22,37 +18,35 @@ const locationLine = computed(() => {
 
 <template>
   <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-    <article class="flex flex-col rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
-      <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-50">
+    <article class="overview-panel">
+      <p class="editorial-kicker editorial-kicker-leaf text-stone-500 dark:text-stone-400">
         {{ t('reviewsTitle') }}
-      </h2>
+      </p>
 
       <div
-        v-if="formattedScore && reviewCount > 0"
-        class="mt-3 flex flex-1 flex-col"
+        v-if="reviewScore !== null && reviewCount > 0"
+        class="mt-4 flex flex-1 flex-col"
       >
-        <div class="flex items-center gap-3">
-          <span
-            class="flex size-14 shrink-0 items-center justify-center rounded-xl bg-brand-700 font-display text-2xl font-bold text-white dark:bg-brand-600"
+        <UiAnimatedScore
+          :score="reviewScore"
+          :locale="locale"
+        />
+
+        <div class="mt-3 space-y-1">
+          <p
+            v-if="reviewLabel"
+            class="font-medium text-stone-900 dark:text-stone-50"
           >
-            {{ formattedScore }}
-          </span>
-          <div class="min-w-0">
-            <p
-              v-if="reviewLabel"
-              class="font-medium text-stone-900 dark:text-stone-50"
-            >
-              {{ reviewLabel }}
-            </p>
-            <p class="text-sm text-stone-500 dark:text-stone-400">
-              {{ $t('review.totalCount', { count: reviewCount }) }}
-            </p>
-          </div>
+            {{ reviewLabel }}
+          </p>
+          <p class="text-sm text-stone-500 dark:text-stone-400">
+            {{ $t('review.totalCount', reviewCount, { count: reviewCount }) }}
+          </p>
         </div>
 
         <button
           type="button"
-          class="mt-4 text-left text-sm font-semibold text-brand-700 hover:underline dark:text-brand-300"
+          class="link-forest mt-4 text-left text-sm"
           @click="emit('scrollToReviews')"
         >
           {{ t('allReviews') }}
@@ -67,10 +61,10 @@ const locationLine = computed(() => {
       </p>
     </article>
 
-    <article class="flex flex-col rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
-      <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-50">
+    <article class="overview-panel">
+      <p class="editorial-kicker editorial-kicker-leaf text-stone-500 dark:text-stone-400">
         {{ t('amenitiesTitle') }}
-      </h2>
+      </p>
 
       <ul
         v-if="amenities.length"
@@ -92,17 +86,17 @@ const locationLine = computed(() => {
       <button
         v-if="amenities.length"
         type="button"
-        class="mt-4 text-left text-sm font-semibold text-brand-700 hover:underline dark:text-brand-300"
+        class="link-forest mt-4 text-left text-sm"
         @click="emit('scrollToAmenities')"
       >
         {{ t('allAmenities') }}
       </button>
     </article>
 
-    <article class="flex flex-col rounded-2xl border border-stone-200 bg-white p-4 sm:col-span-2 lg:col-span-1 dark:border-stone-800 dark:bg-stone-900">
-      <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-50">
+    <article class="overview-panel sm:col-span-2 lg:col-span-1">
+      <p class="editorial-kicker editorial-kicker-leaf text-stone-500 dark:text-stone-400">
         {{ t('locationTitle') }}
-      </h2>
+      </p>
 
       <p class="mt-3 flex-1 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
         {{ locationLine }}
@@ -111,7 +105,7 @@ const locationLine = computed(() => {
       <button
         v-if="hasMap"
         type="button"
-        class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:underline dark:text-brand-300"
+        class="link-forest mt-4 inline-flex items-center gap-1.5 text-sm"
         @click="emit('scrollToMap')"
       >
         <Icon

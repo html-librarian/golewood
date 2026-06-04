@@ -15,6 +15,11 @@ export default async () => {
     await redis.quit()
   }
 
+  execSync('npm run db:migrate', {
+    stdio: 'inherit',
+    cwd: process.cwd(),
+  })
+
   execSync('npm run db:seed', {
     stdio: 'inherit',
     cwd: process.cwd(),

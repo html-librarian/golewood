@@ -13,7 +13,10 @@ const hasListingLink = computed(() => Boolean(props.photo.listingId))
 </script>
 
 <template>
-  <article class="surface-card overflow-hidden">
+  <article
+    class="spotlight-photo-card surface-card overflow-hidden"
+    :class="{ 'opacity-75 saturate-50': pending }"
+  >
     <div class="relative aspect-4/3 bg-stone-100 dark:bg-stone-800">
       <img
         :src="photo.imageUrl"
@@ -22,7 +25,13 @@ const hasListingLink = computed(() => Boolean(props.photo.listingId))
         loading="lazy"
       >
       <p
-        v-if="photo.userVoted || voted"
+        v-if="pending"
+        class="absolute left-2 top-2 rounded-full bg-stone-800/85 px-2.5 py-1 text-xs font-semibold text-white dark:bg-stone-950/90"
+      >
+        {{ $t('review.pendingModeration') }}
+      </p>
+      <p
+        v-else-if="photo.userVoted || voted"
         class="absolute right-2 top-2 rounded-full bg-brand-600 px-2 py-1 text-xs font-semibold text-white dark:bg-brand-500"
       >
         {{ $t('spotlight.yourVote') }}
@@ -90,6 +99,7 @@ const hasListingLink = computed(() => Boolean(props.photo.listingId))
         </p>
 
         <UiButton
+          v-if="!pending"
           size="sm"
           :variant="photo.userVoted || voted ? 'secondary' : 'primary'"
           :disabled="voteDisabled || loading"

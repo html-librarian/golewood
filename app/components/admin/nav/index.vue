@@ -162,10 +162,8 @@ const isActive = (to: string, exact?: boolean) =>
 const linkClass = (active: boolean) => {
   if (props.variant === 'sidebar') {
     return [
-      'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition',
-      active
-        ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
-        : 'text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800',
+      'legal-nav-link flex items-center gap-2.5',
+      { 'legal-nav-link-active': active },
     ]
   }
 

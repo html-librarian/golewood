@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
@@ -20,10 +21,10 @@ const steps = computed(() => (locale.value === 'en' ? en.steps : ru.steps))
 
       <article class="space-y-6">
         <header class="space-y-3">
-          <h1 class="section-title">
+          <h1 class="section-title section-title-accent">
             {{ t('title') }}
           </h1>
-          <p class="text-stone-600 dark:text-stone-400">
+          <p class="section-subtitle">
             {{ t('intro') }}
           </p>
           <NuxtLink :to="localePath('/host/listings/create')">
@@ -31,25 +32,28 @@ const steps = computed(() => (locale.value === 'en' ? en.steps : ru.steps))
           </NuxtLink>
         </header>
 
-        <ol class="space-y-4">
-          <li
-            v-for="(step, index) in steps"
-            :key="index"
-            class="surface-card flex gap-4 p-5"
-          >
-            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-800 dark:bg-brand-950 dark:text-brand-200">
-              {{ index + 1 }}
-            </span>
-            <div class="space-y-1">
-              <h2 class="font-semibold text-stone-900 dark:text-stone-50">
-                {{ step.title }}
-              </h2>
-              <p class="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
-                {{ step.body }}
-              </p>
-            </div>
-          </li>
-        </ol>
+        <UiReveal>
+          <ol class="space-y-4">
+            <li
+              v-for="(step, index) in steps"
+              :key="index"
+              class="reveal-stagger-item surface-card flex gap-4 p-5"
+              :style="{ transitionDelay: `${staggerDelayMs(index, 50, 300)}ms` }"
+            >
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-800 dark:bg-brand-950 dark:text-brand-200">
+                {{ index + 1 }}
+              </span>
+              <div class="space-y-1">
+                <h2 class="font-semibold text-stone-900 dark:text-stone-50">
+                  {{ step.title }}
+                </h2>
+                <p class="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+                  {{ step.body }}
+                </p>
+              </div>
+            </li>
+          </ol>
+        </UiReveal>
       </article>
     </div>
   </div>

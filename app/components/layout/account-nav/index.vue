@@ -37,7 +37,7 @@ const isActive = (path: string) => {
   <aside
     v-if="user"
     class="w-full lg:sticky lg:top-24 lg:w-56 lg:shrink-0 lg:self-start"
-    aria-label="Account navigation"
+    :aria-label="t('navAriaLabel')"
   >
     <div class="surface-card mb-4 hidden p-4 lg:block">
       <div class="flex items-center gap-3">
@@ -50,7 +50,7 @@ const isActive = (path: string) => {
           </p>
           <p
             v-if="roleLabel"
-            class="text-xs text-stone-500 dark:text-stone-400"
+            class="text-xs text-stone-600 dark:text-stone-300"
           >
             {{ roleLabel }}
           </p>
@@ -91,13 +91,13 @@ const isActive = (path: string) => {
         >
           <NuxtLink
             :to="localePath(link.to)"
-            class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
-            :class="isActive(link.to) ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200' : ''"
+            class="legal-nav-link flex items-center gap-2.5"
+            :class="{ 'legal-nav-link-active': isActive(link.to) }"
           >
             <Icon
               :name="link.icon"
               class="size-5 shrink-0"
-              :class="isActive(link.to) ? 'text-brand-700 dark:text-brand-400' : 'text-stone-500 dark:text-stone-400'"
+              :class="isActive(link.to) ? 'text-brand-900 dark:text-brand-100' : 'text-stone-500 dark:text-stone-400'"
             />
             {{ linkLabel(link) }}
           </NuxtLink>

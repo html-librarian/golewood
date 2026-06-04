@@ -11,7 +11,7 @@ const hasContent = computed(() =>
 <template>
   <section
     v-if="hasContent"
-    class="border-t border-stone-200 bg-white py-8 dark:border-stone-800 dark:bg-stone-950 md:py-10"
+    class="bg-white py-8 dark:bg-stone-950 md:py-10"
     data-testid="home-promo-banners"
   >
     <div class="page-container">

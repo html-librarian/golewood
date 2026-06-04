@@ -7,8 +7,9 @@ describe('host listing stories page', () => {
     expect(Object.keys(ru).sort()).toEqual(Object.keys(en).sort())
   })
 
-  it('has pin actions', () => {
-    expect(ru.pin).toBeTruthy()
-    expect(ru.unpin).toBeTruthy()
+  it('has repost actions', () => {
+    expect(ru.repost).toBeTruthy()
+    expect(ru.unrepost).toBeTruthy()
+    expect(en.repost).toBeTruthy()
   })
 })

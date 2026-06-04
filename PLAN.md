@@ -639,6 +639,9 @@ app/pages/search/
 - [x] `app/pages/listings/[id]/` — «Добавить сторис» (guest) + кольцо pinned-сторис
 - [x] `app/pages/stories/` + ссылка с `/bookings` — «Мои сторис»
 - [x] `app/pages/host/listings/[id]/stories/` — управление пинами
+- [x] **Архив гостя:** `GET /api/stories/me` → `{ active, archive }`; истёкшие сторис видны только автору
+- [x] **Репост хоста:** `host_profile_story_reposts`; «У себя в профиле» на `/host/listings/[id]/stories`; кольцо на `/hosts/[id]`
+- [x] `POST/DELETE /api/host/stories/:storyId/repost`, `GET /api/hosts/:id/stories` (без TTL для репостов)
 
 **MVP scope cut (если долго)**
 - Фаза 40a: только **фото**-сторис, без видео
@@ -666,10 +669,11 @@ app/pages/search/
 - [x] v40b: видео-сторис + progress bar в viewer
 - [x] `PLAN.md` — отметить `[x]` по подпунктам фазы 8 (кроме 40b)
 - [x] colocated tests: `/spotlight`, `/stories`, admin/host stories; `spotlight-month` util
+- [x] demo seed: guest stories (active + archive), pin on studio, repost on host profile
 
 ## v41
 
-- [x] E2E `z-content-trust.spec.ts`: spotlight/team-badges/stories APIs + pages
+- [x] E2E `z-content-trust.spec.ts`: spotlight/team-badges/stories APIs + pages + host profile repost UI
 - [x] README: phase 8 URLs + admin sections
 - [x] Nav: `/spotlight` in header
 - [x] verify ✅
@@ -945,7 +949,7 @@ app/pages/search/
 
 ## Запуск в production (ops) — [LAUNCH.md](LAUNCH.md)
 
-**Код:** ✅ `npm run verify:all` (57 E2E). **Осталось на стороне инфраструктуры:**
+**Код:** ✅ `npm run verify:all` (61 E2E). **Осталось на стороне инфраструктуры:**
 
 - [ ] `git push` → зелёный CI (`npm run launch:status` — чеклист)
 - [ ] VPS: DNS, `.env`, `check:prod`, `docker compose -f docker-compose.prod.yml up -d --build`

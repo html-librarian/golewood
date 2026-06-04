@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { AmenityCatalogItem } from '#shared/types/catalog'
 import { AMENITY_LABELS } from '#shared/types/listing'
+import { resolveAmenityIcon } from '#shared/utils/amenity-icon'
 import type { ListingAmenitiesProps } from './types'
 
 defineProps<ListingAmenitiesProps>()
@@ -31,7 +32,7 @@ const labelFor = (slug: string) => {
 }
 
 const iconFor = (slug: string) =>
-  catalogBySlug.value.get(slug)?.icon ?? 'ph:check-circle-duotone'
+  resolveAmenityIcon(catalogBySlug.value.get(slug)?.icon)
 </script>
 
 <template>
@@ -43,7 +44,7 @@ const iconFor = (slug: string) =>
     >
       <Icon
         :name="iconFor(amenity)"
-        class="size-4 shrink-0"
+        class="chip-icon"
       />
       {{ labelFor(amenity) }}
     </li>

@@ -52,8 +52,40 @@ const getPrimaryStyle = (): StyleSpecification =>
 
 const scheduleResize = () => {
   nextTick(() => {
-    requestAnimationFrame(() => map?.resize())
+    requestAnimationFrame(() => {
+      map?.resize()
+      requestAnimationFrame(() => map?.resize())
+    })
   })
+}
+
+const ensureMapReady = () => {
+  if (!mapRoot.value || !props.items.length) {
+    return
+  }
+
+  if (!map) {
+    initMap()
+    return
+  }
+
+  scheduleResize()
+}
+
+let visibilityObserver: IntersectionObserver | null = null
+
+const bindVisibilityObserver = () => {
+  if (!import.meta.client || !mapShell.value || visibilityObserver) {
+    return
+  }
+
+  visibilityObserver = new IntersectionObserver((entries) => {
+    if (entries.some(entry => entry.isIntersecting)) {
+      ensureMapReady()
+    }
+  }, { threshold: 0.01 })
+
+  visibilityObserver.observe(mapShell.value)
 }
 
 const cleanupPopup = (id: string) => {
@@ -94,6 +126,12 @@ const createPopupContent = (listing: ListingCardModel) => {
 const bindListingPopup = (item: MapPinItem) => {
   if (!map || !maplibre) {
     return
+  }
+
+  for (const openId of [...popupsById.keys()]) {
+    if (openId !== item.id) {
+      cleanupPopup(openId)
+    }
   }
 
   cleanupPopup(item.id)
@@ -280,7 +318,7 @@ watch(() => props.items, () => {
 }, { deep: true })
 
 watch(() => props.activeId, (id) => {
-  if (!id || !map) {
+  if (!map) {
     return
   }
 
@@ -291,14 +329,13 @@ watch(() => props.activeId, (id) => {
       continue
     }
 
-    const item = props.items.find(entry => entry.id === markerId)
-
-    if (!item) {
-      continue
-    }
-
     const active = markerId === id
     element.className = active ? 'map-house-marker map-house-marker--active' : 'map-house-marker'
+  }
+
+  if (!id) {
+    cleanupAllPopups()
+    return
   }
 
   openPopup(id)
@@ -313,25 +350,41 @@ watch(() => colorMode.value, () => {
   map.once('styledata', syncMarkers)
 })
 
+watch(mapShell, (shell) => {
+  if (!shell) {
+    return
+  }
+
+  bindVisibilityObserver()
+  ensureMapReady()
+}, { flush: 'post' })
+
+watch(mapRoot, (root) => {
+  if (root) {
+    ensureMapReady()
+  }
+}, { flush: 'post' })
+
 onMounted(() => {
   nextTick(() => {
-    initMap()
-    scheduleResize()
+    ensureMapReady()
   })
 })
 
 onBeforeUnmount(() => {
+  visibilityObserver?.disconnect()
+  visibilityObserver = null
   destroyMap()
 })
 
-defineExpose({ resize: scheduleResize })
+defineExpose({ resize: ensureMapReady })
 </script>
 
 <template>
   <ClientOnly>
     <div
       ref="mapShell"
-      class="relative isolate w-full overflow-hidden rounded-xl border border-stone-200 dark:border-stone-800"
+      class="relative isolate size-full min-h-[240px] overflow-hidden rounded-xl border border-stone-200 dark:border-stone-800"
       :class="props.class"
     >
       <div

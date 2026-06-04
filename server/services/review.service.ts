@@ -163,6 +163,46 @@ const getRepliesForReviews = async (
   return grouped
 }
 
+const getMyPendingReviewForListing = async (
+  listingId: string,
+  userId: string,
+): Promise<ReviewPublic | null> => {
+  const db = getDb()
+  const [row] = await db.select({
+    review: reviews,
+    authorName: users.name,
+    hostId: listings.hostId,
+    checkIn: bookings.checkIn,
+    checkOut: bookings.checkOut,
+    guests: bookings.guests,
+  })
+    .from(reviews)
+    .innerJoin(users, eq(reviews.authorId, users.id))
+    .innerJoin(bookings, eq(reviews.bookingId, bookings.id))
+    .innerJoin(listings, eq(reviews.listingId, listings.id))
+    .where(and(
+      eq(reviews.listingId, listingId),
+      eq(reviews.authorId, userId),
+      eq(reviews.status, 'pending'),
+    ))
+    .orderBy(desc(reviews.createdAt))
+    .limit(1)
+
+  if (!row) {
+    return null
+  }
+
+  const photoMap = await getReviewPhotos([row.review.id])
+
+  return mapReviewPublic(
+    row.review,
+    row.authorName,
+    photoMap[row.review.id] ?? [],
+    mapStayMeta(row.checkIn, row.checkOut, row.guests),
+    [],
+  )
+}
+
 export const reviewService = {
   listForListing: async (listingId: string): Promise<ListingReviewsResponse> => {
     const db = getDb()
@@ -235,6 +275,12 @@ export const reviewService = {
 
   getEligibility: async (listingId: string, userId: string, preferredBookingId?: string): Promise<ReviewEligibility> => {
     const db = getDb()
+    const pendingReview = await getMyPendingReviewForListing(listingId, userId)
+
+    const withPending = (result: ReviewEligibility): ReviewEligibility => ({
+      ...result,
+      pendingReview: pendingReview ?? null,
+    })
 
     const resolveIneligibleReason = async (bookingId: string): Promise<ReviewEligibilityReason> => {
       const [booking] = await db.select({
@@ -309,13 +355,13 @@ export const reviewService = {
 
     if (preferredBookingId) {
       if (await isBookingEligible(preferredBookingId)) {
-        return { bookingId: preferredBookingId }
+        return withPending({ bookingId: preferredBookingId })
       }
 
-      return {
+      return withPending({
         bookingId: null,
         reason: await resolveIneligibleReason(preferredBookingId),
-      }
+      })
     }
 
     const candidateBookings = await db.select({ id: bookings.id })
@@ -329,11 +375,11 @@ export const reviewService = {
 
     for (const booking of candidateBookings) {
       if (await isBookingEligible(booking.id)) {
-        return { bookingId: booking.id }
+        return withPending({ bookingId: booking.id })
       }
     }
 
-    return { bookingId: null }
+    return withPending({ bookingId: null })
   },
 
   create: async (bookingId: string, userId: string, input: CreateReviewInput): Promise<Review> => {

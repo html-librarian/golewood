@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
 
 <template>
   <form
-    class="surface-card space-y-5 p-5"
+    class="space-y-5"
     data-testid="review-form"
     @submit.prevent="handleSubmit()"
   >
@@ -152,6 +152,7 @@ onBeforeUnmount(() => {
           accept="image/jpeg,image/png,image/webp"
           multiple
           class="sr-only"
+          :aria-label="$t('review.addPhotos')"
           @change="onPhotosSelected"
         >
       </label>

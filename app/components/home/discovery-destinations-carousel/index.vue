@@ -14,6 +14,10 @@ const trackRef = ref<HTMLElement | null>(null)
 const canScrollPrev = ref(false)
 const canScrollNext = ref(false)
 
+const SCROLL_EDGE = 20
+
+let rafId = 0
+
 const labelFor = (filter: HomeDiscoveryFilter) =>
   locale.value === 'en' ? filter.labelEn : filter.labelRu
 
@@ -32,9 +36,20 @@ const updateScrollState = () => {
     return
   }
 
-  const maxScroll = track.scrollWidth - track.clientWidth
-  canScrollPrev.value = track.scrollLeft > 4
-  canScrollNext.value = track.scrollLeft < maxScroll - 4
+  const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth)
+  canScrollPrev.value = track.scrollLeft > SCROLL_EDGE
+  canScrollNext.value = maxScroll > SCROLL_EDGE && track.scrollLeft < maxScroll - SCROLL_EDGE
+}
+
+const scheduleScrollStateUpdate = () => {
+  if (rafId) {
+    return
+  }
+
+  rafId = requestAnimationFrame(() => {
+    rafId = 0
+    updateScrollState()
+  })
 }
 
 const scrollByStep = (direction: -1 | 1) => {
@@ -56,18 +71,33 @@ const onSelect = (filter: HomeDiscoveryFilter) => {
   emit('select', filter)
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick()
+
+  if (trackRef.value) {
+    trackRef.value.scrollLeft = 0
+  }
+
   updateScrollState()
-  trackRef.value?.addEventListener('scroll', updateScrollState, { passive: true })
-  window.addEventListener('resize', updateScrollState)
+  trackRef.value?.addEventListener('scroll', scheduleScrollStateUpdate, { passive: true })
+  window.addEventListener('resize', scheduleScrollStateUpdate)
 })
 
 onBeforeUnmount(() => {
-  trackRef.value?.removeEventListener('scroll', updateScrollState)
-  window.removeEventListener('resize', updateScrollState)
+  trackRef.value?.removeEventListener('scroll', scheduleScrollStateUpdate)
+  window.removeEventListener('resize', scheduleScrollStateUpdate)
+  cancelAnimationFrame(rafId)
 })
 
 watch(() => props.filters.length, () => nextTick(updateScrollState))
+
+const showPrevControl = computed(() => canScrollPrev.value)
+const showNextControl = computed(() => canScrollNext.value)
+
+const trackClass = computed(() => [
+  'flex gap-3 overflow-x-auto scroll-smooth py-1 pb-2 [-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden snap-x snap-mandatory',
+  !canScrollNext.value ? 'pr-4 md:pr-6' : 'pr-0',
+])
 </script>
 
 <template>
@@ -77,13 +107,13 @@ watch(() => props.filters.length, () => nextTick(updateScrollState))
   >
     <div
       ref="trackRef"
-      class="flex gap-3 overflow-x-auto scroll-smooth py-1 pb-2 pr-4 [-ms-overflow-style:none] scrollbar-none md:pr-6 lg:pr-8 [&::-webkit-scrollbar]:hidden snap-x snap-mandatory 2xl:pr-10"
+      :class="trackClass"
     >
       <NuxtLink
         v-for="filter in filters"
         :key="filter.id"
         :to="searchLink(filter)"
-        class="group relative aspect-4/5 w-29 shrink-0 snap-start overflow-hidden rounded-2xl ring-1 ring-black/10 sm:w-32 md:w-36 dark:ring-white/10"
+        class="destination-card group relative aspect-4/5 w-36 shrink-0 snap-start overflow-hidden rounded-2xl sm:w-40 md:w-48"
         @click="onSelect(filter)"
       >
         <div
@@ -107,16 +137,18 @@ watch(() => props.filters.length, () => nextTick(updateScrollState))
           />
         </div>
 
-        <span class="absolute inset-x-0 bottom-0 z-10 p-3 text-left text-sm font-semibold leading-tight text-white">
+        <span class="absolute inset-x-0 bottom-0 z-10 p-3 text-left text-xs font-semibold leading-none whitespace-nowrap text-white sm:text-sm">
           {{ labelFor(filter) }}
         </span>
       </NuxtLink>
     </div>
 
     <button
-      v-if="canScrollPrev"
       type="button"
-      class="absolute left-0 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200/80 bg-white/95 text-stone-700 shadow-md backdrop-blur-sm transition hover:bg-white dark:border-stone-700 dark:bg-stone-900/95 dark:text-stone-200"
+      class="absolute left-2 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-stone-700 shadow-md backdrop-blur-sm transition-opacity duration-200 hover:bg-white md:left-3 dark:bg-stone-900/95 dark:text-stone-200"
+      :class="showPrevControl ? 'opacity-100' : 'pointer-events-none opacity-0'"
+      :aria-hidden="!showPrevControl"
+      :tabindex="showPrevControl ? 0 : -1"
       :aria-label="t('common.carouselPrev')"
       @click="scrollByStep(-1)"
     >
@@ -127,9 +159,11 @@ watch(() => props.filters.length, () => nextTick(updateScrollState))
     </button>
 
     <button
-      v-if="canScrollNext"
       type="button"
-      class="absolute right-4 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200/80 bg-white/95 text-stone-700 shadow-md backdrop-blur-sm transition hover:bg-white md:right-6 lg:right-8 dark:border-stone-700 dark:bg-stone-900/95 dark:text-stone-200 2xl:right-10"
+      class="absolute right-2 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-stone-700 shadow-md backdrop-blur-sm transition-opacity duration-200 hover:bg-white md:right-3 dark:bg-stone-900/95 dark:text-stone-200"
+      :class="showNextControl ? 'opacity-100' : 'pointer-events-none opacity-0'"
+      :aria-hidden="!showNextControl"
+      :tabindex="showNextControl ? 0 : -1"
       :aria-label="t('common.carouselNext')"
       @click="scrollByStep(1)"
     >

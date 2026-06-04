@@ -9,14 +9,6 @@ const { t } = useI18n()
 
 const isPromoted = computed(() => Boolean(props.listing.promotions?.highlight))
 
-const ratingLabel = computed(() => {
-  if (!props.listing.reviewCount || props.listing.averageRating == null) {
-    return null
-  }
-
-  return `${props.listing.averageRating} (${props.listing.reviewCount})`
-})
-
 const showCityPin = computed(() => Boolean(props.listing.promotions?.cityPin))
 
 const showOverlayBadges = computed(() =>
@@ -32,21 +24,21 @@ const showOverlayBadges = computed(() =>
 <template>
   <NuxtLink
     :to="localePath(`/listings/${listing.id}`)"
-    class="group grid w-full grid-cols-[minmax(7rem,9rem)_minmax(0,1fr)_auto] gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 sm:grid-cols-[10rem_minmax(0,1fr)_auto] sm:gap-4"
+    class="group grid w-full grid-cols-[minmax(7rem,9rem)_minmax(0,1fr)_auto] gap-3 rounded-xl px-1 py-2 transition hover:bg-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 sm:grid-cols-[10rem_minmax(0,1fr)_auto] sm:gap-4 sm:px-2 dark:hover:bg-stone-900/60"
     :class="isPromoted
-      ? 'rounded-xl bg-brand-50/40 px-2 py-1 ring-1 ring-brand-300/40 dark:bg-brand-950/25 dark:ring-brand-700/35'
+      ? 'bg-brand-50/50 ring-1 ring-brand-300/35 dark:bg-brand-950/20 dark:ring-brand-700/35'
       : ''"
     :data-testid="isPromoted ? 'search-result-highlighted' : undefined"
   >
     <div
-      class="relative h-24 overflow-hidden rounded-lg bg-stone-100 sm:h-28 dark:bg-stone-800"
-      :class="isPromoted ? 'ring-1 ring-brand-300/60 dark:ring-brand-600/45' : ''"
+      class="search-result-thumb relative h-24 overflow-hidden rounded-xl bg-stone-100 shadow-sm sm:h-28 dark:bg-stone-800"
+      :class="isPromoted ? 'ring-1 ring-brand-300/60 dark:ring-brand-600/45' : 'ring-1 ring-stone-200/60 dark:ring-stone-700/60'"
     >
       <ListingImage
         v-if="listing.coverPhoto"
         :src="listing.coverPhoto.url"
         :alt="listing.title"
-        class="size-full transition duration-500 group-hover:scale-105"
+        class="size-full transition duration-700 ease-out group-hover:scale-[1.04]"
       />
       <ListingImagePlaceholder v-else />
 
@@ -68,15 +60,15 @@ const showOverlayBadges = computed(() =>
       </div>
     </div>
 
-    <div class="flex min-w-0 flex-col gap-1.5">
-      <h3
-        class="line-clamp-2 text-sm font-semibold leading-snug sm:text-base"
+    <div class="flex min-w-0 flex-col gap-1.5 py-0.5">
+      <p
+        class="line-clamp-2 font-display text-sm font-semibold leading-snug sm:text-base"
         :class="isPromoted
           ? 'text-brand-900 dark:text-brand-100'
           : 'text-stone-900 dark:text-stone-50'"
       >
         {{ listing.title }}
-      </h3>
+      </p>
       <p class="line-clamp-2 text-xs text-stone-500 sm:text-sm dark:text-stone-400">
         {{ listing.city }}<template v-if="listing.address">, {{ listing.address }}</template>
       </p>
@@ -86,19 +78,16 @@ const showOverlayBadges = computed(() =>
           · {{ listing.distance.toFixed(1) }} km
         </template>
       </p>
-      <span
-        v-if="ratingLabel"
-        class="inline-flex w-fit items-center gap-1 rounded-md bg-emerald-700 px-2 py-0.5 text-xs font-semibold text-white"
-      >
-        <Icon
-          name="ph:star-fill"
-          class="size-3.5"
-        />
-        {{ ratingLabel }}
-      </span>
+      <UiRatingPill
+        v-if="listing.reviewCount && listing.averageRating != null"
+        :score="listing.averageRating"
+        :count="listing.reviewCount"
+        size="sm"
+        class="w-fit"
+      />
     </div>
 
-    <div class="flex flex-col items-end justify-start text-right">
+    <div class="flex flex-col items-end justify-start py-0.5 text-right">
       <p class="text-lg font-bold leading-none text-stone-900 sm:text-xl dark:text-stone-50">
         {{ formatPrice(listing.pricePerNight) }}
       </p>

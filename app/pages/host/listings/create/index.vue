@@ -7,10 +7,13 @@ import { CANCELLATION_POLICIES, CANCELLATION_POLICY_LABELS } from '#shared/types
 import type { AmenityCatalogItem } from '#shared/types/catalog'
 import type { ListingDocument, ListingPhoto } from '#shared/types/listing'
 import { listingContactsFromForm, listingContactsToForm } from '#shared/utils/listing-contacts'
+import { resolveAmenityIcon } from '#shared/utils/amenity-icon'
 import {
   buildListingMetaDescription,
   buildListingMetaTitle,
 } from '#shared/utils/listing-seo'
+import { formatListingPriceBreakdown } from '#shared/utils/listing-price-preview'
+import type { ListingPriceInputMode } from '#shared/utils/listing-price-preview'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
@@ -32,6 +35,7 @@ const { data: amenityCatalog } = await useAsyncData('wizard-amenities', () => fe
 const { data: accommodationTypeCatalog } = await useAsyncData('wizard-accommodation-types', () => fetchAccommodationTypes())
 
 const step = ref(1)
+const priceInputMode = ref<ListingPriceInputMode>('hostNet')
 const listingId = ref<string | null>(null)
 const isTeamManaged = ref(false)
 const propertyListingId = computed(() =>
@@ -352,13 +356,35 @@ const sourcePayload = () => (isTeamManaged.value
       sourceAttributionEn: form.sourceAttributionEn.trim() || null,
     }
   : {})
+
+const previewCoverPhotoUrl = computed(() => {
+  const cover = photos.value.find(item => item.mediaType === 'photo') ?? photos.value[0]
+
+  return cover?.url ?? null
+})
+
+const previewGuestPrice = computed(() => {
+  if (step.value < 2) {
+    return null
+  }
+
+  const base = Number(form.pricePerNight) || 0
+
+  if (base <= 0) {
+    return null
+  }
+
+  return formatListingPriceBreakdown(base).guestTotal
+})
 </script>
 
 <template>
-  <div class="page-container max-w-2xl">
-    <h1 class="section-title mb-6">
-      {{ isEditing ? t('titleEdit') : t('title') }}
-    </h1>
+  <div class="page-container max-w-6xl">
+    <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_min(100%,20rem)] lg:items-start lg:gap-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
+      <div class="min-w-0">
+        <h1 class="section-title mb-6">
+          {{ isEditing ? t('titleEdit') : t('title') }}
+        </h1>
 
     <p
       v-if="loadingListing"
@@ -374,6 +400,20 @@ const sourcePayload = () => (isTeamManaged.value
       clickable
       :is-step-enabled="isWizardStepEnabled"
       @select="goToWizardStep"
+    />
+
+    <HostListingPreview
+      class="mb-6 lg:hidden"
+      :caption="t('previewCaption')"
+      :hint="t('previewHint')"
+      :placeholder-title="t('previewPlaceholderTitle')"
+      :placeholder-city="t('previewPlaceholderCity')"
+      :title="form.title"
+      :city="form.city"
+      :max-guests="Number(form.maxGuests) || 1"
+      :bedrooms="Number(form.bedrooms) || 1"
+      :cover-photo-url="previewCoverPhotoUrl"
+      :guest-price-per-night="previewGuestPrice"
     />
 
     <p
@@ -480,11 +520,17 @@ const sourcePayload = () => (isTeamManaged.value
       class="surface-card space-y-4 p-5"
       @submit.prevent="saveDetails()"
     >
-      <FormInput
+      <HostListingPriceInput
         v-model="form.pricePerNight"
-        type="number"
-        :label="t('priceLabel')"
-        required
+        v-model:mode="priceInputMode"
+        :label-host-net="t('priceHostNetLabel')"
+        :label-guest-total="t('priceGuestTotalLabel')"
+        :mode-host-net="t('priceModeHostNet')"
+        :mode-guest-total="t('priceModeGuestTotal')"
+        :fee-hint-host-net="t('priceFeeHintHostNet')"
+        :fee-hint-guest-total="t('priceFeeHintGuestTotal')"
+        :host-receives-label="t('priceHostReceives')"
+        :guest-pays-label="t('priceGuestPays')"
       />
       <div class="space-y-2">
         <FormLabel required>
@@ -648,8 +694,8 @@ const sourcePayload = () => (isTeamManaged.value
             @click="toggleAmenity(amenity.slug)"
           >
             <Icon
-              :name="amenity.icon"
-              class="size-4"
+              :name="resolveAmenityIcon(amenity.icon)"
+              class="chip-icon"
             />
             {{ amenityLabel(amenity) }}
           </button>
@@ -728,6 +774,23 @@ const sourcePayload = () => (isTeamManaged.value
           {{ t('submit') }}
         </UiButton>
       </div>
+    </div>
+      </div>
+
+      <aside class="hidden lg:sticky lg:top-24 lg:block">
+        <HostListingPreview
+          :caption="t('previewCaption')"
+          :hint="t('previewHint')"
+          :placeholder-title="t('previewPlaceholderTitle')"
+          :placeholder-city="t('previewPlaceholderCity')"
+          :title="form.title"
+          :city="form.city"
+          :max-guests="Number(form.maxGuests) || 1"
+          :bedrooms="Number(form.bedrooms) || 1"
+          :cover-photo-url="previewCoverPhotoUrl"
+          :guest-price-per-night="previewGuestPrice"
+        />
+      </aside>
     </div>
   </div>
 </template>

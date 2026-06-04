@@ -17,7 +17,7 @@ const rightDimensions = REVIEW_RATING_DIMENSIONS.slice(3)
 <template>
   <section
     data-testid="review-rating-summary"
-    class="overflow-hidden rounded-2xl border border-stone-200/80 bg-linear-to-br from-brand-50/90 via-white to-stone-50/80 p-5 shadow-(--shadow-soft) sm:p-6 dark:border-stone-800 dark:from-brand-950/50 dark:via-stone-900 dark:to-stone-950/80"
+    class="rating-summary-panel overflow-hidden rounded-2xl border border-stone-200/80 bg-linear-to-br from-brand-50/90 via-white to-stone-50/80 p-5 shadow-(--shadow-soft) sm:p-6 dark:border-stone-800 dark:from-brand-950/50 dark:via-stone-900 dark:to-stone-950/80"
   >
     <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-10">
       <div class="flex shrink-0 flex-col items-center gap-3 text-center lg:min-w-44 lg:items-start lg:text-left">

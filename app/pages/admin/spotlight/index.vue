@@ -214,6 +214,7 @@ const openFilePicker = () => {
             type="file"
             accept="image/jpeg,image/png,image/webp"
             class="sr-only"
+            :aria-label="t('bannerUpload')"
             @change="onBannerFileChange"
           >
 

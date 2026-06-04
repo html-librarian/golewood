@@ -9,6 +9,7 @@ import {
   searchFilterCacheKey,
   searchParamsCacheKey,
 } from '#shared/utils/search-query'
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
@@ -310,6 +311,10 @@ const onListingHover = (id: string) => {
   activeId.value = id
 }
 
+const onListingHoverEnd = () => {
+  activeId.value = null
+}
+
 const mapFullscreen = ref(false)
 const mapPinsRef = ref<{ resize: () => void } | null>(null)
 const filtersOpen = ref(false)
@@ -334,6 +339,16 @@ const activeFiltersCount = computed(() => {
 
 const hasActiveFilters = computed(() => activeFiltersCount.value > 0)
 
+const resultsTotal = computed(() => {
+  if (showSkeleton.value) {
+    return null
+  }
+
+  return results.value?.total ?? 0
+})
+
+const { display: animatedResultsTotal } = useCountUp(resultsTotal, { decimals: 0 })
+
 const resultsSummary = computed(() => {
   if (showSkeleton.value) {
     return `${t('results')}…`
@@ -341,7 +356,13 @@ const resultsSummary = computed(() => {
 
   const total = results.value?.total ?? 0
 
-  return total === 0 ? t('resultsNone') : `${t('results')}: ${total}`
+  if (total === 0) {
+    return t('resultsNone')
+  }
+
+  const count = animatedResultsTotal.value ?? total
+
+  return `${t('results')}: ${count}`
 })
 
 const clearSearchFilters = async () => {
@@ -396,11 +417,27 @@ const collapseMobileSearch = () => {
   mobileSearchExpanded.value = false
 }
 
+const refreshMapPanel = () => {
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      mapPinsRef.value?.resize()
+
+      window.setTimeout(() => {
+        mapPinsRef.value?.resize()
+      }, 120)
+
+      window.setTimeout(() => {
+        mapPinsRef.value?.resize()
+      }, 350)
+    })
+  })
+}
+
 const setMobileView = (view: 'list' | 'map') => {
   mobileView.value = view
 
   if (view === 'map') {
-    nextTick(() => mapPinsRef.value?.resize())
+    refreshMapPanel()
   }
 }
 
@@ -413,7 +450,7 @@ watch(mapFullscreen, (open) => {
     document.body.classList.toggle('overflow-hidden', open)
   }
 
-  nextTick(() => mapPinsRef.value?.resize())
+  refreshMapPanel()
 })
 
 const onMapFullscreenKeydown = (event: KeyboardEvent) => {
@@ -439,7 +476,13 @@ onBeforeUnmount(() => {
 
 watch(mobileView, (view) => {
   if (view === 'map') {
-    nextTick(() => mapPinsRef.value?.resize())
+    refreshMapPanel()
+  }
+})
+
+watch(mapPinsRef, (pins) => {
+  if (pins && showMapPanel.value) {
+    refreshMapPanel()
   }
 })
 
@@ -503,12 +546,11 @@ watch(routeSearchKey, () => {
             </button>
           </div>
 
-          <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2">
+          <div class="grid grid-cols-[auto_minmax(0,1fr)] items-stretch gap-2">
             <UiButton
               type="button"
               variant="outline"
-              size="sm"
-              class="shrink-0 whitespace-nowrap"
+              class="h-full shrink-0 whitespace-nowrap px-3 py-2.5 text-sm"
               data-testid="search-filters-toggle"
               @click="filtersOpen = !filtersOpen"
             >
@@ -591,8 +633,10 @@ watch(routeSearchKey, () => {
     </div>
 
     <div
-      class="layout-container grid flex-1 grid-cols-1 gap-6 py-6"
-      :class="isSearchDesktop ? 'xl:grid-cols-[240px_minmax(0,1fr)_minmax(22rem,42%)] xl:items-start' : 'min-h-0'"
+      class="layout-container flex-1 py-6"
+      :class="isSearchDesktop
+        ? 'grid grid-cols-1 gap-6 xl:grid-cols-[240px_minmax(0,1fr)_minmax(22rem,42%)] xl:items-start'
+        : 'flex min-h-0 flex-col gap-6'"
     >
       <SearchFilters
         v-model:min-price="form.minPrice"
@@ -642,7 +686,7 @@ watch(routeSearchKey, () => {
 
         <div
           v-if="showSkeleton"
-          class="divide-y divide-stone-200 overflow-hidden rounded-xl border border-stone-200 bg-white dark:divide-stone-800 dark:border-stone-800 dark:bg-stone-900"
+          class="surface-card divide-y divide-stone-200 overflow-hidden dark:divide-stone-800"
         >
           <div
             v-for="n in 4"
@@ -675,13 +719,15 @@ watch(routeSearchKey, () => {
 
         <div
           v-else
-          class="divide-y divide-stone-200 overflow-hidden rounded-xl border border-stone-200 bg-white dark:divide-stone-800 dark:border-stone-800 dark:bg-stone-900"
+          class="surface-card divide-y divide-stone-200 overflow-hidden dark:divide-stone-800"
+          @mouseleave="onListingHoverEnd"
         >
           <div
-            v-for="item in results.items"
+            v-for="(item, index) in results.items"
             :id="`listing-${item.id}`"
-            :key="item.id"
-            class="px-3 py-4 transition-colors sm:px-4 hover:bg-stone-50 dark:hover:bg-stone-900/60"
+            :key="`${routeSearchKey}-${item.id}`"
+            class="search-result-enter px-3 py-4 transition-colors sm:px-4 hover:bg-stone-50 dark:hover:bg-stone-900/60"
+            :style="{ animationDelay: `${staggerDelayMs(index, 45, 400)}ms` }"
             :class="{
               'bg-brand-50/60 dark:bg-brand-950/30': activeId === item.id && !item.promotions?.highlight,
               'bg-brand-50/80 dark:bg-brand-950/40': activeId === item.id && item.promotions?.highlight,
@@ -695,9 +741,9 @@ watch(routeSearchKey, () => {
         <nav
           v-if="results?.items.length && totalPages > 1"
           class="mt-4 flex flex-wrap items-center justify-between gap-3"
-          aria-label="Pagination"
+          :aria-label="t('paginationAria')"
         >
-          <p class="text-sm text-stone-600 dark:text-stone-400">
+          <p class="legal-meta">
             {{ t('pageOf', { page: currentPage, total: totalPages }) }}
           </p>
           <div class="flex gap-2">
@@ -728,17 +774,21 @@ watch(routeSearchKey, () => {
         :disabled="!mapFullscreen"
       >
         <section
-          v-if="showMapPanel"
+          v-show="showMapPanel"
           :class="mapFullscreen
             ? 'fixed inset-0 z-300 flex flex-col bg-stone-50 p-3 dark:bg-stone-950 sm:p-4'
-            : 'max-xl:flex max-xl:min-h-0 max-xl:flex-1 xl:sticky xl:top-32 xl:col-span-1 xl:z-10 xl:self-start'"
+            : isSearchDesktop
+              ? 'xl:sticky xl:top-32 xl:col-span-1 xl:z-10 xl:self-start'
+              : 'flex h-[calc(100dvh-11rem)] min-h-0 flex-1 flex-col'"
         >
           <div
             v-if="mapItems.length"
-            class="relative min-h-0"
+            class="relative min-h-0 flex-1"
             :class="mapFullscreen
               ? 'flex flex-1 flex-col'
-              : 'h-[calc(100dvh-12rem)] max-xl:min-h-[280px] xl:h-[calc(100dvh-11rem)] xl:max-h-[calc(100dvh-11rem)]'"
+              : isSearchDesktop
+                ? 'h-[calc(100dvh-11rem)] max-h-[calc(100dvh-11rem)]'
+                : 'h-full min-h-[280px]'"
           >
             <div
               class="absolute left-3 top-3 z-10 flex gap-2"
@@ -770,7 +820,7 @@ watch(routeSearchKey, () => {
 
           <div
             v-else
-            class="flex h-[calc(100dvh-12rem)] min-h-[280px] items-center justify-center rounded-xl border border-dashed border-stone-300 p-6 text-center text-sm text-stone-500 dark:border-stone-700 dark:text-stone-400 xl:h-[calc(100dvh-11rem)] xl:max-h-[calc(100dvh-11rem)]"
+            class="flex min-h-[min(100%,calc(100dvh-11rem))] flex-1 items-center justify-center rounded-xl border border-dashed border-stone-300 p-6 text-center text-sm text-stone-500 dark:border-stone-700 dark:text-stone-400 xl:h-[calc(100dvh-11rem)] xl:max-h-[calc(100dvh-11rem)]"
           >
             {{ t('mapEmpty') }}
           </div>

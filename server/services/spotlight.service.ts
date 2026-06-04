@@ -111,6 +111,33 @@ export const spotlightService = {
     }))
   },
 
+  listMyPendingForMonth: async (userId: string, monthKey?: string): Promise<SpotlightPhoto[]> => {
+    const month = monthKey ?? getCurrentMonthKey()
+    const db = getDb()
+
+    const rows = await db.select({
+      photo: spotlightPhotos,
+      listingTitle: listings.title,
+      listingCity: listings.city,
+      authorName: users.name,
+    })
+      .from(spotlightPhotos)
+      .leftJoin(listings, eq(spotlightPhotos.listingId, listings.id))
+      .innerJoin(users, eq(spotlightPhotos.userId, users.id))
+      .where(and(
+        eq(spotlightPhotos.userId, userId),
+        eq(spotlightPhotos.monthKey, month),
+        eq(spotlightPhotos.status, 'pending'),
+      ))
+      .orderBy(desc(spotlightPhotos.createdAt))
+
+    return rows.map(row => mapPhoto(row.photo, {
+      listingTitle: row.listingTitle ?? row.photo.placeName,
+      listingCity: row.listingCity,
+      authorName: row.authorName,
+    }))
+  },
+
   listPending: async (): Promise<SpotlightPhoto[]> => {
     const db = getDb()
     const rows = await db.select({

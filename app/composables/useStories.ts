@@ -1,4 +1,4 @@
-import type { UserStory } from '#shared/types/story'
+import type { MyStoriesResponse, UserStory } from '#shared/types/story'
 import { authorizationHeaders } from '#shared/utils/auth-headers'
 
 export const useStories = () => {
@@ -11,8 +11,11 @@ export const useStories = () => {
 
   const fetchMyStories = async () => {
     await fetchMe()
-    return $fetch<UserStory[]>('/api/stories/me', { headers: authHeaders() })
+    return $fetch<MyStoriesResponse>('/api/stories/me', { headers: authHeaders() })
   }
+
+  const fetchHostProfileStories = (hostId: string) =>
+    $fetch<UserStory[]>(`/api/hosts/${hostId}/stories`)
 
   const uploadStory = async (listingId: string, file: File) => {
     await fetchMe()
@@ -50,12 +53,31 @@ export const useStories = () => {
     })
   }
 
+  const repostStoryToProfile = async (storyId: string) => {
+    await fetchMe()
+    return $fetch(`/api/host/stories/${storyId}/repost`, {
+      method: 'POST',
+      headers: authHeaders(),
+    })
+  }
+
+  const unrepostStoryFromProfile = async (storyId: string) => {
+    await fetchMe()
+    return $fetch(`/api/host/stories/${storyId}/repost`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    })
+  }
+
   return {
     fetchListingStories,
     fetchMyStories,
+    fetchHostProfileStories,
     uploadStory,
     fetchHostListingStories,
     pinStory,
     unpinStory,
+    repostStoryToProfile,
+    unrepostStoryFromProfile,
   }
 }

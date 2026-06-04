@@ -7,6 +7,9 @@ export default defineNuxtConfig({
   css: ['./app/assets/css/main.css'],
   app: {
     head: {
+      htmlAttrs: {
+        lang: 'ru',
+      },
       titleTemplate: '%s · Golewood',
       meta: [
         { charset: 'utf-8' },
@@ -68,9 +71,10 @@ export default defineNuxtConfig({
 
   i18n: {
     defaultLocale: 'ru',
+    baseUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
     locales: [
-      { code: 'ru', name: 'Русский', file: 'ru.json' },
-      { code: 'en', name: 'English', file: 'en.json' },
+      { code: 'ru', name: 'Русский', language: 'ru-RU', file: 'ru.json' },
+      { code: 'en', name: 'English', language: 'en-US', file: 'en.json' },
     ],
     strategy: 'prefix_except_default',
     detectBrowserLanguage: {

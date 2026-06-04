@@ -330,9 +330,9 @@ const formatSyncTime = (iso: string | null) => {
 
       <UiEmpty
         v-if="!sync?.feeds.length"
+        embedded
         icon="ph:arrows-clockwise-duotone"
         :title="t('feedsEmpty')"
-        class="py-6"
       />
 
       <ul

@@ -1,5 +1,9 @@
 import type { ListingSectionNavItem } from '~/components/listing/section-nav/types'
 
+const SECTION_NAV_HEIGHT_PX = 49
+const SCROLL_SPY_TOLERANCE_PX = 8
+const BOTTOM_SNAP_PX = 48
+
 const getSiteHeaderOffsetPx = () => {
   if (!import.meta.client) {
     return 64
@@ -37,8 +41,11 @@ export const useListingSectionNav = (
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  let sectionObserver: IntersectionObserver | undefined
+  let scrollRaf = 0
   let scrollHandler: (() => void) | undefined
+
+  const getScrollAnchorPx = () =>
+    getSiteHeaderOffsetPx() + (visible.value ? SECTION_NAV_HEIGHT_PX : 0)
 
   const updateVisible = () => {
     const el = triggerRef.value
@@ -51,50 +58,61 @@ export const useListingSectionNav = (
     visible.value = el.getBoundingClientRect().bottom < getSiteHeaderOffsetPx()
   }
 
-  const bindSectionObserver = () => {
-    sectionObserver?.disconnect()
+  const updateActiveSection = () => {
+    const list = items.value
 
-    if (!import.meta.client) {
+    if (!list.length) {
       return
     }
 
-    const elements = items.value
-      .map(item => document.getElementById(item.id))
-      .filter((element): element is HTMLElement => element !== null)
+    const nearBottom = window.innerHeight + window.scrollY
+      >= document.documentElement.scrollHeight - BOTTOM_SNAP_PX
 
-    if (!elements.length) {
+    if (nearBottom) {
+      activeId.value = list[list.length - 1].id
       return
     }
 
-    sectionObserver = new IntersectionObserver(
-      (entries) => {
-        const intersecting = entries
-          .filter(entry => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+    const anchor = getScrollAnchorPx() + SCROLL_SPY_TOLERANCE_PX
+    let nextActive = list[0].id
 
-        if (intersecting[0]?.target.id) {
-          activeId.value = intersecting[0].target.id
-        }
-      },
-      {
-        rootMargin: '-96px 0px -55% 0px',
-        threshold: [0, 0.1, 0.25, 0.5],
-      },
-    )
+    for (const item of list) {
+      const element = document.getElementById(item.id)
 
-    for (const element of elements) {
-      sectionObserver.observe(element)
+      if (!element) {
+        continue
+      }
+
+      if (element.getBoundingClientRect().top <= anchor) {
+        nextActive = item.id
+      }
     }
+
+    activeId.value = nextActive
   }
 
-  watch(items, () => nextTick(() => bindSectionObserver()), { deep: true })
+  const onScroll = () => {
+    if (scrollRaf) {
+      return
+    }
+
+    scrollRaf = requestAnimationFrame(() => {
+      scrollRaf = 0
+      updateVisible()
+      updateActiveSection()
+    })
+  }
+
+  watch(items, () => nextTick(() => updateActiveSection()), { deep: true })
+
+  watch(visible, () => nextTick(() => updateActiveSection()))
 
   onMounted(() => {
-    scrollHandler = () => updateVisible()
+    scrollHandler = onScroll
     window.addEventListener('scroll', scrollHandler, { passive: true })
     window.addEventListener('resize', scrollHandler, { passive: true })
     updateVisible()
-    nextTick(() => bindSectionObserver())
+    updateActiveSection()
   })
 
   onBeforeUnmount(() => {
@@ -103,7 +121,9 @@ export const useListingSectionNav = (
       window.removeEventListener('resize', scrollHandler)
     }
 
-    sectionObserver?.disconnect()
+    if (scrollRaf) {
+      cancelAnimationFrame(scrollRaf)
+    }
   })
 
   return {

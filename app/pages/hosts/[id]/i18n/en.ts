@@ -21,4 +21,6 @@ export default {
   noDescription: 'The host has not added a description yet.',
   emptyDescriptionHint: 'Tell guests about yourself or your company — tap “Add description”.',
   news: 'News',
+  guestStories: 'Guest stories',
+  guestStoriesHint: 'Guest mentions stay on your profile until you remove them',
 } as const

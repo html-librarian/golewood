@@ -358,6 +358,7 @@ const breakpoints: { id: HomePromoImageBreakpoint, labelKey: 'imageDesktop' | 'i
                       type="file"
                       accept="image/jpeg,image/png,image/webp"
                       class="sr-only"
+                      :aria-label="t('upload')"
                       @change="onImagePick(banner, bp.id, $event)"
                     >
                     <span class="inline-flex items-center rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-800 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200">

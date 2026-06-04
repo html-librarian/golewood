@@ -5,5 +5,6 @@ describe('blog index page', () => {
   it('exposes i18n keys', () => {
     expect(ru.title).toBeTruthy()
     expect(ru.subtitle).toBeTruthy()
+    expect(ru.popularAuthors).toBeTruthy()
   })
 })

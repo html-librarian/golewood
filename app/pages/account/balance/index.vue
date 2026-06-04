@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import { BONUS_TRANSACTION_LABELS } from '#shared/types/bonus'
 import { formatPrice } from '#shared/utils/format'
 import ru from './i18n/ru'
@@ -54,8 +55,11 @@ const formatSignedAmount = (amount: number) => {
         <p class="text-sm text-stone-500 dark:text-stone-400">
           {{ t('balanceLabel') }}
         </p>
-        <p class="font-display text-4xl font-semibold tabular-nums text-stone-900 dark:text-stone-50">
-          {{ formatPrice(account.balance) }}
+        <p class="font-display text-4xl font-semibold text-stone-900 dark:text-stone-50">
+          <UiCountUp
+            :value="account.balance"
+            format="price"
+          />
         </p>
       </section>
 
@@ -83,9 +87,10 @@ const formatSignedAmount = (amount: number) => {
           class="divide-y divide-stone-200 overflow-hidden rounded-xl border border-stone-200 bg-white dark:divide-stone-800 dark:border-stone-800 dark:bg-stone-900"
         >
           <li
-            v-for="item in account.transactions"
+            v-for="(item, index) in account.transactions"
             :key="item.id"
-            class="flex items-center justify-between gap-4 px-4 py-3"
+            class="search-result-enter flex items-center justify-between gap-4 px-4 py-3"
+            :style="{ animationDelay: `${staggerDelayMs(index, 40, 320)}ms` }"
           >
             <div class="min-w-0">
               <p class="text-sm font-medium text-stone-900 dark:text-stone-100">

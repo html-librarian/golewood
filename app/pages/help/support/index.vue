@@ -42,70 +42,82 @@ const initialEmail = computed(() => user.value?.email?.trim() || '')
 
       <article class="space-y-6">
         <header class="space-y-2">
-          <h1 class="section-title">
+          <h1 class="section-title section-title-accent">
             {{ t('title') }}
           </h1>
-          <p class="max-w-2xl text-stone-600 dark:text-stone-400">
+          <p class="section-subtitle max-w-2xl">
             {{ t('intro') }}
           </p>
         </header>
 
-        <div class="surface-card grid gap-6 p-6 sm:grid-cols-2">
-          <div>
-            <p class="text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-stone-400">
-              {{ t('emailLabel') }}
-            </p>
+        <UiReveal>
+          <div class="reveal-stagger-item surface-card grid gap-6 p-6 sm:grid-cols-2">
+            <div>
+              <p class="text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-stone-400">
+                {{ t('emailLabel') }}
+              </p>
+              <a
+                :href="mailto"
+                class="mt-1 block text-lg font-semibold text-brand-700 hover:underline dark:text-brand-300"
+              >
+                {{ supportEmail }}
+              </a>
+            </div>
+            <div>
+              <p class="text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-stone-400">
+                {{ t('hoursLabel') }}
+              </p>
+              <p class="mt-1 text-sm text-stone-700 dark:text-stone-300">
+                {{ t('hours') }}
+              </p>
+            </div>
+          </div>
+        </UiReveal>
+
+        <UiReveal>
+          <section
+            class="reveal-stagger-item space-y-4"
+            style="transition-delay: 80ms"
+          >
+            <h2 class="font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
+              {{ t('formTitle') }}
+            </h2>
+            <HelpSupportForm
+              :labels="formLabels"
+              :initial-name="initialName"
+              :initial-email="initialEmail"
+            />
+          </section>
+        </UiReveal>
+
+        <UiReveal>
+          <section
+            class="reveal-stagger-item surface-card p-6"
+            style="transition-delay: 120ms"
+          >
+            <h2 class="mb-3 font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
+              {{ t('topicsTitle') }}
+            </h2>
+            <ul class="list-inside list-disc space-y-2 text-sm text-stone-600 dark:text-stone-400">
+              <li
+                v-for="(topic, index) in topics"
+                :key="index"
+              >
+                {{ topic }}
+              </li>
+            </ul>
             <a
               :href="mailto"
-              class="mt-1 block text-lg font-semibold text-brand-700 hover:underline dark:text-brand-300"
+              class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 hover:underline dark:text-brand-300"
             >
-              {{ supportEmail }}
+              <Icon
+                name="ph:envelope-duotone"
+                class="size-5"
+              />
+              {{ t('writeUs') }}
             </a>
-          </div>
-          <div>
-            <p class="text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-stone-400">
-              {{ t('hoursLabel') }}
-            </p>
-            <p class="mt-1 text-sm text-stone-700 dark:text-stone-300">
-              {{ t('hours') }}
-            </p>
-          </div>
-        </div>
-
-        <section class="space-y-4">
-          <h2 class="font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('formTitle') }}
-          </h2>
-          <HelpSupportForm
-            :labels="formLabels"
-            :initial-name="initialName"
-            :initial-email="initialEmail"
-          />
-        </section>
-
-        <section class="surface-card p-6">
-          <h2 class="mb-3 font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('topicsTitle') }}
-          </h2>
-          <ul class="list-inside list-disc space-y-2 text-sm text-stone-600 dark:text-stone-400">
-            <li
-              v-for="(topic, index) in topics"
-              :key="index"
-            >
-              {{ topic }}
-            </li>
-          </ul>
-          <a
-            :href="mailto"
-            class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 hover:underline dark:text-brand-300"
-          >
-            <Icon
-              name="ph:envelope-duotone"
-              class="size-5"
-            />
-            {{ t('writeUs') }}
-          </a>
-        </section>
+          </section>
+        </UiReveal>
       </article>
     </div>
   </div>

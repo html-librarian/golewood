@@ -1,5 +1,6 @@
 export default {
   back: 'Back to messages',
+  viewListing: 'View listing',
   placeholder: 'Write a message…',
   send: 'Send',
   emptyThread: 'Start the conversation — send the first message',

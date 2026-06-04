@@ -65,6 +65,7 @@ const canAddMore = computed(() => props.modelValue.length < props.maxFiles)
         :accept="accept"
         multiple
         class="sr-only"
+        :aria-label="label ?? $t('form.filePickerPick')"
         :disabled="disabled"
         @change="onPick"
       >

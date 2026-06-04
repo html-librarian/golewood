@@ -21,10 +21,10 @@ useSiteSeo({
           <h1 class="section-title">
             {{ t('title') }}
           </h1>
-          <p class="text-sm text-stone-500 dark:text-stone-400">
+          <p class="legal-meta">
             {{ t('updated') }}
           </p>
-          <p class="max-w-2xl text-stone-600 dark:text-stone-400">
+          <p class="legal-body max-w-2xl">
             {{ t('intro') }}
           </p>
         </header>
@@ -35,7 +35,7 @@ useSiteSeo({
           </h2>
           <dl class="grid gap-3 text-sm sm:grid-cols-2">
             <div class="sm:col-span-2">
-              <dt class="text-stone-500 dark:text-stone-400">
+              <dt class="legal-label">
                 {{ t('fields.legalName') }}
               </dt>
               <dd class="font-medium text-stone-900 dark:text-stone-100">
@@ -43,7 +43,7 @@ useSiteSeo({
               </dd>
             </div>
             <div>
-              <dt class="text-stone-500 dark:text-stone-400">
+              <dt class="legal-label">
                 {{ t('fields.inn') }}
               </dt>
               <dd class="font-mono text-stone-900 dark:text-stone-100">
@@ -51,7 +51,7 @@ useSiteSeo({
               </dd>
             </div>
             <div>
-              <dt class="text-stone-500 dark:text-stone-400">
+              <dt class="legal-label">
                 {{ t('fields.kpp') }}
               </dt>
               <dd class="font-mono text-stone-900 dark:text-stone-100">
@@ -59,7 +59,7 @@ useSiteSeo({
               </dd>
             </div>
             <div>
-              <dt class="text-stone-500 dark:text-stone-400">
+              <dt class="legal-label">
                 {{ t('fields.ogrn') }}
               </dt>
               <dd class="font-mono text-stone-900 dark:text-stone-100">
@@ -67,7 +67,7 @@ useSiteSeo({
               </dd>
             </div>
             <div class="sm:col-span-2">
-              <dt class="text-stone-500 dark:text-stone-400">
+              <dt class="legal-label">
                 {{ t('fields.legalAddress') }}
               </dt>
               <dd class="text-stone-900 dark:text-stone-100">
@@ -75,13 +75,13 @@ useSiteSeo({
               </dd>
             </div>
             <div class="sm:col-span-2">
-              <dt class="text-stone-500 dark:text-stone-400">
+              <dt class="legal-label">
                 {{ t('fields.email') }}
               </dt>
               <dd>
                 <a
                   :href="`mailto:${platformLegal.email}`"
-                  class="font-medium text-brand-700 hover:underline dark:text-brand-300"
+                  class="legal-link"
                 >
                   {{ platformLegal.email }}
                 </a>
@@ -96,7 +96,7 @@ useSiteSeo({
           </h2>
           <dl class="grid gap-3 text-sm sm:grid-cols-2">
             <div class="sm:col-span-2">
-              <dt class="text-stone-500 dark:text-stone-400">
+              <dt class="legal-label">
                 {{ t('fields.bankName') }}
               </dt>
               <dd class="text-stone-900 dark:text-stone-100">
@@ -104,7 +104,7 @@ useSiteSeo({
               </dd>
             </div>
             <div class="sm:col-span-2">
-              <dt class="text-stone-500 dark:text-stone-400">
+              <dt class="legal-label">
                 {{ t('fields.bankAccount') }}
               </dt>
               <dd class="font-mono text-stone-900 dark:text-stone-100">
@@ -112,7 +112,7 @@ useSiteSeo({
               </dd>
             </div>
             <div>
-              <dt class="text-stone-500 dark:text-stone-400">
+              <dt class="legal-label">
                 {{ t('fields.bik') }}
               </dt>
               <dd class="font-mono text-stone-900 dark:text-stone-100">
@@ -122,7 +122,7 @@ useSiteSeo({
           </dl>
         </section>
 
-        <p class="text-xs text-stone-500 dark:text-stone-400">
+        <p class="legal-meta text-xs">
           {{ t('disclaimer') }}
         </p>
       </article>

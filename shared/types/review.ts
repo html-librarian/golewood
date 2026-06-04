@@ -71,6 +71,7 @@ export type ReviewEligibilityReason = typeof REVIEW_ELIGIBILITY_REASONS[number]
 export interface ReviewEligibility {
   bookingId: string | null
   reason?: ReviewEligibilityReason
+  pendingReview?: ReviewPublic | null
 }
 
 export interface ListingReviewsResponse {

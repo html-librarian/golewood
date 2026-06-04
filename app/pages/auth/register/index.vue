@@ -99,32 +99,33 @@ const handleVerify = async () => {
         </p>
       </div>
 
-      <div class="flex flex-col gap-2">
-        <a
-          href="/api/auth/oauth/yandex"
-          class="oauth-button"
-        >
-          {{ t('oauthYandex') }}
-        </a>
-        <a
-          href="/api/auth/oauth/vk"
-          class="oauth-button"
-        >
-          {{ t('oauthVk') }}
-        </a>
-      </div>
-
-      <template v-if="phoneAuthEnabled">
-        <div class="my-6 flex items-center gap-3">
-          <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
-          <span class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">{{ t('oauthDivider') }}</span>
-          <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+      <div class="space-y-6">
+        <div class="flex flex-col gap-2">
+          <a
+            href="/api/auth/oauth/yandex"
+            class="oauth-button"
+          >
+            {{ t('oauthYandex') }}
+          </a>
+          <a
+            href="/api/auth/oauth/vk"
+            class="oauth-button"
+          >
+            {{ t('oauthVk') }}
+          </a>
         </div>
 
-        <form
-          class="flex flex-col gap-4"
-          @submit.prevent="step === 'form' ? handleSendCode() : handleVerify()"
-        >
+        <template v-if="phoneAuthEnabled">
+          <div class="flex items-center gap-3">
+            <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+            <span class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">{{ t('oauthDivider') }}</span>
+            <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+          </div>
+
+          <form
+            class="flex flex-col gap-4"
+            @submit.prevent="step === 'form' ? handleSendCode() : handleVerify()"
+          >
           <FormUserName
             v-if="step === 'form'"
             v-model:last-name="lastName"
@@ -170,24 +171,22 @@ const handleVerify = async () => {
             {{ step === 'form' ? t('sendCode') : t('submit') }}
           </UiButton>
         </form>
-      </template>
+        </template>
 
-      <template v-if="emailSignInEnabled">
-        <div
-          v-if="phoneAuthEnabled"
-          class="my-6 flex items-center gap-3"
-        >
-          <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
-          <span class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">{{ t('emailDivider') }}</span>
-          <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
-        </div>
+        <template v-if="emailSignInEnabled">
+          <div class="flex items-center gap-3">
+            <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+            <span class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">{{ t('emailDivider') }}</span>
+            <div class="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+          </div>
 
-        <AuthEmailSignIn
-          :labels="emailLabels"
-          register-mode
-          @success="onEmailSuccess"
-        />
-      </template>
+          <AuthEmailSignIn
+            :labels="emailLabels"
+            register-mode
+            @success="onEmailSuccess"
+          />
+        </template>
+      </div>
 
       <LegalConsentNotice class="mt-6" />
 

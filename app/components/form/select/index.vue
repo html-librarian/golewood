@@ -18,6 +18,10 @@ const selectedLabel = computed(() => {
   return match?.label ?? props.placeholder ?? t('form.selectPlaceholder')
 })
 
+const isPlaceholder = computed(() =>
+  !props.options.some(option => option.value === props.modelValue),
+)
+
 const triggerClass = computed(() => {
   if (props.variant === 'plain') {
     return 'flex w-full items-center justify-between gap-2 border-0 bg-transparent px-3 py-3 text-left text-stone-900 outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:text-stone-100'
@@ -47,7 +51,7 @@ useClickOutside(root, () => {
     :variant="variant"
     :required="required"
   >
-    <template #default="{ fieldId }">
+    <template #default="{ fieldId, labelId }">
       <div
         ref="root"
         class="relative"
@@ -59,10 +63,12 @@ useClickOutside(root, () => {
           :class="triggerClass"
           :disabled="disabled"
           :aria-expanded="open"
+          :aria-labelledby="label ? labelId : undefined"
+          :aria-label="label ? undefined : (placeholder || t('form.selectPlaceholder'))"
           aria-haspopup="listbox"
           @click="open = !open"
         >
-          <span :class="{ 'text-stone-400 dark:text-stone-500': !modelValue }">
+          <span :class="{ 'text-stone-500 dark:text-stone-400': isPlaceholder }">
             {{ selectedLabel }}
           </span>
           <Icon

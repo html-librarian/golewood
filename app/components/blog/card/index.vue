@@ -3,15 +3,33 @@ import type { BlogCardProps } from './types'
 
 const props = defineProps<BlogCardProps>()
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const localePath = useLocalePath()
 
 const title = computed(() => (locale.value === 'en' ? props.post.titleEn : props.post.titleRu))
 const excerpt = computed(() => (locale.value === 'en' ? props.post.excerptEn : props.post.excerptRu))
+
+const locationLabel = computed(() => {
+  const parts = [props.post.city, props.post.listingCity].filter(Boolean)
+
+  return [...new Set(parts)].join(' · ')
+})
+
+const authorLabel = computed(() => {
+  if (!props.post.authorId) {
+    return t('blog.teamReview')
+  }
+
+  return props.post.authorName?.trim() || t('blog.anonymousAuthor')
+})
 </script>
 
 <template>
-  <article class="surface-card overflow-hidden transition hover:shadow-(--shadow-card)">
+  <article class="surface-card-interactive group relative overflow-hidden">
+    <span
+      class="card-crown"
+      aria-hidden="true"
+    />
     <NuxtLink
       :to="localePath(`/blog/${post.slug}`)"
       class="block"
@@ -23,7 +41,7 @@ const excerpt = computed(() => (locale.value === 'en' ? props.post.excerptEn : p
         <img
           :src="post.coverImageUrl"
           :alt="title"
-          class="size-full object-cover"
+          class="size-full object-cover transition duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           loading="lazy"
         >
       </div>
@@ -38,6 +56,30 @@ const excerpt = computed(() => (locale.value === 'en' ? props.post.excerptEn : p
       </div>
 
       <div class="space-y-2 p-4">
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-stone-500 dark:text-stone-400">
+          <NuxtLink
+            v-if="post.authorId"
+            :to="localePath(`/blog/authors/${post.authorId}`)"
+            class="font-medium text-brand-700 hover:underline dark:text-brand-400"
+            @click.stop
+          >
+            {{ authorLabel }}
+          </NuxtLink>
+          <span
+            v-else
+            class="font-medium text-stone-600 dark:text-stone-300"
+          >
+            {{ authorLabel }}
+          </span>
+          <span
+            v-if="locationLabel"
+            aria-hidden="true"
+          >
+            ·
+          </span>
+          <span v-if="locationLabel">{{ locationLabel }}</span>
+        </div>
+
         <h2 class="font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
           {{ title }}
         </h2>
@@ -47,7 +89,7 @@ const excerpt = computed(() => (locale.value === 'en' ? props.post.excerptEn : p
         >
           {{ excerpt }}
         </p>
-        <span class="inline-flex items-center gap-1 text-sm font-medium text-brand-700 dark:text-brand-400">
+        <span class="blog-read-link inline-flex items-center gap-1 text-sm font-medium text-brand-700 dark:text-brand-400">
           {{ $t('blog.readMore') }}
           <Icon
             name="ph:arrow-right"

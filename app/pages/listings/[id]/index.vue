@@ -3,12 +3,13 @@ import { AMENITY_LABELS, CANCELLATION_POLICY_LABELS } from '#shared/types/listin
 import type { ReviewRatings } from '#shared/types/review-ratings'
 import type { ListingSectionNavItem } from '~/components/listing/section-nav/types'
 import { formatPrice } from '#shared/utils/format'
+import { resolveAmenityIcon } from '#shared/utils/amenity-icon'
 import { getListingGuestCapacity } from '#shared/utils/listing-extra-guests'
 import { getListingSourceAttributionText } from '#shared/utils/listing-source-attribution'
 import { buildYandexMapsUrl, hasValidMapCoordinates } from '#shared/utils/map-coordinates'
 import { getReviewRatingLabel } from '#shared/utils/review-rating'
 import { parseBookingRouteQuery } from '#shared/utils/booking-route-query'
-import { buildListingMetaDescription, buildListingMetaTitle } from '#shared/utils/listing-seo'
+import { buildListingMetaTitle } from '#shared/utils/listing-seo'
 import { resolveSiteUrl } from '#shared/utils/seo'
 import ru from './i18n/ru'
 import en from './i18n/en'
@@ -19,7 +20,7 @@ const { t, locale } = usePageI18n({ ru, en })
 const { t: tReview } = useI18n()
 const route = useRoute()
 const localePath = useLocalePath()
-const { isAuthenticated, user, accessToken } = useAuth()
+const { isAuthenticated, user, accessToken, fetchMe } = useAuth()
 const { fetchPublishedById } = useListings()
 const { createBooking } = useBookings()
 const {
@@ -31,6 +32,7 @@ const {
 } = useReviews()
 const { createReport } = useReports()
 const { fetchFavoriteIds, addFavorite, removeFavorite } = useFavorites()
+const { fetchPosts } = useBlog()
 const { startConversation } = useConversations()
 const { fetchListingStories } = useStories()
 const { fetchListingNews } = useListingNews()
@@ -53,6 +55,8 @@ const showReportForm = ref(false)
 const reportLoading = ref(false)
 const reportSubmitted = ref(false)
 const hostVerificationModalOpen = ref(false)
+const reviewAuthPromptOpen = ref(false)
+const reviewAuthAttempted = ref(false)
 
 const listingId = computed(() => String(route.params.id))
 
@@ -322,6 +326,32 @@ const { data: hostNews } = await useAsyncData(
   { watch: [listingId] },
 )
 
+const { data: listingBlogPosts } = await useAsyncData(
+  () => `listing-blog-${listingId.value}`,
+  async () => {
+    const result = await fetchPosts({ listingId: listingId.value, pageSize: 6 })
+    return result.items
+  },
+  { watch: [listingId] },
+)
+
+const hasListingBlogPosts = computed(() => (listingBlogPosts.value?.length ?? 0) > 0)
+
+const listingBlogMoreHref = computed(() => localePath({
+  path: '/blog',
+  query: { listingId: listingId.value },
+}))
+
+const writeBlogPostHref = computed(() => {
+  const query: Record<string, string> = { listingId: listingId.value }
+
+  if (listing.value?.city) {
+    query.city = listing.value.city
+  }
+
+  return localePath({ path: '/blog/create', query })
+})
+
 const teamBadgeHref = computed(() => {
   const firstNews = hostNews.value?.[0]
 
@@ -365,12 +395,6 @@ const shareTitle = computed(() =>
     : '',
 )
 
-const shareDescription = computed(() =>
-  listing.value
-    ? buildListingMetaDescription(listing.value, locale.value === 'en' ? 'en' : 'ru')
-    : '',
-)
-
 const { data: reviewsData, refresh: refreshReviews } = await useAsyncData(
   () => `listing-reviews-${listingId.value}`,
   () => fetchListingReviews(listingId.value),
@@ -393,6 +417,12 @@ const displayedReviews = computed(() =>
 )
 
 const pendingHostReviews = computed(() => hostReviewsData.value?.pending ?? [])
+
+const myPendingReview = computed(() => eligibility.value?.pendingReview ?? null)
+
+const showMyPendingReview = computed(() =>
+  Boolean(myPendingReview.value) && !isHostOwner.value,
+)
 
 const replyLabels = computed(() => ({
   host: t('review.replyHost'),
@@ -431,26 +461,52 @@ const { data: eligibility, refresh: refreshEligibility } = await useAsyncData(
   },
 )
 
-const showReviewLoginHint = computed(() => wantsLeaveReview.value && !isAuthenticated.value)
+const showReviewLoginHint = computed(() =>
+  wantsLeaveReview.value && !isAuthenticated.value && !reviewAuthPromptOpen.value,
+)
 const showReviewAlreadyLeftHint = computed(() =>
-  wantsLeaveReview.value
+  (wantsLeaveReview.value || reviewAuthAttempted.value)
   && isAuthenticated.value
   && !eligibility.value?.bookingId
   && !reviewSubmitted.value
+  && !showMyPendingReview.value
   && eligibility.value?.reason === 'already_reviewed',
 )
 
 const showReviewNotEligibleHint = computed(() =>
-  wantsLeaveReview.value
+  (wantsLeaveReview.value || reviewAuthAttempted.value)
   && isAuthenticated.value
   && !eligibility.value?.bookingId
   && !reviewSubmitted.value
   && eligibility.value?.reason !== 'already_reviewed',
 )
 
+const openReviewAuthPrompt = () => {
+  reviewAuthPromptOpen.value = true
+}
+
 const scrollToReviewsSection = () => {
   reviewsSectionRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
+
+const onReviewAuthSuccess = async () => {
+  reviewAuthPromptOpen.value = false
+  reviewAuthAttempted.value = true
+  await fetchMe()
+  await refreshEligibility()
+  nextTick(() => scrollToReviewsSection())
+}
+
+const showReviewForm = computed(() =>
+  Boolean(eligibility.value?.bookingId) && !reviewSubmitted.value,
+)
+
+const showEmptyReviews = computed(() =>
+  !displayedReviews.value.length
+  && !pendingHostReviews.value.length
+  && !showMyPendingReview.value
+  && !showReviewForm.value,
+)
 
 watch(
   () => eligibility.value?.bookingId,
@@ -487,8 +543,7 @@ const handleReviewSubmit = async (payload: { ratings: ReviewRatings, text: strin
     }
 
     reviewSubmitted.value = true
-    await refreshAllReviews()
-    eligibility.value = { bookingId: null }
+    await Promise.all([refreshAllReviews(), refreshEligibility()])
   } finally {
     reviewLoading.value = false
   }
@@ -586,6 +641,10 @@ const sectionNavItems = computed<ListingSectionNavItem[]>(() => {
     items.push({ id: 'listing-map', label: t('navMap') })
   }
 
+  if (hasListingBlogPosts.value) {
+    items.push({ id: 'listing-blog', label: t('navTravelerStories') })
+  }
+
   items.push({ id: 'reviews', label: t('navReviews') })
 
   return items
@@ -662,7 +721,7 @@ const overviewAmenities = computed(() => {
 
     return {
       slug,
-      icon: item?.icon ?? 'ph:check-circle-duotone',
+      icon: resolveAmenityIcon(item?.icon),
       label: item
         ? (locale.value === 'en' ? item.labelEn : item.labelRu)
         : (legacy?.[locale.value as 'ru' | 'en'] ?? slug),
@@ -770,11 +829,17 @@ const headerPricePerNight = computed(() => {
           </template>
         </ListingSectionNav>
 
-        <header class="space-y-4">
+        <header class="space-y-3">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
-            <div class="min-w-0 flex-1 space-y-2">
+            <div class="min-w-0 flex-1 space-y-3">
+              <p
+                v-if="listing.managedByTeam"
+                class="editorial-kicker editorial-kicker-leaf"
+              >
+                {{ $t('listing.teamCatalog') }}
+              </p>
               <div class="flex flex-wrap items-start gap-3">
-                <h1 class="min-w-0 flex-1 font-display text-2xl font-semibold text-stone-900 sm:text-3xl md:text-4xl dark:text-stone-50">
+                <h1 class="listing-page-title min-w-0 flex-1">
                   {{ listing.title }}
                 </h1>
                 <ListingTeamBadgeLink
@@ -785,20 +850,22 @@ const headerPricePerNight = computed(() => {
                   class="shrink-0"
                 />
               </div>
-              <p class="flex items-center gap-1.5 text-stone-600 dark:text-stone-400">
-                <Icon
-                  name="ph:map-pin-duotone"
-                  class="size-4 shrink-0 text-brand-600 dark:text-brand-400"
-                />
-                {{ listing.city }}<span v-if="listing.address">, {{ listing.address }}</span>
-              </p>
-              <p class="flex items-center gap-1.5 text-sm text-stone-500 dark:text-stone-400">
-                <Icon
-                  name="ph:users-duotone"
-                  class="size-4 shrink-0"
-                  aria-hidden="true"
-                />
-                {{ capacityLabel }}
+              <p class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-stone-600 dark:text-stone-400">
+                <span class="inline-flex items-center gap-1.5">
+                  <Icon
+                    name="ph:map-pin-duotone"
+                    class="size-4 shrink-0 text-brand-600 dark:text-brand-400"
+                  />
+                  {{ listing.city }}<span v-if="listing.address">, {{ listing.address }}</span>
+                </span>
+                <span class="inline-flex items-center gap-1.5 text-stone-500 dark:text-stone-500">
+                  <Icon
+                    name="ph:users-duotone"
+                    class="size-4 shrink-0"
+                    aria-hidden="true"
+                  />
+                  {{ capacityLabel }}
+                </span>
               </p>
             </div>
 
@@ -848,16 +915,12 @@ const headerPricePerNight = computed(() => {
           />
         </header>
 
-        <p
+        <ListingTeamBanner
           v-if="isTeamListing"
-          class="rounded-xl border border-brand-200/80 bg-brand-50/60 px-4 py-3 text-sm text-brand-900 dark:border-brand-800/60 dark:bg-brand-950/40 dark:text-brand-100"
-        >
-          {{ t('teamListingNotice') }}<span
-            v-if="hasSourceFootnote"
-            class="font-medium"
-            aria-hidden="true"
-          >*</span>
-        </p>
+          :notice="`${t('teamListingNotice')}${hasSourceFootnote ? '*' : ''}`"
+          :badge="listing.teamBadge"
+          :badge-href="teamBadgeHref"
+        />
 
         <ListingHostToolbar
           v-if="isHostOwner && !isTeamListing"
@@ -916,22 +979,57 @@ const headerPricePerNight = computed(() => {
           />
         </template>
 
-        <div class="space-y-12 md:space-y-14">
+        <div class="content-sections">
           <div
             v-if="!isOwnListing"
             class="border-b border-stone-200 pb-8 dark:border-stone-800"
           >
-            <NuxtLink
-              :to="localePath(`/spotlight?listingId=${listing.id}`)"
-              class="inline-flex items-center gap-2 text-sm font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300"
-            >
-              <Icon
-                name="ph:camera-duotone"
-                class="size-5"
-              />
-              {{ t('addToSpotlight') }}
-            </NuxtLink>
+            <ListingSpotlightPrompt :listing-id="listing.id" />
           </div>
+
+        <UiSection
+          id="listing-description"
+          :title="t('aboutTitle')"
+          icon="ph:article-duotone"
+        >
+          <p class="max-w-3xl whitespace-pre-wrap leading-relaxed text-stone-700 dark:text-stone-300">
+            {{ listing.description || $t('common.emDash') }}
+          </p>
+        </UiSection>
+
+        <div
+          class="scroll-mt-32 grid gap-4 sm:grid-cols-2"
+        >
+          <ListingCheckInOut
+            :check-in-time="listing.checkInTime"
+            :check-out-time="listing.checkOutTime"
+            :labels="checkInOutLabels"
+          />
+
+          <UiSection
+            :title="t('cancellationPolicy')"
+            icon="ph:shield-check-duotone"
+          >
+            <p class="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+              {{ cancellationPolicyLabel }}
+            </p>
+          </UiSection>
+        </div>
+
+        <UiSection
+          v-if="listing.transferOffered"
+          :title="t('transferTitle')"
+          icon="ph:car-profile-duotone"
+        >
+          <p class="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+            <template v-if="listing.transferPriceOnRequest">
+              {{ t('transferOnRequest') }}
+            </template>
+            <template v-else-if="listing.transferPrice">
+              {{ t('transferFixed', { price: formatPrice(listing.transferPrice) }) }}
+            </template>
+          </p>
+        </UiSection>
 
         <section
           v-if="hostNews?.length"
@@ -944,15 +1042,62 @@ const headerPricePerNight = computed(() => {
           />
         </section>
 
-        <section
+        <UiSection
+          v-if="listing.amenities.length"
+          id="listing-amenities"
+          :title="t('servicesTitle')"
+          icon="ph:sparkle-duotone"
+        >
+          <ListingAmenitiesGrouped :amenities="listing.amenities" />
+        </UiSection>
+
+        <UiSection
+          v-if="listing.houseRules"
+          id="listing-rules"
+          :title="t('houseRules')"
+          icon="ph:clipboard-text-duotone"
+        >
+          <p class="whitespace-pre-wrap leading-relaxed text-stone-700 dark:text-stone-300">
+            {{ listing.houseRules }}
+          </p>
+        </UiSection>
+
+        <UiSection
+          v-if="listing.documents?.length"
+          id="listing-documents"
+          :title="t('documents')"
+          icon="ph:files-duotone"
+        >
+          <ul class="space-y-2">
+            <li
+              v-for="doc in listing.documents"
+              :key="doc.id"
+            >
+              <a
+                :href="doc.fileUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-brand-700 transition hover:bg-brand-50 hover:underline dark:text-brand-300 dark:hover:bg-brand-950/40"
+              >
+                <Icon
+                  name="ph:file-pdf-duotone"
+                  class="size-5 shrink-0"
+                />
+                {{ doc.title }}
+              </a>
+            </li>
+          </ul>
+        </UiSection>
+
+        <ListingContactsBlock :contacts="listing.contacts" />
+
+        <UiSection
           v-if="showListingMap"
           id="listing-map"
-          class="scroll-mt-32 space-y-4"
+          :title="t('locationTitle')"
+          icon="ph:map-trifold-duotone"
         >
-          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-              {{ t('locationTitle') }}
-            </h2>
+          <template #actions>
             <a
               :href="listingMapUrl"
               target="_blank"
@@ -965,7 +1110,7 @@ const headerPricePerNight = computed(() => {
               />
               {{ t('openInMaps') }}
             </a>
-          </div>
+          </template>
 
           <p
             v-if="listingMapLabel"
@@ -986,271 +1131,173 @@ const headerPricePerNight = computed(() => {
             :latitude="listing.latitude"
             :longitude="listing.longitude"
             :label="listingMapLabel"
-            class="h-[min(280px,45vh)] w-full md:h-[380px]"
+            class="mt-4 h-[min(280px,45vh)] w-full overflow-hidden rounded-xl md:h-[380px]"
           />
-        </section>
+        </UiSection>
 
-        <section
-          id="listing-description"
-          class="scroll-mt-32 space-y-4"
+        <UiSection
+          v-if="hasListingBlogPosts"
+          id="listing-blog"
+          :title="t('travelerStories')"
+          icon="ph:article-duotone"
         >
-          <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('aboutTitle') }}
-          </h2>
-          <p class="max-w-3xl whitespace-pre-wrap leading-relaxed text-stone-700 dark:text-stone-300">
-            {{ listing.description || $t('common.emDash') }}
-          </p>
-        </section>
-
-        <ListingContactsBlock :contacts="listing.contacts" />
-
-        <div
-          class="scroll-mt-32 grid gap-4 sm:grid-cols-2"
-        >
-          <ListingCheckInOut
-            :check-in-time="listing.checkInTime"
-            :check-out-time="listing.checkOutTime"
-            :labels="checkInOutLabels"
-          />
-
-          <section class="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
-            <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-50">
-              {{ t('cancellationPolicy') }}
-            </h2>
-            <p class="mt-2 flex items-start gap-2 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-              <Icon
-                name="ph:shield-check-duotone"
-                class="mt-0.5 size-5 shrink-0 text-brand-600 dark:text-brand-400"
-              />
-              {{ cancellationPolicyLabel }}
-            </p>
-          </section>
-        </div>
-
-        <section
-          v-if="listing.transferOffered"
-          class="scroll-mt-32 rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900"
-        >
-          <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('transferTitle') }}
-          </h2>
-          <p class="mt-2 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-            <template v-if="listing.transferPriceOnRequest">
-              {{ t('transferOnRequest') }}
-            </template>
-            <template v-else-if="listing.transferPrice">
-              {{ t('transferFixed', { price: formatPrice(listing.transferPrice) }) }}
-            </template>
-          </p>
-        </section>
-
-        <section
-          v-if="listing.amenities.length"
-          id="listing-amenities"
-          class="scroll-mt-32 space-y-5"
-        >
-          <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('servicesTitle') }}
-          </h2>
-          <ListingAmenitiesGrouped :amenities="listing.amenities" />
-        </section>
-
-        <section
-          v-if="listing.houseRules"
-          id="listing-rules"
-          class="scroll-mt-32 space-y-4"
-        >
-          <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('houseRules') }}
-          </h2>
-          <p class="whitespace-pre-wrap leading-relaxed text-stone-700 dark:text-stone-300">
-            {{ listing.houseRules }}
-          </p>
-        </section>
-
-        <section
-          v-if="listing.documents?.length"
-          id="listing-documents"
-          class="scroll-mt-32 space-y-4"
-        >
-          <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-            {{ t('documents') }}
-          </h2>
-          <ul class="space-y-2">
-            <li
-              v-for="doc in listing.documents"
-              :key="doc.id"
+          <div
+            class="grid gap-4 sm:grid-cols-2"
+            data-testid="listing-blog-posts"
+          >
+            <BlogCard
+              v-for="post in listingBlogPosts"
+              :key="post.id"
+              :post="post"
+            />
+          </div>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <NuxtLink
+              :to="listingBlogMoreHref"
+              class="link-forest text-sm"
             >
-              <a
-                :href="doc.fileUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 text-sm font-medium text-brand-700 hover:underline dark:text-brand-300"
-              >
-                <Icon
-                  name="ph:file-pdf-duotone"
-                  class="size-5 shrink-0"
-                />
-                {{ doc.title }}
-              </a>
-            </li>
-          </ul>
-        </section>
+              {{ t('allTravelerStories') }} →
+            </NuxtLink>
+            <NuxtLink
+              v-if="isAuthenticated && !isOwnListing"
+              :to="writeBlogPostHref"
+            >
+              <UiButton size="sm">
+                {{ t('writeAboutPlace') }}
+              </UiButton>
+            </NuxtLink>
+          </div>
+        </UiSection>
 
-        <section
+        <UiSection
           id="reviews"
           ref="reviewsSectionRef"
-          class="scroll-mt-32 space-y-6 lg:pb-4"
+          :title="t('reviews')"
+          icon="ph:chat-circle-text-duotone"
         >
-          <div class="flex items-center gap-3">
-            <span
-              class="flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-              aria-hidden="true"
+          <div class="space-y-6">
+            <p
+              v-if="showReviewLoginHint"
+              class="rounded-xl border border-stone-200/80 bg-stone-50 px-4 py-3 text-sm text-stone-700 dark:border-stone-700 dark:bg-stone-800/60 dark:text-stone-300"
+              data-testid="review-login-hint"
             >
-              <Icon
-                name="ph:chat-circle-text-duotone"
-                class="size-5"
-              />
-            </span>
-            <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-              {{ t('reviews') }}
-            </h2>
-          </div>
-
-          <p
-            v-if="showReviewLoginHint"
-            class="rounded-xl border border-stone-200/80 bg-stone-50 px-4 py-3 text-sm text-stone-700 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300"
-            data-testid="review-login-hint"
-          >
-            {{ t('reviewLoginRequired') }}
-            <NuxtLink
-              :to="localePath('/auth/login')"
-              class="ml-1 font-medium text-brand-700 underline dark:text-brand-400"
-            >
-              {{ $t('nav.login') }}
-            </NuxtLink>
-          </p>
-
-          <p
-            v-else-if="showReviewNotEligibleHint"
-            class="rounded-xl border border-stone-200/80 bg-stone-50 px-4 py-3 text-sm text-stone-700 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300"
-            data-testid="review-not-eligible-hint"
-          >
-            {{ t('reviewNotEligible') }}
-          </p>
-
-          <p
-            v-else-if="showReviewAlreadyLeftHint"
-            class="rounded-xl border border-stone-200/80 bg-stone-50 px-4 py-3 text-sm text-stone-700 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300"
-            data-testid="review-already-left-hint"
-          >
-            {{ t('reviewAlreadyLeft') }}
-          </p>
-
-          <ReviewRatingSummary
-            v-if="reviewsData?.ratingBreakdown && reviewsData.totalCount"
-            :breakdown="reviewsData.ratingBreakdown"
-            :total-count="reviewsData.totalCount"
-          />
-
-          <p
-            v-if="reviewSubmitted"
-            data-testid="review-success"
-            class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200"
-          >
-            {{ t('reviewSubmitted') }}
-          </p>
-
-          <ReviewForm
-            v-else-if="eligibility?.bookingId"
-            :loading="reviewLoading"
-            @submit-review="handleReviewSubmit"
-          />
-
-          <div
-            v-if="isHostOwner && pendingHostReviews.length"
-            class="space-y-4"
-          >
-            <div>
-              <h3 class="text-base font-semibold text-stone-900 dark:text-stone-50">
-                {{ tReview('review.pendingReviewsTitle') }}
-              </h3>
-              <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
-                {{ tReview('review.pendingReviewsHint') }}
-              </p>
-            </div>
-            <ReviewCard
-              v-for="pendingReview in pendingHostReviews"
-              :key="`pending-${pendingReview.id}`"
-              :review="pendingReview"
-              show-pending-badge
-            />
-          </div>
-
-          <div
-            v-if="!displayedReviews.length && !pendingHostReviews.length"
-            class="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-stone-200/90 bg-stone-50/50 px-6 py-10 text-center dark:border-stone-700 dark:bg-stone-900/40"
-          >
-            <Icon
-              name="ph:chat-teardrop-dots-duotone"
-              class="size-10 text-stone-300 dark:text-stone-600"
-              aria-hidden="true"
-            />
-            <p class="text-sm text-stone-600 dark:text-stone-400">
-              {{ t('noReviews') }}
+              {{ t('reviewLoginRequired') }}
+              <NuxtLink
+                :to="localePath('/auth/login')"
+                class="ml-1 font-medium text-brand-700 underline dark:text-brand-400"
+              >
+                {{ $t('nav.login') }}
+              </NuxtLink>
             </p>
-          </div>
 
-          <div
-            v-else
-            class="space-y-4"
-          >
-            <ReviewCard
-              v-for="review in displayedReviews"
-              :key="review.id"
-              :review="review"
-              :reply-labels="replyLabels"
-              :can-reply-to-review="canReplyAsHost"
-              :can-reply-to-reply="canReplyToReply(review)"
-              @refresh="refreshAllReviews()"
+            <p
+              v-else-if="showReviewNotEligibleHint"
+              class="rounded-xl border border-stone-200/80 bg-stone-50 px-4 py-3 text-sm text-stone-700 dark:border-stone-700 dark:bg-stone-800/60 dark:text-stone-300"
+              data-testid="review-not-eligible-hint"
+            >
+              {{ t('reviewNotEligible') }}
+            </p>
+
+            <p
+              v-else-if="showReviewAlreadyLeftHint"
+              class="rounded-xl border border-stone-200/80 bg-stone-50 px-4 py-3 text-sm text-stone-700 dark:border-stone-700 dark:bg-stone-800/60 dark:text-stone-300"
+              data-testid="review-already-left-hint"
+            >
+              {{ t('reviewAlreadyLeft') }}
+            </p>
+
+            <ReviewRatingSummary
+              v-if="reviewsData?.ratingBreakdown && reviewsData.totalCount"
+              :breakdown="reviewsData.ratingBreakdown"
+              :total-count="reviewsData.totalCount"
             />
+
+            <p
+              v-if="reviewSubmitted && !showMyPendingReview"
+              data-testid="review-success"
+              class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200"
+            >
+              {{ t('reviewSubmitted') }}
+            </p>
+
+            <ReviewForm
+              v-if="showReviewForm"
+              :loading="reviewLoading"
+              @submit-review="handleReviewSubmit"
+            />
+
+            <div
+              v-if="showMyPendingReview"
+              class="space-y-3"
+              data-testid="my-pending-review"
+            >
+              <p class="text-sm font-medium text-stone-600 dark:text-stone-400">
+                {{ t('myPendingReviewTitle') }}
+              </p>
+              <ReviewCard
+                :review="myPendingReview!"
+                pending
+              />
+            </div>
+
+            <div
+              v-if="isHostOwner && pendingHostReviews.length"
+              class="space-y-4 border-t border-stone-100 pt-6 dark:border-stone-800"
+            >
+              <div>
+                <h3 class="text-base font-semibold text-stone-900 dark:text-stone-50">
+                  {{ tReview('review.pendingReviewsTitle') }}
+                </h3>
+                <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
+                  {{ tReview('review.pendingReviewsHint') }}
+                </p>
+              </div>
+              <ReviewCard
+                v-for="pendingReview in pendingHostReviews"
+                :key="`pending-${pendingReview.id}`"
+                :review="pendingReview"
+                show-pending-badge
+              />
+            </div>
+
+            <div
+              v-if="displayedReviews.length"
+              class="space-y-4 border-t border-stone-100 pt-6 dark:border-stone-800"
+            >
+              <ReviewCard
+                v-for="review in displayedReviews"
+                :key="review.id"
+                :review="review"
+                :reply-labels="replyLabels"
+                :can-reply-to-review="canReplyAsHost"
+                :can-reply-to-reply="canReplyToReply(review)"
+                @refresh="refreshAllReviews()"
+              />
+            </div>
+
+            <UiEmpty
+              v-else-if="showEmptyReviews"
+              icon="ph:chat-teardrop-dots-duotone"
+              :title="t('noReviews')"
+              inline
+            >
+              <UiButton
+                v-if="!isAuthenticated"
+                type="button"
+                data-testid="review-add-unauthenticated"
+                @click="openReviewAuthPrompt()"
+              >
+                {{ t('addReview') }}
+              </UiButton>
+            </UiEmpty>
           </div>
-        </section>
+        </UiSection>
 
         <ListingSourceFootnote
           v-if="hasSourceFootnote && listing"
           :listing="listing"
           class="border-t border-stone-200 pt-6 dark:border-stone-800"
         />
-
-        <section
-          v-if="isAuthenticated && !isOwnListing"
-          class="space-y-4 border-t border-stone-200 pt-10 lg:mt-4 lg:pb-2 dark:border-stone-800"
-        >
-          <p
-            v-if="reportSubmitted"
-            class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200"
-          >
-            {{ $t('report.submitted') }}
-          </p>
-
-          <template v-else>
-            <button
-              v-if="!showReportForm"
-              type="button"
-              class="text-sm text-stone-500 underline hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
-              @click="showReportForm = true"
-            >
-              {{ $t('report.reportListing') }}
-            </button>
-
-            <ReportForm
-              v-else
-              :loading="reportLoading"
-              @submit="handleReportSubmit"
-            />
-          </template>
-        </section>
         </div>
       </article>
 
@@ -1290,7 +1337,7 @@ const headerPricePerNight = computed(() => {
         ref="bookingPanelRef"
         class="scroll-mt-24 lg:sticky lg:top-24 lg:self-start"
       >
-        <div class="surface-card space-y-4 p-5">
+        <div class="booking-panel surface-card space-y-4 p-5 md:p-6">
           <p class="text-2xl font-semibold text-stone-900 dark:text-stone-50">
             {{ formatPrice(listing.pricePerNight) }}
             <span class="text-base font-normal text-stone-500 dark:text-stone-400">{{ t('pricePerNight') }}</span>
@@ -1385,12 +1432,48 @@ const headerPricePerNight = computed(() => {
           </div>
         </div>
       </aside>
+
+      <section
+        v-if="isAuthenticated && !isOwnListing"
+        class="col-span-full space-y-4 border-t border-stone-200 pt-8 dark:border-stone-800"
+      >
+        <p
+          v-if="reportSubmitted"
+          class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200"
+        >
+          {{ $t('report.submitted') }}
+        </p>
+
+        <template v-else>
+          <button
+            v-if="!showReportForm"
+            type="button"
+            class="text-sm text-stone-500 underline hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
+            @click="showReportForm = true"
+          >
+            {{ $t('report.reportListing') }}
+          </button>
+
+          <ReportForm
+            v-else
+            :loading="reportLoading"
+            @submit="handleReportSubmit"
+          />
+        </template>
+      </section>
     </div>
 
     <HostVerificationModal
       v-if="listing?.hostVerification?.isVerified"
       v-model:open="hostVerificationModalOpen"
       :verification="listing.hostVerification"
+    />
+
+    <AuthPromptModal
+      v-model:open="reviewAuthPromptOpen"
+      :title="t('reviewAuthModalTitle')"
+      :description="t('reviewAuthModalDescription')"
+      @success="onReviewAuthSuccess()"
     />
 
     <ListingBookingBar

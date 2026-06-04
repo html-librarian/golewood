@@ -28,7 +28,7 @@ const cards = computed(() => [
           <h1 class="section-title">
             {{ t('title') }}
           </h1>
-          <p class="max-w-2xl text-stone-600 dark:text-stone-400">
+          <p class="legal-body max-w-2xl">
             {{ t('subtitle') }}
           </p>
         </header>
@@ -40,10 +40,10 @@ const cards = computed(() => [
             :to="localePath(card.to)"
             class="surface-card group flex flex-col gap-2 p-5 transition hover:border-brand-300 hover:shadow-(--shadow-card-hover) dark:hover:border-brand-700"
           >
-            <h2 class="font-display text-lg font-semibold text-stone-900 group-hover:text-brand-800 dark:text-stone-50 dark:group-hover:text-brand-200">
+            <h2 class="font-display text-lg font-semibold text-stone-900 group-hover:text-brand-900 dark:text-stone-50 dark:group-hover:text-brand-100">
               {{ card.title }}
             </h2>
-            <p class="text-sm text-stone-600 dark:text-stone-400">
+            <p class="legal-body">
               {{ card.description }}
             </p>
           </NuxtLink>

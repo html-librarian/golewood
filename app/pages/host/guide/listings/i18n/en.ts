@@ -21,7 +21,7 @@ export default {
     },
     {
       title: 'News and stories',
-      body: 'News posts are short updates about the property (text and gallery). Stories are vertical photo/video for guests in the app feed. Both are only available for published listings.',
+      body: 'News posts are short updates about the property (text and gallery). Guest stories are vertical photo/video: pin active ones on the listing card or repost to your host profile (reposts stay visible after the 24h TTL).',
     },
   ],
 } as const

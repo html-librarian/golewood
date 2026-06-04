@@ -1,0 +1,15 @@
+export default {
+  listingLabel: 'Объявление (необязательно)',
+  cityLabel: 'Город',
+  cityPlaceholder: 'Например, Сочи',
+  titleRu: 'Заголовок (RU)',
+  titleEn: 'Заголовок (EN)',
+  excerptRu: 'Краткое описание (RU)',
+  excerptEn: 'Краткое описание (EN)',
+  bodyRu: 'Текст (RU)',
+  bodyEn: 'Текст (EN)',
+  coverLabel: 'Обложка (URL)',
+  statusLabel: 'Статус',
+  draft: 'Черновик',
+  published: 'Опубликовано',
+} as const

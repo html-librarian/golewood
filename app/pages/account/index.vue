@@ -134,18 +134,19 @@ const sessionsLabels = computed(() => ({
 <template>
   <div class="page-container max-w-2xl space-y-8">
     <header class="space-y-1">
-      <h1 class="section-title">
+      <h1 class="section-title section-title-accent">
         {{ t('title') }}
       </h1>
-      <p class="text-sm text-stone-600 dark:text-stone-400">
+      <p class="section-subtitle text-sm">
         {{ t('subtitle') }}
       </p>
     </header>
 
-    <section
-      v-if="user"
-      class="surface-card space-y-4 p-5"
-    >
+    <UiReveal>
+      <section
+        v-if="user"
+        class="overview-panel space-y-4"
+      >
       <div class="flex items-center gap-3">
         <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-100 text-lg font-semibold text-brand-800 dark:bg-brand-900 dark:text-brand-200">
           {{ userInitials }}
@@ -186,8 +187,11 @@ const sessionsLabels = computed(() => ({
           </dd>
         </div>
       </dl>
-    </section>
+      </section>
+    </UiReveal>
 
+    <UiReveal :delay="40">
+      <div class="space-y-8">
     <section class="surface-card p-5">
       <h2 class="mb-1 text-base font-semibold text-stone-900 dark:text-stone-50">
         {{ t('homeCity.title') }}
@@ -225,5 +229,7 @@ const sessionsLabels = computed(() => ({
     />
 
     <AccountSessions :labels="sessionsLabels" />
+      </div>
+    </UiReveal>
   </div>
 </template>

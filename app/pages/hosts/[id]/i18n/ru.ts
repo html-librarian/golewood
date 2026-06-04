@@ -21,4 +21,6 @@ export default {
   noDescription: 'Хозяин пока не добавил описание.',
   emptyDescriptionHint: 'Расскажите гостям о себе или своей компании — нажмите «Добавить описание».',
   news: 'Новости',
+  guestStories: 'Сторис гостей',
+  guestStoriesHint: 'Отметки гостей — всегда в профиле, пока вы их не уберёте',
 } as const

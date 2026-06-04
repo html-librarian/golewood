@@ -26,7 +26,7 @@ const localePath = useLocalePath()
         class="relative flex size-18 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-stone-200/90 dark:bg-stone-800 dark:ring-stone-600"
       >
         <Icon
-          name="ph:house-line-duotone"
+          name="ph:tree-evergreen-duotone"
           class="size-10 text-brand-600 dark:text-brand-400"
         />
       </div>

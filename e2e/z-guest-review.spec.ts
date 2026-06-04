@@ -52,6 +52,6 @@ test.describe('guest review', () => {
     await expect(submitButton).toBeEnabled()
     await submitButton.click()
 
-    await expect(page.getByTestId('review-success')).toBeVisible({ timeout: 15_000 })
+    await expect(page.getByTestId('my-pending-review')).toBeVisible({ timeout: 15_000 })
   })
 })

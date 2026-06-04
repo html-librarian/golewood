@@ -1,15 +1,5 @@
-<script setup lang="ts">
-const { locale } = useI18n()
-
-useHead({
-  htmlAttrs: {
-    lang: () => locale.value,
-  },
-})
-</script>
-
 <template>
-  <div class="flex min-h-screen flex-col bg-stone-50 dark:bg-stone-950">
+  <div class="flex min-h-screen flex-col public-page">
     <LayoutSettingsBar />
     <main class="mobile-nav-offset flex-1">
       <slot />
@@ -17,5 +7,6 @@ useHead({
     <LayoutAppFooter />
     <LayoutMobileNav />
     <LegalCookieConsent />
+    <UiBackToTop />
   </div>
 </template>

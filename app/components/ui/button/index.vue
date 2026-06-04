@@ -25,8 +25,7 @@ const variantClasses = computed(() => {
   }
 
   return [
-    'bg-brand-700 text-white shadow-sm hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-500',
-    // Phosphor duotone: secondary layer reads as a light box on solid fills
+    'bg-linear-to-br from-brand-700 to-brand-900 text-white shadow-md shadow-brand-900/20 hover:from-brand-800 hover:to-brand-950 dark:from-brand-600 dark:to-brand-800 dark:hover:from-brand-500 dark:hover:to-brand-700',
     '[&_[opacity="0.2"]]:opacity-0',
   ].join(' ')
 })

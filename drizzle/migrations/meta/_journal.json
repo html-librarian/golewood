@@ -421,6 +421,34 @@
       "when": 1779441600000,
       "tag": "0059_listing_source_attribution",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1779445200000,
+      "tag": "0060_amenity_icon_fixes",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1779448800000,
+      "tag": "0061_host_profile_story_reposts",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1779535200000,
+      "tag": "0062_home_discovery_destinations",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1779621600000,
+      "tag": "0063_blog_authors_follows",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
@@ -20,10 +21,10 @@ const sections = computed(() => (locale.value === 'en' ? en.sections : ru.sectio
 
       <article class="space-y-6">
         <header class="space-y-3">
-          <h1 class="section-title">
+          <h1 class="section-title section-title-accent">
             {{ t('title') }}
           </h1>
-          <p class="text-stone-600 dark:text-stone-400">
+          <p class="section-subtitle">
             {{ t('intro') }}
           </p>
           <NuxtLink :to="localePath('/host/listings/create')">
@@ -31,18 +32,23 @@ const sections = computed(() => (locale.value === 'en' ? en.sections : ru.sectio
           </NuxtLink>
         </header>
 
-        <section
-          v-for="(section, index) in sections"
-          :key="index"
-          class="surface-card space-y-2 p-5"
-        >
-          <h2 class="font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
-            {{ section.title }}
-          </h2>
-          <p class="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
-            {{ section.body }}
-          </p>
-        </section>
+        <UiReveal>
+          <div class="space-y-4">
+            <section
+              v-for="(section, index) in sections"
+              :key="index"
+              class="reveal-stagger-item surface-card space-y-2 p-5"
+              :style="{ transitionDelay: `${staggerDelayMs(index, 45, 280)}ms` }"
+            >
+              <h2 class="font-display text-lg font-semibold text-stone-900 dark:text-stone-50">
+                {{ section.title }}
+              </h2>
+              <p class="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+                {{ section.body }}
+              </p>
+            </section>
+          </div>
+        </UiReveal>
       </article>
     </div>
   </div>

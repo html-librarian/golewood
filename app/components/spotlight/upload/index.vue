@@ -14,7 +14,7 @@ const { uploadPhoto } = useSpotlight()
 type SourceMode = 'listing' | 'external'
 
 const sourceMode = ref<SourceMode>('listing')
-const listingUrl = ref(props.listingId ? `${localePath(`/listings/${props.listingId}`)}` : '')
+const selectedListingId = ref(props.listingId ?? '')
 const placeName = ref('')
 const externalSiteUrl = ref('')
 const externalInstagram = ref('')
@@ -28,7 +28,7 @@ const success = ref(false)
 watch(() => props.listingId, (id) => {
   if (id) {
     sourceMode.value = 'listing'
-    listingUrl.value = localePath(`/listings/${id}`)
+    selectedListingId.value = id
   }
 })
 
@@ -41,7 +41,7 @@ const setSourceMode = (mode: SourceMode) => {
   sourceMode.value = mode
 }
 
-const hasListingLink = computed(() => listingUrl.value.trim().length > 0)
+const hasListingSelected = computed(() => selectedListingId.value.trim().length > 0)
 const hasExternalLink = computed(() =>
   externalSiteUrl.value.trim().length > 0 || externalInstagram.value.trim().length > 0,
 )
@@ -52,7 +52,7 @@ const canSubmit = computed(() => {
   }
 
   if (sourceMode.value === 'listing') {
-    return hasListingLink.value
+    return hasListingSelected.value
   }
 
   return hasExternalLink.value
@@ -80,10 +80,7 @@ const submit = async () => {
     formData.append('file', file.value!)
 
     if (sourceMode.value === 'listing') {
-      if (props.listingId) {
-        formData.append('listingId', props.listingId)
-      }
-      formData.append('listingUrl', listingUrl.value.trim())
+      formData.append('listingId', selectedListingId.value.trim())
     } else {
       formData.append('placeName', placeName.value.trim())
       formData.append('externalSiteUrl', externalSiteUrl.value.trim())
@@ -159,19 +156,14 @@ const submit = async () => {
 
       <div
         v-show="sourceMode === 'listing'"
-        class="space-y-4"
         data-testid="spotlight-upload-listing-fields"
       >
-        <FormInput
-          v-model="listingUrl"
-          :label="t('listingUrl')"
-          :placeholder="t('listingUrlPlaceholder')"
+        <FormListingSelect
+          v-model="selectedListingId"
+          :label="t('listing')"
           :disabled="Boolean(props.listingId)"
           required
         />
-        <p class="text-xs text-stone-500 dark:text-stone-400">
-          {{ t('listingUrlHint') }}
-        </p>
       </div>
 
       <div

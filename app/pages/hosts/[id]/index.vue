@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { staggerDelayMs } from '#shared/utils/stagger-delay'
 import ru from './i18n/ru'
 import en from './i18n/en'
 
@@ -9,6 +10,7 @@ const route = useRoute()
 const localePath = useLocalePath()
 const { isAuthenticated, user } = useAuth()
 const { fetchHostProfile, updateHostProfileDescription } = useHosts()
+const { fetchHostProfileStories } = useStories()
 const { startConversation } = useConversations()
 
 const messageLoading = ref(false)
@@ -26,6 +28,19 @@ const { data: host, error, pending, refresh } = await useAsyncData(
   () => `host-${hostId.value}`,
   () => fetchHostProfile(hostId.value),
 )
+
+const { data: hostStories } = await useAsyncData(
+  () => `host-stories-${hostId.value}`,
+  () => fetchHostProfileStories(hostId.value),
+)
+
+const hostStoriesViewerOpen = ref(false)
+const hostStoriesViewerStart = ref(0)
+
+const openHostStoriesViewer = (index: number) => {
+  hostStoriesViewerStart.value = index
+  hostStoriesViewerOpen.value = true
+}
 
 const showNotFound = computed(() => error.value && isNotFoundError(error.value))
 const showLoadError = computed(() => error.value && !showNotFound.value)
@@ -136,9 +151,10 @@ const messageHost = async () => {
 
     <div
       v-else-if="host"
-      class="space-y-8"
+      class="content-sections"
     >
-      <header class="surface-card space-y-4 p-6 md:p-8">
+      <UiReveal>
+        <header class="reveal-stagger-item surface-card space-y-4 p-6 md:p-8">
         <div class="flex items-start gap-4">
           <div class="flex size-16 shrink-0 items-center justify-center rounded-full bg-brand-100 text-2xl font-semibold text-brand-800 dark:bg-brand-950 dark:text-brand-200">
             {{ (host.name ?? '?').charAt(0).toUpperCase() }}
@@ -261,50 +277,93 @@ const messageHost = async () => {
           />
           {{ t('messageHost') }}
         </UiButton>
-      </header>
 
-      <section class="space-y-4">
-        <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-          {{ t('listings') }}
-        </h2>
-
-        <UiEmpty
-          v-if="!host.listings.length"
-          icon="ph:house-line-duotone"
-          :title="t('noListings')"
-        />
-
-        <div
-          v-else
-          class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
+        <section
+          v-if="hostStories?.length"
+          class="space-y-2 border-t border-stone-200 pt-4 dark:border-stone-800"
+          data-testid="host-profile-stories"
         >
-          <ListingCard
-            v-for="listing in host.listings"
-            :key="listing.id"
-            :listing="listing"
+          <div>
+            <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-100">
+              {{ t('guestStories') }}
+            </h2>
+            <p class="mt-1 text-xs text-stone-500 dark:text-stone-400">
+              {{ t('guestStoriesHint') }}
+            </p>
+          </div>
+          <StoryRing
+            :stories="hostStories"
+            @open="openHostStoriesViewer"
           />
-        </div>
-      </section>
+        </section>
+      </header>
+      </UiReveal>
 
-      <section
-        v-if="host.news.length"
-        class="space-y-4"
-        data-testid="host-profile-news"
-      >
-        <h2 class="font-display text-xl font-semibold text-stone-900 dark:text-stone-50">
-          {{ t('news') }}
-        </h2>
+      <UiReveal>
+        <div
+          class="reveal-stagger-item"
+          style="transition-delay: 60ms"
+        >
+          <UiSection
+            :title="t('listings')"
+            icon="ph:house-line-duotone"
+            variant="plain"
+          >
+            <UiEmpty
+              v-if="!host.listings.length"
+              icon="ph:house-line-duotone"
+              :title="t('noListings')"
+            />
 
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-          <ListingNewsCard
-            v-for="item in host.news"
-            :key="item.id"
-            :item="item"
-            :listing-id="item.listingId"
-            :listing-title="item.listingTitle"
-          />
+            <div
+              v-else
+              class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
+            >
+              <ListingCard
+                v-for="(listing, index) in host.listings"
+                :key="listing.id"
+                class="search-result-enter"
+                :style="{ animationDelay: `${staggerDelayMs(index, 45, 280)}ms` }"
+                :listing="listing"
+              />
+            </div>
+          </UiSection>
         </div>
-      </section>
+      </UiReveal>
+
+      <UiReveal v-if="host.news.length">
+        <div
+          class="reveal-stagger-item"
+          style="transition-delay: 80ms"
+        >
+          <UiSection
+            :title="t('news')"
+            icon="ph:newspaper-duotone"
+            variant="plain"
+            data-testid="host-profile-news"
+          >
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+              <ListingNewsCard
+                v-for="(item, index) in host.news"
+                :key="item.id"
+                class="search-result-enter"
+                :style="{ animationDelay: `${staggerDelayMs(index, 40, 240)}ms` }"
+                :item="item"
+                :listing-id="item.listingId"
+                :listing-title="item.listingTitle"
+              />
+            </div>
+          </UiSection>
+        </div>
+      </UiReveal>
+
+      <StoryViewer
+        v-if="hostStories?.length"
+        :stories="hostStories"
+        :start-index="hostStoriesViewerStart"
+        :open="hostStoriesViewerOpen"
+        @update:open="hostStoriesViewerOpen = $event"
+      />
 
       <HostVerificationModal
         v-if="host.verification.isVerified"

@@ -64,4 +64,12 @@ test.describe('host flow', () => {
     await expect(page.getByText(String(body.listingsPublished)).first()).toBeVisible()
     await expect(page.getByText(String(body.bookingsPending)).first()).toBeVisible()
   })
+
+  test('host dashboard links to guest stories management', async ({ page }) => {
+    await loginWithOtp(page, HOST_EMAIL)
+
+    await page.goto('/host')
+    await expect(page.getByTestId('host-dashboard-stories')).toBeVisible()
+    await expect(page.getByTestId('host-dashboard-stories')).toContainText(/сторис|stories/i)
+  })
 })

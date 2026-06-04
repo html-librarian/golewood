@@ -105,7 +105,7 @@ const dayClass = (iso: string, inMonth: boolean, isPast: boolean) => {
   return [
     'size-9 rounded-lg text-sm transition text-stone-800 dark:text-stone-200',
     !inMonth ? 'text-stone-300 dark:text-stone-600' : 'hover:bg-stone-100 dark:hover:bg-stone-800',
-    inRange && !selected ? 'bg-brand-50 text-brand-800 dark:bg-brand-950/60 dark:text-brand-200' : '',
+    inRange && !selected ? 'bg-brand-100 text-brand-950 dark:bg-brand-900/80 dark:text-brand-50' : '',
     selected ? 'bg-brand-600 font-semibold text-white dark:bg-brand-500' : '',
   ]
 }
@@ -212,7 +212,7 @@ onBeforeUnmount(() => {
     :error="error"
     :variant="variant"
   >
-    <template #default="{ fieldId }">
+    <template #default="{ fieldId, labelId }">
       <div
         ref="root"
         class="relative w-full"
@@ -223,7 +223,12 @@ onBeforeUnmount(() => {
           class="cursor-pointer"
           :class="triggerClass"
           :disabled="disabled"
+          role="combobox"
           :aria-expanded="open"
+          aria-haspopup="listbox"
+          :aria-controls="open ? `${fieldId}-listbox` : undefined"
+          :aria-labelledby="label ? labelId : undefined"
+          :aria-label="label ? undefined : (placeholder || t('form.pickDates'))"
           @click.stop="toggleOpen()"
         >
           <Icon
@@ -232,7 +237,7 @@ onBeforeUnmount(() => {
           />
           <span
             class="truncate"
-            :class="{ 'text-stone-400 dark:text-stone-500': !start }"
+            :class="{ 'text-stone-500 dark:text-stone-400': !start }"
           >
             {{ displayValue }}
           </span>
@@ -286,7 +291,7 @@ onBeforeUnmount(() => {
                   <span
                     v-for="weekday in weekdayLabels"
                     :key="weekday"
-                    class="text-center text-[10px] font-medium uppercase text-stone-400 dark:text-stone-500"
+                    class="text-center text-[10px] font-medium uppercase text-stone-500 dark:text-stone-400"
                   >
                     {{ weekday }}
                   </span>

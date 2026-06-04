@@ -7,8 +7,9 @@ describe('stories page', () => {
     expect(Object.keys(ru).sort()).toEqual(Object.keys(en).sort())
   })
 
-  it('has title', () => {
-    expect(ru.title).toBeTruthy()
-    expect(en.title).toBeTruthy()
+  it('has archive section keys', () => {
+    expect(ru.archive).toBeTruthy()
+    expect(ru.archiveEmpty).toBeTruthy()
+    expect(en.archive).toBeTruthy()
   })
 })

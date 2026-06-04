@@ -24,4 +24,5 @@ export default {
   pageOf: 'Page {page} of {total}',
   prevPage: 'Previous',
   nextPage: 'Next',
+  paginationAria: 'Search results pagination',
 } as const

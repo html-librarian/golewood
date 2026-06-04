@@ -24,4 +24,5 @@ export default {
   pageOf: 'Страница {page} из {total}',
   prevPage: 'Назад',
   nextPage: 'Вперёд',
+  paginationAria: 'Пагинация результатов',
 } as const

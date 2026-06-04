@@ -13,5 +13,6 @@
     </div>
     <LayoutAppFooter />
     <LegalCookieConsent />
+    <UiBackToTop />
   </div>
 </template>

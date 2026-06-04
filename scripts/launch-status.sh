@@ -55,7 +55,7 @@ fi
 
 echo ""
 echo "Code quality:"
-echo "  npm run launch:verify   # verify + 57 E2E (~3 min)"
+echo "  npm run launch:verify   # verify + 61 E2E (~5 min)"
 echo ""
 echo "Production env:"
 if [[ -f .env ]]; then

@@ -37,7 +37,7 @@ const isActive = (match: (path: string) => boolean) => match(route.path)
   <nav
     v-if="showNav"
     class="fixed inset-x-0 bottom-0 z-50 border-t border-stone-200/80 bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden dark:border-stone-800/80 dark:bg-stone-950/90"
-    aria-label="Mobile navigation"
+    :aria-label="$t('common.navMobile')"
   >
     <ul class="mx-auto grid max-w-lg grid-cols-3 gap-1 px-2 pt-1">
       <li
@@ -49,8 +49,8 @@ const isActive = (match: (path: string) => boolean) => match(route.path)
           :to="localePath(link.to)"
           class="flex flex-col items-center gap-1 rounded-xl px-1 py-2 text-xs font-medium transition"
           :class="isActive(link.match)
-            ? 'text-brand-700 dark:text-brand-300'
-            : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200'"
+            ? 'text-brand-800 dark:text-brand-200'
+            : 'text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-stone-100'"
         >
           <Icon
             :name="link.icon"

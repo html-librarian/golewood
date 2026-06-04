@@ -12,16 +12,16 @@ const { t } = usePageI18n({ ru, en })
 
 <template>
   <div
-    class="flex flex-col gap-4 rounded-2xl border border-accent-200/80 bg-accent-50/80 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-accent-900/50 dark:bg-accent-950/30"
+    class="flex flex-col gap-4 rounded-2xl border border-brand-200 bg-brand-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-brand-800 dark:bg-brand-950/50"
   >
-    <div class="flex min-w-0 items-start gap-3">
+    <div class="flex min-w-0 items-center gap-3">
       <span
-        class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white text-accent-600 shadow-sm dark:bg-stone-900 dark:text-accent-400"
+        class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300"
         aria-hidden="true"
       >
         <Icon
           name="ph:calendar-blank-duotone"
-          class="size-6"
+          class="size-5"
         />
       </span>
       <div class="min-w-0">
@@ -31,19 +31,21 @@ const { t } = usePageI18n({ ru, en })
         <p class="mt-0.5 text-sm text-stone-600 dark:text-stone-400">
           {{ t('subtitle') }}
         </p>
-        <p class="mt-2 text-sm font-medium text-stone-800 dark:text-stone-200">
-          {{ t('fromPrice', { price: formatPrice(pricePerNight) }) }}
-          <span class="font-normal text-stone-500 dark:text-stone-400"> {{ t('perNight') }}</span>
-        </p>
       </div>
     </div>
 
-    <UiButton
-      type="button"
-      class="w-full shrink-0 sm:w-auto"
-      @click="emit('selectDates')"
-    >
-      {{ t('action') }}
-    </UiButton>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+      <p class="text-sm font-semibold tabular-nums text-stone-900 dark:text-stone-100">
+        {{ t('fromPrice', { price: formatPrice(pricePerNight) }) }}
+        <span class="font-normal text-stone-500 dark:text-stone-400">{{ t('perNight') }}</span>
+      </p>
+      <UiButton
+        type="button"
+        class="w-full shrink-0 sm:w-auto"
+        @click="emit('selectDates')"
+      >
+        {{ t('action') }}
+      </UiButton>
+    </div>
   </div>
 </template>

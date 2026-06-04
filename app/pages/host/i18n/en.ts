@@ -36,6 +36,8 @@ export default {
   giftCertificatesDesc: 'Certificate sales and your payouts',
   promoLink: 'Promotion',
   promoDesc: 'Points balance and listing ads in search',
+  storiesLink: 'Guest stories',
+  storiesDesc: 'Pin on listing cards and repost to your host profile',
   guideLink: 'Guide',
   guideDesc: 'How to use the host dashboard and portal features',
 } as const

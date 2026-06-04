@@ -197,7 +197,7 @@ onMounted(() => {
     :variant="variant"
     :required="required"
   >
-    <template #default="{ fieldId }">
+    <template #default="{ fieldId, labelId }">
       <div
         ref="root"
         data-testid="form-city-select"
@@ -205,23 +205,27 @@ onMounted(() => {
         :class="hint ? 'space-y-1.5' : ''"
       >
         <div
-          :id="fieldId"
           ref="triggerRef"
           :class="triggerClass"
-          :aria-expanded="open"
-          role="combobox"
         >
           <button
+            :id="fieldId"
             type="button"
             class="min-w-0 flex-1 truncate text-left disabled:cursor-not-allowed"
             :class="[
               props.variant === 'plain' ? 'px-0 py-0' : 'border-0 bg-transparent py-2.5 pl-3.5',
-              !modelValue ? 'text-stone-400 dark:text-stone-500' : 'text-stone-900 dark:text-stone-100',
+              !modelValue ? 'text-stone-500 dark:text-stone-400' : 'text-stone-900 dark:text-stone-100',
             ]"
+            role="combobox"
+            :aria-expanded="open"
+            aria-haspopup="listbox"
+            :aria-controls="open ? `${fieldId}-listbox` : undefined"
+            :aria-labelledby="label ? labelId : undefined"
+            :aria-label="label ? undefined : (placeholder || t('form.citySearch'))"
             :disabled="disabled"
             @click="toggleOpen()"
           >
-            {{ selectedLabel }}
+            {{ selectedLabel || placeholder || t('form.citySearch') }}
           </button>
 
           <button
@@ -284,6 +288,7 @@ onMounted(() => {
             </div>
 
             <ul
+              :id="`${fieldId}-listbox`"
               role="listbox"
               class="max-h-52 overflow-auto py-1"
             >

@@ -32,12 +32,19 @@
     "patronymic": "Patronymic",
     "patronymicOptional": "Optional",
     "carouselPrev": "Previous",
-    "carouselNext": "Next"
+    "carouselNext": "Next",
+    "close": "Close",
+    "navMain": "Main navigation",
+    "navMobile": "Mobile navigation",
+    "pagination": "Pagination",
+    "discoveryQuickSearch": "Quick search",
+    "backToTop": "Back to top"
   },
   "story": {
     "anonymous": "Guest",
     "guestOnlyPage": "Stories are for guest accounts only.",
-    "myStories": "My stories"
+    "myStories": "My stories",
+    "close": "Close"
   },
   "spotlight": {
     "yourVote": "Your vote",
@@ -54,7 +61,26 @@
     "back": "Back to blog",
     "relatedListing": "Listing",
     "viewListing": "View on Golewood",
-    "teamReview": "Team review"
+    "teamReview": "Team review",
+    "followAuthor": "Follow",
+    "unfollowAuthor": "Unfollow",
+    "anonymousAuthor": "Author",
+    "writePost": "Write a post",
+    "myPosts": "My posts",
+    "authorMeta": "{posts} posts · {followers} followers",
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Title or text",
+      "author": "Author",
+      "authorPlaceholder": "Author name",
+      "clearAuthor": "Clear",
+      "city": "City",
+      "allCities": "All cities",
+      "listing": "Place",
+      "followingOnly": "Following only",
+      "apply": "Search",
+      "reset": "Reset filters"
+    }
   },
   "listing": {
     "noPhoto": "No photo",
@@ -116,11 +142,19 @@
     "nextMonth": "Next month",
     "decrease": "Decrease",
     "increase": "Increase",
+    "rangeMin": "Minimum",
+    "rangeMax": "Maximum",
     "citySearch": "Search city…",
     "cityEmpty": "No cities found",
     "cityClear": "Clear city",
     "cityOpen": "Open city list",
     "cityClose": "Close city list",
+    "listingSelectSearch": "Search by name or address…",
+    "listingSelectEmpty": "No listings found",
+    "listingSelectPlaceholder": "Select a listing…",
+    "listingSelectClear": "Clear selection",
+    "listingSelectOpen": "Open listing list",
+    "listingSelectClose": "Close listing list",
     "cityDefaultHint": "“{city}” was filled in automatically from your location",
     "filePickerPick": "Attach files",
     "filePickerRemove": "Remove file",
@@ -415,7 +449,8 @@
   "cookieConsent": {
     "message": "We use cookies and similar technologies for sign-in, language, theme, and site security. Learn more in our ",
     "privacyLink": "Privacy policy",
-    "accept": "Accept"
+    "accept": "Accept",
+    "ariaLabel": "Cookie notice"
   },
   "legalConsent": {
     "prefix": "By registering or continuing to use the site you accept the ",
@@ -424,6 +459,7 @@
   },
   "legal": {
     "nav": {
+      "ariaLabel": "Legal documents",
       "overview": "Legal information",
       "requisites": "Company details",
       "offer": "Public offer",
@@ -441,6 +477,7 @@
   },
   "help": {
     "nav": {
+      "ariaLabel": "Help",
       "overview": "Overview",
       "faq": "Q&A",
       "becomeHost": "How to host",

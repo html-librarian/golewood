@@ -16,7 +16,7 @@ test.describe('smoke', () => {
     await expect(page.locator('h1')).toBeVisible()
     await expect(page.getByRole('heading', { name: /популярн|featured/i })).toBeVisible()
     await expect(
-      page.getByTestId('featured-carousel').getByRole('link').first(),
+      page.getByTestId('featured-carousel').locator('a[href*="/listings/"]').first(),
     ).toBeVisible({ timeout: 15_000 })
   })
 
@@ -24,6 +24,12 @@ test.describe('smoke', () => {
     await gotoReady(page, `/search?city=${encodeURIComponent('Москва')}`)
     await expect(page.getByRole('heading', { level: 1 })).toContainText(/поиск|search/i, { timeout: 15_000 })
     await expect(page.getByRole('link', { name: 'Уютная студия у метро' })).toBeVisible({ timeout: 15_000 })
+  })
+
+  test('blog page loads', async ({ page }) => {
+    await gotoReady(page, '/blog')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/блог|blog/i, { timeout: 15_000 })
+    await expect(page.getByTestId('blog-filters')).toBeVisible()
   })
 
   test('login page loads', async ({ page }) => {

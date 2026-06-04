@@ -7,10 +7,13 @@ describe('SpotlightUpload', () => {
     expect(Object.keys(ru).sort()).toEqual(Object.keys(en).sort())
   })
 
-  it('includes external upload field labels', () => {
-    expect(ru.placeName).toBeTruthy()
-    expect(ru.externalSite).toBeTruthy()
-    expect(ru.externalInstagram).toBeTruthy()
+  it('escapes @ in instagram placeholder for vue-i18n', () => {
+    expect(ru.externalInstagramPlaceholder).toContain("{'@'}")
+    expect(en.externalInstagramPlaceholder).toContain("{'@'}")
+  })
+
+  it('includes listing picker label', () => {
+    expect(ru.listing).toBeTruthy()
     expect(ru.sourceExternal).toBeTruthy()
   })
 })

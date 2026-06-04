@@ -45,7 +45,7 @@ For E2E: stop the dev server first, or Playwright will reuse it locally (`reuseE
 | `npm run check:prod` | Validate production env vars (requires `NODE_ENV=production`) |
 | `npm run preflight:prod` | Same as `check:prod` with `NODE_ENV=production` set |
 | `npm run launch:status` | Report: remote, `.env`, preflight (before VPS deploy) |
-| `npm run launch:verify` | Full gate: `verify` + 57 E2E (before first push) |
+| `npm run launch:verify` | Full gate: `verify` + 61 E2E (before first push) |
 | `npm run github:setup` | Create GitHub repo + push via `gh` CLI |
 | `npm run secrets:prod` | Print `openssl` secrets for production `.env` |
 | `npm run setup:prod-env` | Create `.env` from template + random secrets (`--domain`, `--force`) |
@@ -54,7 +54,7 @@ For E2E: stop the dev server first, or Playwright will reuse it locally (`reuseE
 | `npm run bootstrap` | Docker + `.env` + migrate + seed (first-time local setup) |
 | `npm run db:generate` | Generate Drizzle migration |
 | `npm run db:migrate` | Apply migrations |
-| `npm run db:seed` | Seed demo data (users, listings, bookings, reviews) |
+| `npm run db:seed` | Seed demo data (users, listings, bookings, reviews, stories) |
 | `npm run db:seed:cities` | Upsert ~324 Russian cities (after migrate) |
 | `npm run db:seed:reset` | Remove non-demo rows, then seed |
 
@@ -68,7 +68,7 @@ Idempotent seed: upserts demo users/listings, resets guest bookings/reports, rei
 | Host  | +79000000002 | 0000 |
 | Guest | +79000000003 | 0000 |
 
-Also creates listings (published, moderation, draft), property complex **«Глэмпинг «Боровое»»** with two units, 3 bookings (pending / confirmed / completed), payments, reviews, 1 open report for admin. Guest `+79000000003` has **3500** bonus balance; demo host `+79000000002` has **5000** promo points and verified legal profile. With `SEED_E2E=1` (Playwright): gift certificate code `GW-E2E5000` for booking E2E.
+Also creates listings (published, moderation, draft), property complex **«Глэмпинг «Боровое»»** with two units, 3 bookings (pending / confirmed / completed), payments, reviews, **demo guest stories** (active + archive, pin on studio, repost on host profile), 1 open report for admin. Guest `+79000000003` has **3500** bonus balance; demo host `+79000000002` has **5000** promo points and verified legal profile. With `SEED_E2E=1` (Playwright): gift certificate code `GW-E2E5000` for booking E2E.
 
 ### Sign-in (dev)
 
@@ -94,12 +94,13 @@ Sections: `/admin/listings` (moderation), `/admin/spotlight` (photo of the month
 | Feature | URL | Notes |
 |---------|-----|--------|
 | Photo of the month | `/spotlight` | Gallery + voting; upload only for listings you booked |
-| Guest stories | `/stories` | 24h TTL; photo or video (MP4/WebM/MOV); upload from listing page (guest only) |
-| Host story pins | `/host/listings/:id/stories` | Show guest stories on listing |
+| Guest stories | `/stories` | 24h public TTL; **archive** keeps your stories forever; photo or video; upload from listing page (guest only) |
+| Host story pins | `/host/listings/:id/stories` | Pin active stories on listing; **repost to host profile** (works after expiry) |
+| Host profile stories | `/hosts/:id` | Guest stories reposted by the host (mention-style) |
 | Team badges | `/admin/team-badges` | Catalog + assign to published listings (review badges need a blog post) |
 | Blog | `/blog`, `/admin/blog` | Team reviews; required link for «Мы здесь отдыхали» / «Одобрено Golewood» |
 
-Public APIs: `GET /api/spotlight/hero`, `GET /api/team-badges`, `GET /api/blog/posts`, `GET /api/blog/posts/:slug`, `GET /api/listings/:id/stories` (pinned only).
+Public APIs: `GET /api/spotlight/hero`, `GET /api/team-badges`, `GET /api/blog/posts`, `GET /api/blog/posts/:slug`, `GET /api/listings/:id/stories` (pinned only), `GET /api/stories/me` (`{ active, archive }`), `GET /api/hosts/:id/stories` (host reposts).
 
 ### Host calendar sync
 
@@ -116,7 +117,7 @@ Full guide: **[DEPLOY.md](DEPLOY.md)**. Template env: **`deploy/.env.production.
 1. Copy `deploy/.env.production.example` → `.env` on the server; set secrets. **Unset** `NUXT_AUTH_DEV_CODE`; set `NUXT_YOOKASSA_MARKETPLACE_MOCK=false`.
 2. `NODE_ENV=production npm run check:prod` — fix errors before deploy.
 3. `docker compose -f docker-compose.prod.yml up -d --build`
-4. `docker compose -f docker-compose.prod.yml exec app npm run db:migrate` (through `0048` if upgrading)
+4. `docker compose -f docker-compose.prod.yml exec app npm run db:migrate` (through `0061` if upgrading)
 5. Caddy/nginx → `127.0.0.1:3000` (see `deploy/Caddyfile.example`)
 6. **YooKassa** webhook: `{SITE_URL}/api/payments/yookassa/webhook`
 7. **S3** + **SMTP** for production

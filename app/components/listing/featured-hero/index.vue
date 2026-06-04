@@ -13,10 +13,10 @@ const isHighlighted = computed(() => Boolean(props.listing.promotions?.highlight
 <template>
   <NuxtLink
     :to="localePath(`/listings/${listing.id}`)"
-    class="group grid overflow-hidden rounded-2xl border shadow-(--shadow-card-hover) transition duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 dark:focus-visible:ring-offset-stone-950 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]"
+    class="group grid overflow-hidden rounded-2xl border-0 bg-white shadow-(--shadow-card-hover) transition duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 dark:bg-stone-900 dark:focus-visible:ring-offset-stone-950 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]"
     :class="isHighlighted
-      ? 'border-brand-400/70 bg-brand-50/40 ring-1 ring-brand-300/50 dark:border-brand-600/40 dark:bg-brand-950/30 dark:ring-brand-700/40'
-      : 'border-stone-200/80 bg-white dark:border-stone-800 dark:bg-stone-900'"
+      ? 'bg-brand-50/40 dark:bg-brand-950/30'
+      : ''"
     data-testid="listing-featured-hero"
   >
     <div class="relative aspect-16/10 min-h-48 overflow-hidden bg-stone-100 md:aspect-auto md:min-h-72 dark:bg-stone-800">
@@ -56,12 +56,12 @@ const isHighlighted = computed(() => Boolean(props.listing.promotions?.highlight
       <p class="text-xs font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-300">
         {{ t('promotion.cityPinHeroLabel') }}
       </p>
-      <h3
+      <p
         class="font-display text-2xl font-semibold leading-tight text-stone-900 md:text-3xl dark:text-stone-50"
         :class="isHighlighted ? 'text-brand-900 dark:text-brand-100' : ''"
       >
         {{ listing.title }}
-      </h3>
+      </p>
       <p class="text-sm text-stone-600 md:text-base dark:text-stone-400">
         {{ listing.city }}<template v-if="listing.address"> · {{ listing.address }}</template>
       </p>

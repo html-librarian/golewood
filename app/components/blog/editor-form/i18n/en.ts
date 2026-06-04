@@ -1,0 +1,15 @@
+export default {
+  listingLabel: 'Listing (optional)',
+  cityLabel: 'City',
+  cityPlaceholder: 'e.g. Sochi',
+  titleRu: 'Title (RU)',
+  titleEn: 'Title (EN)',
+  excerptRu: 'Excerpt (RU)',
+  excerptEn: 'Excerpt (EN)',
+  bodyRu: 'Body (RU)',
+  bodyEn: 'Body (EN)',
+  coverLabel: 'Cover image (URL)',
+  statusLabel: 'Status',
+  draft: 'Draft',
+  published: 'Published',
+} as const

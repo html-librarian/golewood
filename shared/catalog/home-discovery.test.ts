@@ -13,6 +13,12 @@ describe('home-discovery', () => {
     expect(amenityFilter?.params.amenities?.length).toBeGreaterThan(0)
   })
 
+  it('defines sixteen destination filters for the home carousel', () => {
+    const destinations = HOME_DISCOVERY_GROUPS.find(group => group.id === 'destinations')
+
+    expect(destinations?.filters).toHaveLength(16)
+  })
+
   it('builds valid search routes for filters', () => {
     const pets = HOME_DISCOVERY_GROUPS[1]?.filters.find(item => item.id === 'pets')
     expect(buildSearchRouteQuery(pets!.params)).toEqual({ amenities: 'pets_allowed' })

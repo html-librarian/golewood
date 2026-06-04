@@ -3,6 +3,7 @@ import type { AmenityCatalogItem } from '#shared/types/catalog'
 import type { AmenityCategory } from '#shared/catalog/amenity-categories'
 import { AMENITY_CATEGORY_LABELS, AMENITY_CATEGORY_ORDER } from '#shared/catalog/amenity-categories'
 import { AMENITY_LABELS } from '#shared/types/listing'
+import { resolveAmenityIcon } from '#shared/utils/amenity-icon'
 import type { ListingAmenitiesGroupedProps } from './types'
 
 const props = defineProps<ListingAmenitiesGroupedProps>()
@@ -46,7 +47,7 @@ const labelFor = (slug: string) => {
 }
 
 const iconFor = (slug: string) =>
-  catalogBySlug.value.get(slug)?.icon ?? 'ph:check-circle-duotone'
+  resolveAmenityIcon(catalogBySlug.value.get(slug)?.icon)
 
 const groupedSections = computed(() => {
   const byCategory = new Map<AmenityCategory, string[]>()
@@ -73,28 +74,33 @@ const groupedSections = computed(() => {
 </script>
 
 <template>
-  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
     <section
       v-for="section in groupedSections"
       :key="section.category"
-      class="min-w-0"
+      class="min-w-0 rounded-xl bg-stone-50/80 p-4 ring-1 ring-stone-200/70 dark:bg-stone-800/30 dark:ring-stone-700/50"
     >
       <h3 class="flex items-center gap-2 text-sm font-semibold text-stone-900 dark:text-stone-50">
-        <Icon
-          :name="section.icon"
-          class="size-4 shrink-0 text-brand-600 dark:text-brand-400"
-        />
+        <span
+          class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300"
+          aria-hidden="true"
+        >
+          <Icon
+            :name="section.icon"
+            class="size-4"
+          />
+        </span>
         {{ section.title }}
       </h3>
-      <ul class="mt-3 space-y-2">
+      <ul class="mt-3 space-y-2.5">
         <li
           v-for="slug in section.items"
           :key="slug"
-          class="flex items-start gap-2 text-sm text-stone-700 dark:text-stone-300"
+          class="flex items-start gap-2.5 text-sm text-stone-700 dark:text-stone-300"
         >
           <Icon
             :name="iconFor(slug)"
-            class="mt-0.5 size-4 shrink-0 text-stone-400 dark:text-stone-500"
+            class="mt-0.5 size-4 shrink-0 text-brand-600/80 dark:text-brand-400/90"
           />
           <span>{{ labelFor(slug) }}</span>
         </li>

@@ -12,6 +12,7 @@ const { isAuthenticated, user } = useAuth()
 const { uploadStory } = useStories()
 
 const fileInputRef = ref<HTMLInputElement | null>(null)
+const fileInputId = `story-upload-file-${useId()}`
 const file = ref<File | null>(null)
 const previewUrl = ref<string | null>(null)
 const loading = ref(false)
@@ -107,7 +108,14 @@ onUnmounted(() => {
       {{ t('addStory') }}
     </p>
 
+    <label
+      :for="fileInputId"
+      class="sr-only"
+    >
+      {{ t('addMedia') }}
+    </label>
     <input
+      :id="fileInputId"
       ref="fileInputRef"
       type="file"
       accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"

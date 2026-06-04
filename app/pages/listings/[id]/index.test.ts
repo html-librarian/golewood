@@ -6,4 +6,15 @@ describe('listing detail page', () => {
   it('has i18n keys in all locales', () => {
     expect(Object.keys(ru).sort()).toEqual(Object.keys(en).sort())
   })
+
+  it('includes review auth empty-state keys', () => {
+    expect(ru.addReview).toBeTruthy()
+    expect(ru.reviewAuthModalTitle).toBeTruthy()
+    expect(ru.reviewAuthModalDescription).toBeTruthy()
+  })
+
+  it('includes traveler blog section keys', () => {
+    expect(ru.travelerStories).toBeTruthy()
+    expect(en.writeAboutPlace).toBeTruthy()
+  })
 })

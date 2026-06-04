@@ -6,6 +6,7 @@ const props = withDefaults(defineProps<StoryViewerProps>(), {
 })
 const emit = defineEmits<StoryViewerEmits>()
 
+const localePath = useLocalePath()
 const config = useRuntimeConfig()
 const imageDurationMs = computed(() => {
   const ms = Number(config.storyImageDurationMs || 5000)
@@ -216,15 +217,20 @@ onUnmounted(() => {
           </p>
           <p
             v-if="currentStory.listingTitle"
-            class="truncate text-xs text-white/70"
+            class="truncate text-xs"
           >
-            {{ currentStory.listingTitle }}
+            <NuxtLink
+              :to="localePath(`/listings/${currentStory.listingId}`)"
+              class="text-white/80 underline-offset-2 hover:text-white hover:underline"
+            >
+              {{ currentStory.listingTitle }}
+            </NuxtLink>
           </p>
         </div>
         <button
           type="button"
           class="rounded-full p-2 hover:bg-white/10"
-          aria-label="Close"
+          :aria-label="$t('story.close')"
           @click="close"
         >
           <Icon

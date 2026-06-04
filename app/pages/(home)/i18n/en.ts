@@ -1,6 +1,5 @@
 export default {
-  title: 'Golewood — vacation rentals',
-  subtitle: 'Find the perfect place to stay',
+  title: 'Find your perfect place to stay',
   empty: 'No published listings yet',
   featured: 'Featured listings',
   featuredDesc: 'Hand-picked stays from trusted hosts',

@@ -195,6 +195,7 @@ const onDropPhoto = async (targetId: string) => {
           accept="image/jpeg,image/png,image/webp"
           multiple
           class="sr-only"
+          :aria-label="$t('listingMedia.uploadPhotos')"
           :disabled="busy || loading"
           @change="onPhotoFiles"
         >
@@ -326,6 +327,7 @@ const onDropPhoto = async (targetId: string) => {
               type="file"
               accept=".pdf,.doc,.docx,image/jpeg,image/png,image/webp"
               class="sr-only"
+              :aria-label="$t('listingMedia.pickDocument')"
               :disabled="busy || loading"
               @change="onDocumentFilePick"
             >
