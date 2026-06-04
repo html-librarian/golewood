@@ -93,11 +93,6 @@ watch(() => props.filters.length, () => nextTick(updateScrollState))
 
 const showPrevControl = computed(() => canScrollPrev.value)
 const showNextControl = computed(() => canScrollNext.value)
-
-const trackClass = computed(() => [
-  'flex gap-3 overflow-x-auto scroll-smooth py-1 pb-2 [-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden snap-x snap-mandatory',
-  !canScrollNext.value ? 'pr-4 md:pr-6' : 'pr-0',
-])
 </script>
 
 <template>
@@ -107,7 +102,7 @@ const trackClass = computed(() => [
   >
     <div
       ref="trackRef"
-      :class="trackClass"
+      class="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth py-1 pb-2 [-ms-overflow-style:none] scroll-pe-[max(1rem,calc(1rem+(100vw-100%)/2))] scrollbar-none md:scroll-pe-[max(1.5rem,calc(1.5rem+(100vw-100%)/2))] [&::-webkit-scrollbar]:hidden"
     >
       <NuxtLink
         v-for="filter in filters"
@@ -141,6 +136,12 @@ const trackClass = computed(() => [
           {{ labelFor(filter) }}
         </span>
       </NuxtLink>
+
+      <!-- Stable end inset (matches panel padding when bleed reaches viewport edge). -->
+      <div
+        aria-hidden="true"
+        class="w-[max(1rem,calc(1rem+(100vw-100%)/2))] shrink-0 snap-end md:w-[max(1.5rem,calc(1.5rem+(100vw-100%)/2))]"
+      />
     </div>
 
     <button

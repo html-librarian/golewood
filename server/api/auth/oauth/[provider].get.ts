@@ -11,6 +11,12 @@ const parseProvider = (value: string | undefined): OAuthProvider => {
 
 export default defineEventHandler((event) => {
   const provider = parseProvider(getRouterParam(event, 'provider'))
+
+  if (provider === 'vk') {
+    const url = oauthService.prepareVkAuthorize(event)
+    return sendRedirect(event, url)
+  }
+
   const url = oauthService.getAuthorizeUrl(provider)
   return sendRedirect(event, url)
 })

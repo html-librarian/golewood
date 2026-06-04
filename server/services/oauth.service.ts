@@ -1,3 +1,4 @@
+import type { H3Event } from 'h3'
 import type { OAuthProfile, OAuthProvider } from '#shared/types/oauth'
 import type { SessionClientMeta } from '#shared/types/session'
 import type { LoginResult } from '#shared/types/two-factor'
@@ -11,6 +12,24 @@ import { resolveAuthNameColumns } from './auth-name'
 import { toUserNameDbColumns } from '../utils/user-name'
 import { syntheticOAuthPhone } from '#shared/utils/synthetic-phone-oauth'
 import { forbidInProduction } from '../utils/dev-guards'
+import {
+  buildVkCodeChallenge,
+  generateVkCodeVerifier,
+  generateVkOAuthState,
+  parseVkIdCallbackQuery,
+} from '../utils/vk-id-oauth'
+
+const VK_OAUTH_STATE_COOKIE = 'vk-oauth-state'
+const VK_OAUTH_VERIFIER_COOKIE = 'vk-oauth-verifier'
+const VK_OAUTH_COOKIE_MAX_AGE = 600
+
+const vkOAuthCookieOptions = () => ({
+  httpOnly: true,
+  sameSite: 'lax' as const,
+  path: '/',
+  maxAge: VK_OAUTH_COOKIE_MAX_AGE,
+  secure: process.env.NODE_ENV === 'production',
+})
 
 const getOAuthConfig = () => {
   const config = useRuntimeConfig()
@@ -72,38 +91,89 @@ const fetchYandexProfile = async (code: string): Promise<OAuthProfile> => {
   }
 }
 
-const fetchVkProfile = async (code: string): Promise<OAuthProfile> => {
+const fetchVkIdProfile = async (
+  code: string,
+  codeVerifier: string,
+  deviceId: string,
+  state: string,
+): Promise<OAuthProfile> => {
   const config = getOAuthConfig()
   const redirectUri = callbackUrl('vk')
-  const tokenUrl = new URL('https://oauth.vk.com/access_token')
-  tokenUrl.searchParams.set('client_id', config.vkClientId)
-  tokenUrl.searchParams.set('client_secret', config.vkClientSecret)
-  tokenUrl.searchParams.set('redirect_uri', redirectUri)
-  tokenUrl.searchParams.set('code', code)
 
-  const tokenResponse = await fetch(tokenUrl)
-  const tokenData = await tokenResponse.json()
+  const tokenBody = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code,
+    code_verifier: codeVerifier,
+    client_id: config.vkClientId,
+    redirect_uri: redirectUri,
+    device_id: deviceId,
+    state,
+  })
 
-  if (!tokenResponse.ok || !tokenData.user_id) {
-    throw createError({ statusCode: 502, statusMessage: 'VK OAuth failed' })
+  if (config.vkClientSecret) {
+    tokenBody.set('service_token', config.vkClientSecret)
   }
 
-  const userUrl = new URL('https://api.vk.com/method/users.get')
-  userUrl.searchParams.set('user_ids', String(tokenData.user_id))
-  userUrl.searchParams.set('fields', 'screen_name')
-  userUrl.searchParams.set('access_token', tokenData.access_token)
-  userUrl.searchParams.set('v', '5.199')
+  const tokenResponse = await fetch('https://id.vk.ru/oauth2/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: tokenBody,
+  })
 
-  const profileResponse = await fetch(userUrl)
-  const profileData = await profileResponse.json()
-  const profile = profileData.response?.[0]
+  const tokenData = await tokenResponse.json() as {
+    access_token?: string
+    user_id?: number | string
+    error?: string
+    error_description?: string
+  }
+
+  if (!tokenResponse.ok || !tokenData.access_token) {
+    throw createError({
+      statusCode: 502,
+      statusMessage: tokenData.error_description ?? tokenData.error ?? 'VK ID token exchange failed',
+    })
+  }
+
+  const userBody = new URLSearchParams({
+    access_token: tokenData.access_token,
+    client_id: config.vkClientId,
+  })
+
+  const profileResponse = await fetch('https://id.vk.ru/oauth2/user_info', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: userBody,
+  })
+
+  const profileData = await profileResponse.json() as {
+    user?: {
+      user_id?: string | number
+      first_name?: string
+      last_name?: string
+      email?: string
+    }
+    error?: string
+    error_description?: string
+  }
+
+  const user = profileData.user
+
+  if (!profileResponse.ok || !user?.user_id) {
+    throw createError({
+      statusCode: 502,
+      statusMessage: profileData.error_description ?? profileData.error ?? 'VK ID user_info failed',
+    })
+  }
+
+  const firstName = user.first_name ?? null
+  const lastName = user.last_name ?? null
 
   return {
-    providerUserId: String(tokenData.user_id),
-    name: profile ? `${profile.first_name ?? ''} ${profile.last_name ?? ''}`.trim() : null,
-    firstName: profile?.first_name ?? null,
-    lastName: profile?.last_name ?? null,
-    email: tokenData.email ?? null,
+    providerUserId: String(user.user_id),
+    name: firstName || lastName ? `${firstName ?? ''} ${lastName ?? ''}`.trim() : null,
+    firstName,
+    lastName,
+    email: user.email ?? null,
   }
 }
 
@@ -220,8 +290,70 @@ export const oauthService = {
       return `https://oauth.yandex.ru/authorize?response_type=code&client_id=${yandexClientId}&redirect_uri=${redirectUri}`
     }
 
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Use prepareVkAuthorize for VK ID',
+    })
+  },
+
+  prepareVkAuthorize: (event: H3Event) => {
+    if (!isProviderConfigured('vk')) {
+      forbidInProduction()
+      return `/api/auth/oauth/vk/mock`
+    }
+
+    const verifier = generateVkCodeVerifier()
+    const challenge = buildVkCodeChallenge(verifier)
+    const state = generateVkOAuthState()
     const { vkClientId } = getOAuthConfig()
-    return `https://oauth.vk.com/authorize?client_id=${vkClientId}&redirect_uri=${redirectUri}&response_type=code&scope=email&v=5.199`
+    const redirectUri = callbackUrl('vk')
+    const cookieOptions = vkOAuthCookieOptions()
+
+    setCookie(event, VK_OAUTH_VERIFIER_COOKIE, verifier, cookieOptions)
+    setCookie(event, VK_OAUTH_STATE_COOKIE, state, cookieOptions)
+
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: vkClientId,
+      redirect_uri: redirectUri,
+      state,
+      code_challenge: challenge,
+      code_challenge_method: 'S256',
+      scope: 'email',
+    })
+
+    return `https://id.vk.ru/authorize?${params.toString()}`
+  },
+
+  handleVkCallback: async (
+    event: H3Event,
+    meta?: SessionClientMeta,
+  ): Promise<LoginResult> => {
+    const parsed = parseVkIdCallbackQuery(getQuery(event) as Record<string, unknown>)
+
+    if (!parsed) {
+      throw createError({ statusCode: 400, statusMessage: 'Invalid VK ID callback' })
+    }
+
+    const savedState = getCookie(event, VK_OAUTH_STATE_COOKIE)
+    const verifier = getCookie(event, VK_OAUTH_VERIFIER_COOKIE)
+
+    if (!savedState || !verifier || savedState !== parsed.state) {
+      throw createError({ statusCode: 400, statusMessage: 'VK ID state mismatch' })
+    }
+
+    deleteCookie(event, VK_OAUTH_STATE_COOKIE, { path: '/' })
+    deleteCookie(event, VK_OAUTH_VERIFIER_COOKIE, { path: '/' })
+
+    const profile = await fetchVkIdProfile(
+      parsed.code,
+      verifier,
+      parsed.deviceId,
+      parsed.state,
+    )
+
+    const userRow = await findOrCreateUser('vk', profile)
+    return authService.completeLogin(userRow, meta)
   },
 
   handleCallback: async (
@@ -229,10 +361,11 @@ export const oauthService = {
     code: string,
     meta?: SessionClientMeta,
   ): Promise<LoginResult> => {
-    const profile = provider === 'yandex'
-      ? await fetchYandexProfile(code)
-      : await fetchVkProfile(code)
+    if (provider === 'vk') {
+      throw createError({ statusCode: 400, statusMessage: 'Use handleVkCallback for VK ID' })
+    }
 
+    const profile = await fetchYandexProfile(code)
     const userRow = await findOrCreateUser(provider, profile)
     return authService.completeLogin(userRow, meta)
   },

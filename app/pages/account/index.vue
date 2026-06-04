@@ -9,6 +9,7 @@ definePageMeta({ layout: 'account', middleware: 'auth', pageTransition: false })
 const { t } = usePageI18n({ ru, en })
 const { user } = useAuth()
 const { phoneAuthEnabled, emailAuthEnabled } = useAuthFeatures()
+const { maxNotificationsEnabled } = useMaxFeatures()
 
 const userDisplayName = computed(() =>
   user.value ? formatUserDisplayName(user.value) : '',
@@ -225,6 +226,7 @@ const sessionsLabels = computed(() => ({
     />
 
     <AccountMaxNotifications
+      v-if="maxNotificationsEnabled"
       :labels="maxLabels"
     />
 

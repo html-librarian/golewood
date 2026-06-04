@@ -99,7 +99,7 @@ onMounted(() => {
     </div>
 
     <p
-      v-if="!status?.enabled"
+      v-if="import.meta.dev && !status?.enabled"
       class="rounded-lg bg-stone-100 px-3 py-2 text-sm text-stone-600 dark:bg-stone-800 dark:text-stone-300"
     >
       {{ labels.disabledHint }}

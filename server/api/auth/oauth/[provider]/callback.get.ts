@@ -34,13 +34,19 @@ const setSessionCookies = (
 
 export default defineEventHandler(async (event) => {
   const provider = parseProvider(getRouterParam(event, 'provider'))
-  const code = getQuery(event).code
+  const meta = getSessionClientMeta(event)
 
-  if (!code || typeof code !== 'string') {
-    throw createError({ statusCode: 400, statusMessage: 'Missing OAuth code' })
-  }
+  const result = provider === 'vk'
+    ? await oauthService.handleVkCallback(event, meta)
+    : await (async () => {
+      const code = getQuery(event).code
 
-  const result = await oauthService.handleCallback(provider, code, getSessionClientMeta(event))
+      if (!code || typeof code !== 'string') {
+        throw createError({ statusCode: 400, statusMessage: 'Missing OAuth code' })
+      }
+
+      return oauthService.handleCallback(provider, code, meta)
+    })()
   const resolved = resolveOAuthLoginResult(result)
 
   if (resolved.kind === 'mfa') {

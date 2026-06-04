@@ -143,6 +143,10 @@ if (env('NUXT_MAX_NOTIFICATIONS_ENABLED') === 'true' && !env('NUXT_PUBLIC_MAX_BO
   warnings.push('NUXT_PUBLIC_MAX_BOT_USERNAME missing — deep links to the bot will not work')
 }
 
+if (env('NUXT_MAX_NOTIFICATIONS_ENABLED') === 'true' && env('NUXT_PUBLIC_MAX_NOTIFICATIONS_ENABLED') !== 'true') {
+  warnings.push('NUXT_PUBLIC_MAX_NOTIFICATIONS_ENABLED=false — MAX block hidden in /account (set true when bot is live)')
+}
+
 if (env('NUXT_PUBLIC_SMS_AUTH_ENABLED') === 'true' && !env('NUXT_SMS_RU_API_ID')) {
   warnings.push('SMS auth enabled but NUXT_SMS_RU_API_ID is empty')
 }

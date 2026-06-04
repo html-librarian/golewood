@@ -150,18 +150,20 @@ onBeforeUnmount(() => {
         </span>
       </NuxtLink>
 
-      <NuxtLink
-        :to="localePath('/search')"
-        class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 xl:hidden dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
-        :class="{ 'border-brand-600 bg-brand-100 text-brand-950 dark:border-brand-500 dark:bg-brand-900/90 dark:text-brand-50': isActive('/search') }"
-        :aria-label="$t('common.search')"
-        data-testid="nav-search-icon"
-      >
-        <Icon
-          name="ph:magnifying-glass-duotone"
-          class="size-5"
-        />
-      </NuxtLink>
+      <UiIconTooltip :label="$t('common.search')">
+        <NuxtLink
+          :to="localePath('/search')"
+          class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 xl:hidden dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
+          :class="{ 'border-brand-600 bg-brand-100 text-brand-950 dark:border-brand-500 dark:bg-brand-900/90 dark:text-brand-50': isActive('/search') }"
+          :aria-label="$t('common.search')"
+          data-testid="nav-search-icon"
+        >
+          <Icon
+            name="ph:magnifying-glass-duotone"
+            class="size-5"
+          />
+        </NuxtLink>
+      </UiIconTooltip>
 
       <nav
         class="hidden min-w-0 flex-1 justify-center px-1 xl:flex"
@@ -194,53 +196,63 @@ onBeforeUnmount(() => {
 
       <div class="ml-auto flex h-9 shrink-0 items-center gap-1.5 sm:gap-2">
         <div class="hidden h-9 items-center rounded-xl border border-stone-200 bg-stone-50 p-0.5 sm:flex dark:border-stone-700 dark:bg-stone-900">
-          <button
+          <UiIconTooltip
             v-for="item in locales"
             :key="item.code"
-            type="button"
-            class="flex h-full items-center rounded-lg px-2 text-xs font-medium transition"
-            :class="locale === item.code
-              ? 'bg-white text-brand-900 shadow-sm dark:bg-stone-800 dark:text-brand-100'
-              : 'text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-stone-100'"
-            @click="setLocale(item.code)"
+            :label="item.name"
           >
-            {{ item.code.toUpperCase() }}
-          </button>
+            <button
+              type="button"
+              class="flex h-full items-center rounded-lg px-2 text-xs font-medium transition"
+              :class="locale === item.code
+                ? 'bg-white text-brand-900 shadow-sm dark:bg-stone-800 dark:text-brand-100'
+                : 'text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-stone-100'"
+              :aria-label="item.name"
+              @click="setLocale(item.code)"
+            >
+              {{ item.code.toUpperCase() }}
+            </button>
+          </UiIconTooltip>
         </div>
 
-        <button
-          type="button"
-          class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
-          :aria-label="$t('common.theme')"
-          :title="$t('common.theme')"
-          @click="toggleTheme"
-        >
-          <Icon
-            :name="colorMode.value === 'dark' ? 'ph:sun-duotone' : 'ph:moon-duotone'"
-            class="size-5"
-          />
-        </button>
+        <UiIconTooltip :label="$t('common.theme')">
+          <button
+            type="button"
+            class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
+            :aria-label="$t('common.theme')"
+            @click="toggleTheme"
+          >
+            <Icon
+              :name="colorMode.value === 'dark' ? 'ph:sun-duotone' : 'ph:moon-duotone'"
+              class="size-5"
+            />
+          </button>
+        </UiIconTooltip>
 
-        <NuxtLink
+        <UiIconTooltip
           v-for="link in userQuickLinks"
           :key="link.to"
-          :to="localePath(link.to)"
-          :class="headerIconClass(isActive(link.to))"
-          :aria-label="$t(link.labelKey)"
-          :data-testid="link.testId"
+          :label="$t(link.labelKey)"
         >
-          <Icon
-            :name="link.icon"
-            class="size-5"
-          />
-          <span
-            v-if="link.showUnreadBadge && unreadCount > 0"
-            data-testid="messages-unread-badge"
-            class="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white"
+          <NuxtLink
+            :to="localePath(link.to)"
+            :class="headerIconClass(isActive(link.to))"
+            :aria-label="$t(link.labelKey)"
+            :data-testid="link.testId"
           >
-            {{ unreadCount > 9 ? '9+' : unreadCount }}
-          </span>
-        </NuxtLink>
+            <Icon
+              :name="link.icon"
+              class="size-5"
+            />
+            <span
+              v-if="link.showUnreadBadge && unreadCount > 0"
+              data-testid="messages-unread-badge"
+              class="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white"
+            >
+              {{ unreadCount > 9 ? '9+' : unreadCount }}
+            </span>
+          </NuxtLink>
+        </UiIconTooltip>
 
         <NuxtLink
           v-if="!isAuthenticated"
@@ -252,31 +264,37 @@ onBeforeUnmount(() => {
           </UiButton>
         </NuxtLink>
 
-        <NuxtLink
+        <UiIconTooltip
           v-else
-          :to="localePath('/account')"
-          class="flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 px-2 text-xs font-medium text-stone-700 transition hover:bg-stone-100 sm:px-2.5 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:bg-stone-800"
-          :title="userDisplayName || $t('common.account')"
+          :label="userDisplayName || $t('common.account')"
         >
-          <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[10px] font-semibold text-brand-800 dark:bg-brand-900 dark:text-brand-200">
-            {{ userInitials }}
-          </span>
-          <span class="hidden max-w-30 truncate 2xl:inline">{{ userDisplayName }}</span>
-        </NuxtLink>
+          <NuxtLink
+            :to="localePath('/account')"
+            class="flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 px-2 text-xs font-medium text-stone-700 transition hover:bg-stone-100 sm:px-2.5 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:bg-stone-800"
+            :aria-label="userDisplayName || $t('common.account')"
+          >
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[10px] font-semibold text-brand-800 dark:bg-brand-900 dark:text-brand-200">
+              {{ userInitials }}
+            </span>
+            <span class="hidden max-w-30 truncate 2xl:inline">{{ userDisplayName }}</span>
+          </NuxtLink>
+        </UiIconTooltip>
 
-        <button
-          type="button"
-          class="relative flex size-9 shrink-0 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 xl:hidden dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
-          :aria-label="mobileMenuOpen ? $t('common.closeMenu') : $t('common.menu')"
-          :aria-expanded="mobileMenuOpen"
-          data-testid="nav-burger"
-          @click="toggleMobileMenu"
-        >
-          <Icon
-            :name="mobileMenuOpen ? 'ph:x-bold' : 'ph:list-bold'"
-            class="size-5"
-          />
-        </button>
+        <UiIconTooltip :label="mobileMenuOpen ? $t('common.closeMenu') : $t('common.menu')">
+          <button
+            type="button"
+            class="relative flex size-9 shrink-0 items-center justify-center rounded-xl border border-stone-200 text-stone-600 transition hover:bg-stone-100 xl:hidden dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
+            :aria-label="mobileMenuOpen ? $t('common.closeMenu') : $t('common.menu')"
+            :aria-expanded="mobileMenuOpen"
+            data-testid="nav-burger"
+            @click="toggleMobileMenu"
+          >
+            <Icon
+              :name="mobileMenuOpen ? 'ph:x-bold' : 'ph:list-bold'"
+              class="size-5"
+            />
+          </button>
+        </UiIconTooltip>
       </div>
     </div>
 

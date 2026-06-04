@@ -58,7 +58,7 @@ export default {
   max: {
     title: 'MAX notifications',
     subtitle: 'Bookings, status updates and messages in the messenger, without SMS',
-    disabledHint: 'MAX integration is not configured on the server (NUXT_MAX_BOT_TOKEN and NUXT_MAX_NOTIFICATIONS_ENABLED).',
+    disabledHint: 'MAX notifications are off. Configure the bot in .env (see README).',
     connect: 'Get link code',
     linked: 'MAX is connected — notifications go to the bot',
     unlink: 'Disconnect MAX',

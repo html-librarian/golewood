@@ -283,13 +283,10 @@ const { meshStyle, orbStyle, orbStyleSlow } = useHeroParallax(heroSectionRef)
       <UiForestDivider />
     </section>
 
-    <div
-      v-if="hasHomePromos"
-      class="bg-white dark:bg-stone-950"
-    >
+    <template v-if="hasHomePromos">
       <HomePromoBanners :section="homePromosResolved" />
       <UiForestDivider tone="sand" />
-    </div>
+    </template>
 
     <UiReveal>
       <section class="overflow-x-clip py-10 md:py-12">
@@ -307,13 +304,8 @@ const { meshStyle, orbStyle, orbStyleSlow } = useHeroParallax(heroSectionRef)
       </section>
     </UiReveal>
 
-    <UiForestDivider
-      flip
-      class="opacity-80"
-    />
-
     <UiReveal :delay="80">
-      <section class="page-container">
+      <section class="page-container pb-8 pt-6 md:pb-10 md:pt-8">
         <div
           v-if="pending"
           class="space-y-6"

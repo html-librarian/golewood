@@ -58,7 +58,7 @@ export default {
   max: {
     title: 'Уведомления в MAX',
     subtitle: 'Брони, статусы и сообщения — в мессенджер, без SMS',
-    disabledHint: 'Интеграция MAX не настроена на сервере (NUXT_MAX_BOT_TOKEN и NUXT_MAX_NOTIFICATIONS_ENABLED).',
+    disabledHint: 'Уведомления MAX выключены. Настройте бота в .env (см. README).',
     connect: 'Получить код привязки',
     linked: 'MAX подключён — уведомления приходят в бота',
     unlink: 'Отключить MAX',
