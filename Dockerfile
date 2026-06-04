@@ -4,8 +4,9 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Reduce peak RAM during Vite/Nuxt build (small VPS OOM otherwise).
-ENV NODE_OPTIONS=--max-old-space-size=2048
+# Nitro bundling can exceed 2 GB on a large Nuxt app; override on tiny VPS: --build-arg NODE_MAX_OLD_SPACE_SIZE=6144
+ARG NODE_MAX_OLD_SPACE_SIZE=4096
+ENV NODE_OPTIONS=--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE}
 
 # Lockfile is generated with npm 11; stock node:22-alpine ships npm 10.
 RUN npm install -g npm@11

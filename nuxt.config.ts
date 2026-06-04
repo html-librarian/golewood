@@ -35,6 +35,7 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: 'node-server',
+    sourceMap: false,
     typescript: {
       tsConfig: {
         compilerOptions: {

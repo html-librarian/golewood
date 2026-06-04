@@ -352,7 +352,12 @@ export GOLEWOOD_USE_REGISTRY=1 GHCR_TOKEN=ghp_... GHCR_USER=html-librarian
 
 ### Small VPS: OOM during `docker compose build`
 
-Nuxt build needs ~2–4 GB RAM. **SIGKILL** on `npm run build` = out of memory.
+Nuxt build (especially the Nitro step) needs **~4–6 GB** RAM or swap. Symptoms:
+
+- `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` during `[nitro] Building Nuxt Nitro server`
+- **SIGKILL** on `npm run build` = host ran out of RAM (not only Node heap)
+
+The Dockerfile sets `NODE_OPTIONS=--max-old-space-size=4096`. The **host** must still have enough memory + swap for that heap and the rest of the build.
 
 **Option A — swap (first manual deploy):**
 
