@@ -111,8 +111,8 @@ const fetchVkIdProfile = async (
     state,
   })
 
+  // Web (public) app: PKCE + «Защищённый ключ» as client_secret. service_token is only for confidential apps.
   if (config.vkClientSecret) {
-    tokenBody.set('service_token', config.vkClientSecret)
     tokenBody.set('client_secret', config.vkClientSecret)
   }
 

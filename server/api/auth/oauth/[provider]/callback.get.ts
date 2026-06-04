@@ -62,17 +62,22 @@ export default defineEventHandler(async (event) => {
       ? Number((err as { statusCode: number }).statusCode)
       : 500
 
-    if (status >= 400 && status < 500) {
-      const message = err && typeof err === 'object' && 'statusMessage' in err
-        ? String((err as { statusMessage: string }).statusMessage)
-        : 'oauth_failed'
+    const message = err && typeof err === 'object' && 'statusMessage' in err
+      ? String((err as { statusMessage: string }).statusMessage)
+      : 'oauth_failed'
 
+    if (status >= 400 && status < 500) {
       return sendRedirect(event, localePath({
         path: '/auth/login',
         query: { oauth: provider, error: message },
       }))
     }
 
-    throw err
+    console.error(`[oauth] ${provider} callback failed (${status}):`, message, err)
+
+    return sendRedirect(event, localePath({
+      path: '/auth/login',
+      query: { oauth: provider, error: 'oauth_failed' },
+    }))
   }
 })
